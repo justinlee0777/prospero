@@ -4,15 +4,18 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
 module.exports = {
-  entry: './index.ts',
+  entry: {
+    'character-widths': './pages/character-widths.ts',
+    'normalize-page-height': './pages/normalize-page-height.ts',
+  },
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: 'index_bundle.js',
+    filename: '[name].bundle.js',
   },
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.ts$/,
         exclude: /node_modules/,
         use: {
           loader: 'ts-loader',
@@ -33,9 +36,21 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   plugins: [
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      filename: 'character-widths.html',
+      chunks: ['character-widths'],
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'normalize-page-height.html',
+      chunks: ['normalize-page-height'],
+    }),
     new CopyWebpackPlugin({
-      patterns: ['tempest.txt'],
+      patterns: [
+        {
+          from: './text-samples',
+          to: 'text-samples',
+        },
+      ],
     }),
     new MiniCssExtractPlugin(),
   ],
