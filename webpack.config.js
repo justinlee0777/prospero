@@ -1,13 +1,32 @@
+const fs = require('fs');
+const path = require('path');
+
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const path = require('path');
+
+const extensionlessFilenames = fs
+  .readdirSync('./pages')
+  .filter((filename) => filename.includes('.ts'))
+  .map((filename) => filename.slice(0, filename.length - 3));
+
+const pageEntry = extensionlessFilenames.reduce((entry, filename) => {
+  return {
+    ...entry,
+    [filename]: `./pages/${filename}.ts`,
+  };
+}, {});
+
+const pageHtml = extensionlessFilenames.map((filename) => {
+  return new HtmlWebpackPlugin({
+    filename: `${filename}.html`,
+    chunks: [filename],
+  });
+});
 
 module.exports = {
   entry: {
-    'character-widths': './pages/character-widths.ts',
-    'get-text-content': './pages/get-text-content.ts',
-    'normalize-page-height': './pages/normalize-page-height.ts',
+    ...pageEntry,
   },
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -37,17 +56,23 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   plugins: [
+    ...pageHtml,
     new HtmlWebpackPlugin({
-      filename: 'character-widths.html',
-      chunks: ['character-widths'],
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'get-text-content.html',
-      chunks: ['get-text-content'],
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'normalize-page-height.html',
-      chunks: ['normalize-page-height'],
+      filename: 'index.html',
+      chunks: [],
+      templateContent: () => {
+        const links = extensionlessFilenames.map(
+          (filename) => `<a href="/${filename}">${filename}</a>`
+        );
+
+        return `
+          <html>
+            <body>
+             ${links.join('<br/>')}
+            </body>
+          </html>
+        `;
+      },
     }),
     new CopyWebpackPlugin({
       patterns: [
