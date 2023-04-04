@@ -1,6 +1,6 @@
 export const allCapsAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export const lowCapsAlphabet = allCapsAlphabet.toLowerCase();
-export const punctuation = `!?,.:;"'-`;
+export const punctuation = `!?,.:;"'-—“`;
 export const whitespace = ' ';
 
 export const nonWhitespaceGlyphs =
@@ -10,7 +10,9 @@ export const glyphs = nonWhitespaceGlyphs + whitespace;
 
 export const newline = '\n';
 
-const escapedPunctuation = punctuation.split('').join('\\');
+const escapedPunctuation = [...punctuation]
+  .map((glyph) => `\\${glyph}`)
+  .join('');
 
 /**
  * <token> = <punctuatedWord> | <whitespace> | <newline>
