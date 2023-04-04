@@ -22,6 +22,10 @@ window.addEventListener('DOMContentLoaded', async () => {
           left: toPixelUnits(style.paddingLeft),
           right: toPixelUnits(style.paddingRight),
         },
+        margin: {
+          left: toPixelUnits(style.marginLeft),
+          right: toPixelUnits(style.marginRight),
+        },
       },
       text,
       [
@@ -30,6 +34,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         {
           top: toPixelUnits(style.paddingTop),
           bottom: toPixelUnits(style.paddingBottom),
+        },
+        {
+          top: toPixelUnits(style.marginTop),
+          bottom: toPixelUnits(style.marginBottom),
         },
       ],
       [style.fontSize, style.fontFamily]

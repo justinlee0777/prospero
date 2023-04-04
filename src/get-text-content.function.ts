@@ -7,25 +7,37 @@ interface ContainerStyle {
   width: number;
   padding: {
     left: number;
-    right;
+    right: number;
+  };
+  margin: {
+    left: number;
+    right: number;
   };
 }
 
 export default function* getTextContent(
   container: ContainerStyle,
   textContent: string,
-  [containerHeight, lineHeightInPixels, paddingInPixels]: Parameters<
-    typeof getNormalizedPageHeight
-  >,
+  [
+    containerHeight,
+    lineHeightInPixels,
+    paddingInPixels,
+    marginInPixels,
+  ]: Parameters<typeof getNormalizedPageHeight>,
   [fontSizeInPixels, fontFamily]: Parameters<typeof getCharacterWidths>
 ): Generator<string> {
   const containerWidth =
-    container.width - container.padding.left - container.padding.right;
+    container.width -
+    container.padding.left -
+    container.padding.right -
+    container.margin.left -
+    container.margin.right;
 
   const pageHeight = getNormalizedPageHeight(
     containerHeight,
     lineHeightInPixels,
-    paddingInPixels
+    paddingInPixels,
+    marginInPixels
   );
   const characterToWidth = getCharacterWidths(fontSizeInPixels, fontFamily);
 
@@ -48,7 +60,7 @@ export default function* getTextContent(
 
     const newLineWidth = currentLineWidth + wordWidth;
 
-    const wordOverflows = newLineWidth >= containerWidth;
+    const wordOverflows = Math.ceil(newLineWidth) >= containerWidth;
 
     if (newLine) {
       currentLine++;
@@ -71,6 +83,19 @@ export default function* getTextContent(
       currentLine = 0;
       currentTextContent = '';
     }
+
+    console.log(
+      formatVariables({
+        token,
+        wordWidth,
+        currentLineWidth,
+        newLineWidth,
+        containerWidth,
+        wordOverflows,
+        currentLine,
+        numLines,
+      })
+    );
 
     currentTextContent += token;
   }

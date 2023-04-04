@@ -22,6 +22,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         {
           top: toPixelUnits(styles.paddingTop),
           bottom: toPixelUnits(styles.paddingBottom),
+        },
+        {
+          top: toPixelUnits(styles.marginTop),
+          bottom: toPixelUnits(styles.marginBottom),
         }
       );
 

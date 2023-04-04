@@ -4,7 +4,7 @@ import getTextContent from '../src/get-text-content.function';
 import toPixelUnits from '../src/utils/to-pixel-units.function';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/lorem-ipsum.txt');
+  const response = await fetch('../text-samples/ping.txt');
   const text = await response.text();
 
   const container = document.body;
@@ -22,6 +22,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         left: 18,
         right: 18,
       },
+      margin: {
+        left: 1,
+        right: 1,
+      },
     },
     text,
     [
@@ -30,6 +34,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       {
         top: 18,
         bottom: 18,
+      },
+      {
+        top: 1,
+        bottom: 1,
       },
     ],
     [style.fontSize, style.fontFamily]
