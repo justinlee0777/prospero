@@ -14,6 +14,10 @@ body {
   flex-direction: row;
 }
 
+.book.animated {
+  overflow-x: hidden;
+}
+
 .book > .page {
   border: 1px solid black;
   box-sizing: border-box;
