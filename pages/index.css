@@ -1,8 +1,9 @@
 body {
   border: 1px solid black;
   box-sizing: border-box;
-  font-family: Courier;
+  font-family: Arial;
   font-size: 16px;
   line-height: 2;
   margin: 0;
+  white-space: pre-wrap;
 }

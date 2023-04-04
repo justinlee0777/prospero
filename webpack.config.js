@@ -6,6 +6,7 @@ const path = require('path');
 module.exports = {
   entry: {
     'character-widths': './pages/character-widths.ts',
+    'get-text-content': './pages/get-text-content.ts',
     'normalize-page-height': './pages/normalize-page-height.ts',
   },
   output: {
@@ -39,6 +40,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'character-widths.html',
       chunks: ['character-widths'],
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'get-text-content.html',
+      chunks: ['get-text-content'],
     }),
     new HtmlWebpackPlugin({
       filename: 'normalize-page-height.html',
