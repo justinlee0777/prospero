@@ -2,14 +2,14 @@ import getCharacterWidths from './get-character-widths.function';
 import getNormalizedPageHeight from './get-normalized-page-height.function';
 import { newline, tokenExpression, whitespace } from './glyphs.const';
 
-export default function getTextContent(
+export default function* getTextContent(
   containerWidth: number,
   textContent: string,
   [containerHeight, lineHeightInPixels]: Parameters<
     typeof getNormalizedPageHeight
   >,
   [fontSizeInPixels, fontFamily]: Parameters<typeof getCharacterWidths>
-): string {
+): Generator<string> {
   const pageHeight = getNormalizedPageHeight(
     containerHeight,
     lineHeightInPixels
@@ -53,11 +53,11 @@ export default function getTextContent(
     }
 
     if (currentLine === numLines) {
-      break;
+      yield currentTextContent;
     }
 
     currentTextContent += token;
   }
 
-  return currentTextContent;
+  yield currentTextContent;
 }

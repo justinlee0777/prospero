@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       text,
       [window.innerHeight, Number(style.lineHeight.replace(/[A-Z]/gi, ''))],
       [style.fontSize, style.fontFamily]
-    );
+    ).next().value;
   }
 
   window.addEventListener('resize', debounce(updateTextContent), {
