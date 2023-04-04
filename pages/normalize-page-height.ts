@@ -2,6 +2,7 @@ import './index.css';
 
 import getNormalizedPageHeight from '../src/get-normalized-page-height.function';
 import debounce from '../src/utils/debounce.function';
+import toPixelUnits from '../src/utils/to-pixel-units.function';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch('../text-samples/tempest.txt');
@@ -9,7 +10,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const container = document.body;
   const styles = window.getComputedStyle(container);
-  const lineHeightInPixels = Number(styles.lineHeight.replace(/[A-Z]/gi, ''));
+  const lineHeightInPixels = toPixelUnits(styles.lineHeight);
 
   const updatePageHeight = (() => {
     let cachedHeight: number | undefined;
@@ -17,7 +18,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     return () => {
       const pageHeight = getNormalizedPageHeight(
         window.innerHeight,
-        lineHeightInPixels
+        lineHeightInPixels,
+        {
+          top: toPixelUnits(styles.paddingTop),
+          bottom: toPixelUnits(styles.paddingBottom),
+        }
       );
 
       if (cachedHeight !== pageHeight) {

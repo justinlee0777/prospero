@@ -7,3 +7,16 @@ body {
   margin: 0;
   white-space: pre-wrap;
 }
+
+.book {
+  border: none;
+  display: flex;
+  flex-direction: row;
+}
+
+.book > .page {
+  border: 1px solid black;
+  box-sizing: border-box;
+  flex: none;
+  padding: 18px;
+}

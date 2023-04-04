@@ -1,18 +1,31 @@
 import getCharacterWidths from './get-character-widths.function';
 import getNormalizedPageHeight from './get-normalized-page-height.function';
 import { newline, tokenExpression, whitespace } from './glyphs.const';
+import { formatVariables } from './utils/debug/format-variables.function';
+
+interface ContainerStyle {
+  width: number;
+  padding: {
+    left: number;
+    right;
+  };
+}
 
 export default function* getTextContent(
-  containerWidth: number,
+  container: ContainerStyle,
   textContent: string,
-  [containerHeight, lineHeightInPixels]: Parameters<
+  [containerHeight, lineHeightInPixels, paddingInPixels]: Parameters<
     typeof getNormalizedPageHeight
   >,
   [fontSizeInPixels, fontFamily]: Parameters<typeof getCharacterWidths>
 ): Generator<string> {
+  const containerWidth =
+    container.width - container.padding.left - container.padding.right;
+
   const pageHeight = getNormalizedPageHeight(
     containerHeight,
-    lineHeightInPixels
+    lineHeightInPixels,
+    paddingInPixels
   );
   const characterToWidth = getCharacterWidths(fontSizeInPixels, fontFamily);
 
@@ -54,6 +67,9 @@ export default function* getTextContent(
 
     if (currentLine === numLines) {
       yield currentTextContent;
+
+      currentLine = 0;
+      currentTextContent = '';
     }
 
     currentTextContent += token;

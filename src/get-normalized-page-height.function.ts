@@ -1,8 +1,12 @@
 export default function getNormalizedPageHeight(
   containerHeight: number,
-  lineHeightInPixels: number
+  lineHeightInPixels: number,
+  paddingInPixels: { top: number; bottom: number }
 ): number {
-  const difference = containerHeight % lineHeightInPixels;
+  const calculatedContainerHeight =
+    containerHeight - paddingInPixels.top - paddingInPixels.bottom;
 
-  return containerHeight - difference;
+  const difference = calculatedContainerHeight % lineHeightInPixels;
+
+  return calculatedContainerHeight - difference;
 }
