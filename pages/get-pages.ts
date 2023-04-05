@@ -29,6 +29,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         bottom: 18,
       },
       margin: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+      },
+      border: {
         left: 1,
         right: 1,
         top: 1,

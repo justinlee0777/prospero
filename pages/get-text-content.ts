@@ -34,6 +34,12 @@ window.addEventListener('DOMContentLoaded', async () => {
           top: toPixelUnits(style.marginTop),
           bottom: toPixelUnits(style.marginBottom),
         },
+        border: {
+          top: toPixelUnits(style.borderTopWidth),
+          right: toPixelUnits(style.borderRightWidth),
+          bottom: toPixelUnits(style.borderBottomWidth),
+          left: toPixelUnits(style.borderLeftWidth),
+        },
       },
       text
     ).next().value;

@@ -31,6 +31,16 @@ interface ContainerStyle {
     /** In pixels. */
     left: number;
   };
+  border: {
+    /** In pixels. */
+    top: number;
+    /** In pixels. */
+    right: number;
+    /** In pixels. */
+    bottom: number;
+    /** In pixels. */
+    left: number;
+  };
 }
 
 export default function* getTextContent(
@@ -42,17 +52,28 @@ export default function* getTextContent(
     lineHeight,
     padding,
     margin,
+    border,
   }: ContainerStyle,
   textContent: string
 ): Generator<string> {
   const containerWidth =
-    width - padding.left - padding.right - margin.left - margin.right;
+    width -
+    padding.left -
+    padding.right -
+    margin.left -
+    margin.right -
+    border.left -
+    border.right;
 
   const pageHeight = getNormalizedPageHeight(
-    height,
-    lineHeight,
-    padding,
-    margin
+    height -
+      padding.top -
+      padding.bottom -
+      margin.top -
+      margin.bottom -
+      border.top -
+      border.bottom,
+    lineHeight
   );
   const characterToWidth = getCharacterWidths(
     computedFontSize,

@@ -1,66 +1,37 @@
-import './index.css';
+import './book-demo.css';
 
-import toPixelUnits from '../src/utils/to-pixel-units.function';
-import getTextContent from '../src/get-text-content.function';
 import div from '../src/elements/div.function';
 import createKeydownListener from '../src/elements/create-keydown-listener.function';
+import getTextContentByPageElement from '../src/get-text-content-by-page-element.function';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch('../text-samples/ping.txt');
   const text = await response.text();
 
-  const container = div({
-    classnames: ['book', 'root', 'animated'],
-  });
-
-  document.body.classList.add('reset');
-  document.body.append(container);
-
-  const style = window.getComputedStyle(container);
-
-  const pageWidth = window.innerWidth;
-  const pageHeight = window.innerHeight;
-
-  const generator = getTextContent(
-    {
-      width: window.innerWidth,
-      height: pageHeight,
-      lineHeight: toPixelUnits(style.lineHeight),
-      computedFontSize: style.fontSize,
-      computedFontFamily: style.fontFamily,
-      padding: {
-        left: 18,
-        right: 18,
-        top: 18,
-        bottom: 18,
-      },
-      margin: {
-        left: 1,
-        right: 1,
-        top: 1,
-        bottom: 1,
-      },
-    },
-    text
-  );
-
-  let result: IteratorResult<string> = generator.next();
-
-  let currentPage = 0;
-  const cachedPages = [result.value];
-
-  function createPage(textContent: string): HTMLDivElement {
+  function createPage(textContent?: string): HTMLDivElement {
     return div({
       textContent,
-      classnames: ['page', 'animated'],
-      styles: {
-        height: `${pageHeight}px`,
-        width: `${pageWidth}px`,
-      },
+      classnames: ['page'],
     });
   }
 
-  let page: HTMLDivElement = createPage(result.value);
+  let page: HTMLDivElement = createPage();
+
+  const container = div({
+    classnames: ['book'],
+    children: [page],
+  });
+
+  document.body.append(container);
+
+  const generator = getTextContentByPageElement(page, text);
+
+  let result: IteratorResult<string> = generator.next();
+
+  page.textContent = result.value;
+
+  let currentPage = 0;
+  const cachedPages = [result.value];
 
   window.addEventListener(
     'keydown',

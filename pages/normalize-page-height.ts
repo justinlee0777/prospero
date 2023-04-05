@@ -17,16 +17,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     return () => {
       const pageHeight = getNormalizedPageHeight(
-        window.innerHeight,
-        lineHeightInPixels,
-        {
-          top: toPixelUnits(styles.paddingTop),
-          bottom: toPixelUnits(styles.paddingBottom),
-        },
-        {
-          top: toPixelUnits(styles.marginTop),
-          bottom: toPixelUnits(styles.marginBottom),
-        }
+        window.innerHeight -
+          toPixelUnits(styles.paddingTop) -
+          toPixelUnits(styles.paddingBottom) -
+          toPixelUnits(styles.marginTop) -
+          toPixelUnits(styles.marginBottom),
+        lineHeightInPixels
       );
 
       if (cachedHeight !== pageHeight) {

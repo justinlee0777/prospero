@@ -1,13 +1,10 @@
 body {
-  margin: 0;
-}
-
-body:not(.reset) {
   border: 1px solid black;
   box-sizing: border-box;
   font-family: Arial;
   font-size: 16px;
   line-height: 2;
+  margin: 0;
   white-space: pre-wrap;
 }
 
@@ -17,40 +14,9 @@ body:not(.reset) {
   flex-direction: row;
 }
 
-.book.root {
-  box-sizing: border-box;
-  font-family: Arial;
-  font-size: 16px;
-  height: 100vh;
-  line-height: 2;
-  margin: 0;
-  position: relative;
-  white-space: pre-wrap;
-  width: 100vw;
-}
-
-.book.animated {
-  overflow-x: hidden;
-}
-
 .book > .page {
-  flex: none;
-}
-
-.page {
-  background-color: white;
   border: 1px solid black;
-  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
+  flex: none;
   padding: 18px;
-}
-
-.page.animated {
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  transform-origin: top left;
-  transition: 1s transform;
-  width: 100%;
 }
