@@ -18,29 +18,24 @@ window.addEventListener('DOMContentLoaded', async () => {
     container.textContent = getTextContent(
       {
         width: window.innerWidth,
+        height: window.innerHeight,
+        lineHeight: toPixelUnits(style.lineHeight),
+        computedFontSize: style.fontSize,
+        computedFontFamily: style.fontFamily,
         padding: {
           left: toPixelUnits(style.paddingLeft),
           right: toPixelUnits(style.paddingRight),
+          top: toPixelUnits(style.paddingTop),
+          bottom: toPixelUnits(style.paddingBottom),
         },
         margin: {
           left: toPixelUnits(style.marginLeft),
           right: toPixelUnits(style.marginRight),
-        },
-      },
-      text,
-      [
-        window.innerHeight,
-        toPixelUnits(style.lineHeight),
-        {
-          top: toPixelUnits(style.paddingTop),
-          bottom: toPixelUnits(style.paddingBottom),
-        },
-        {
           top: toPixelUnits(style.marginTop),
           bottom: toPixelUnits(style.marginBottom),
         },
-      ],
-      [style.fontSize, style.fontFamily]
+      },
+      text
     ).next().value;
   }
 
