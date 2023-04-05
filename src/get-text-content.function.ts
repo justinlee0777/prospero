@@ -3,44 +3,63 @@ import getNormalizedPageHeight from './get-normalized-page-height.function';
 import { newline, tokenExpression, whitespace } from './glyphs.const';
 
 interface ContainerStyle {
+  /** In pixels. */
   width: number;
+  /** In pixels. */
+  height: number;
+  computedFontSize: string;
+  computedFontFamily: string;
+  /** In pixels. */
+  lineHeight: number;
   padding: {
-    left: number;
+    /** In pixels. */
+    top: number;
+    /** In pixels. */
     right: number;
+    /** In pixels. */
+    bottom: number;
+    /** In pixels. */
+    left: number;
   };
   margin: {
-    left: number;
+    /** In pixels. */
+    top: number;
+    /** In pixels. */
     right: number;
+    /** In pixels. */
+    bottom: number;
+    /** In pixels. */
+    left: number;
   };
 }
 
 export default function* getTextContent(
-  container: ContainerStyle,
-  textContent: string,
-  [
-    containerHeight,
-    lineHeightInPixels,
-    paddingInPixels,
-    marginInPixels,
-  ]: Parameters<typeof getNormalizedPageHeight>,
-  [fontSizeInPixels, fontFamily]: Parameters<typeof getCharacterWidths>
+  {
+    width,
+    height,
+    computedFontFamily,
+    computedFontSize,
+    lineHeight,
+    padding,
+    margin,
+  }: ContainerStyle,
+  textContent: string
 ): Generator<string> {
   const containerWidth =
-    container.width -
-    container.padding.left -
-    container.padding.right -
-    container.margin.left -
-    container.margin.right;
+    width - padding.left - padding.right - margin.left - margin.right;
 
   const pageHeight = getNormalizedPageHeight(
-    containerHeight,
-    lineHeightInPixels,
-    paddingInPixels,
-    marginInPixels
+    height,
+    lineHeight,
+    padding,
+    margin
   );
-  const characterToWidth = getCharacterWidths(fontSizeInPixels, fontFamily);
+  const characterToWidth = getCharacterWidths(
+    computedFontSize,
+    computedFontFamily
+  );
 
-  const numLines = pageHeight / lineHeightInPixels;
+  const numLines = pageHeight / lineHeight;
 
   const tokens = textContent.matchAll(tokenExpression);
 

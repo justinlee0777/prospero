@@ -24,29 +24,24 @@ window.addEventListener('DOMContentLoaded', async () => {
   const generator = getTextContent(
     {
       width: window.innerWidth,
+      height: pageHeight,
+      lineHeight: toPixelUnits(style.lineHeight),
+      computedFontSize: style.fontSize,
+      computedFontFamily: style.fontFamily,
       padding: {
         left: 18,
         right: 18,
+        top: 18,
+        bottom: 18,
       },
       margin: {
         left: 1,
         right: 1,
-      },
-    },
-    text,
-    [
-      pageHeight,
-      toPixelUnits(style.lineHeight),
-      {
-        top: 18,
-        bottom: 18,
-      },
-      {
         top: 1,
         bottom: 1,
       },
-    ],
-    [style.fontSize, style.fontFamily]
+    },
+    text
   );
 
   let result: IteratorResult<string> = generator.next();
