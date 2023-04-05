@@ -10,10 +10,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   const text = await response.text();
 
   const container = div({
-    classnames: ['book', 'animated'],
+    classnames: ['book', 'root', 'animated'],
   });
-  container.classList.add('book');
 
+  document.body.classList.add('reset');
   document.body.append(container);
 
   const style = window.getComputedStyle(container);
@@ -54,14 +54,18 @@ window.addEventListener('DOMContentLoaded', async () => {
   let currentPage = 0;
   const cachedPages = [result.value];
 
-  const page = div({
-    textContent: result.value,
-    classnames: ['page'],
-    styles: {
-      height: `${pageHeight}px`,
-      width: `${pageWidth}px`,
-    },
-  });
+  function createPage(textContent: string): HTMLDivElement {
+    return div({
+      textContent,
+      classnames: ['page', 'animated'],
+      styles: {
+        height: `${pageHeight}px`,
+        width: `${pageWidth}px`,
+      },
+    });
+  }
+
+  let page: HTMLDivElement = createPage(result.value);
 
   window.addEventListener(
     'keydown',
@@ -81,7 +85,27 @@ window.addEventListener('DOMContentLoaded', async () => {
           textContent = cachedPages[currentPage];
         }
 
-        textContent && (page.textContent = textContent);
+        if (textContent) {
+          const newPage = createPage(textContent);
+
+          container.prepend(newPage);
+
+          const oldPage = page;
+          page = newPage;
+          oldPage
+            .animate(
+              {
+                transform: [
+                  'skewY(0) translateX(0) scaleX(1)',
+                  'skewY(-30deg) translateX(-100%) scaleX(.5)',
+                ],
+              },
+              600
+            )
+            .finished.then(() => {
+              container.removeChild(oldPage);
+            });
+        }
       },
       ArrowLeft: () => {
         if (currentPage !== 0) {
