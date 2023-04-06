@@ -1,4 +1,4 @@
-import './book.css';
+import styles from './book.module.css';
 
 import div from '../../elements/div.function';
 import GetPage from '../../get-page.interface';
@@ -27,7 +27,7 @@ export default function Book({ getPage, currentPage }: BookArgs): BookElement {
   currentPage ??= 0;
 
   const book = div({
-    classnames: ['book'],
+    classnames: [styles.book],
     attributes: {
       tabindex: 0,
     },

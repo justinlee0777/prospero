@@ -1,7 +1,10 @@
 {
+  "name": "prospero",
+  "version": "0.0.1",
   "scripts": {
-    "start": "npm run build -- --mode=development && http-server -c-1 ./dist",
     "build": "rm -rf dist && webpack",
+    "start": "npm run build -- --config-name=development && http-server -c-1 ./dist",
+    "build:lib": "npm run build -- --config-name=production",
     "format": "prettier --write ."
   },
   "devDependencies": {
@@ -15,6 +18,7 @@
     "style-loader": "^3.3.2",
     "ts-loader": "^9.4.2",
     "typescript": "^5.0.3",
+    "typescript-plugin-css-modules": "^5.0.0",
     "webpack": "^5.77.0",
     "webpack-cli": "^5.0.1"
   }

@@ -1,5 +1,3 @@
-import './page.css';
-
 import div from '../../elements/div.function';
 import pageClassName from './page-class-name.const';
 import PageElement from './page-element.interface';
