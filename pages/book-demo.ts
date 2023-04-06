@@ -24,34 +24,23 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   document.body.append(container);
 
-  const generator = getTextContentByPageElement(page, text);
+  const getPage = buildPagesByGenerator(
+    getTextContentByPageElement(page, text)
+  );
 
-  let result: IteratorResult<string> = generator.next();
-
-  page.textContent = result.value;
+  page.textContent = getPage(0);
 
   let currentPage = 0;
-  const cachedPages = [result.value];
 
   window.addEventListener(
     'keydown',
     createKeydownListener({
       ArrowRight: () => {
-        let textContent: string;
-
-        if (currentPage === cachedPages.length - 1) {
-          result = generator.next();
-
-          if (!result.done) {
-            currentPage++;
-            textContent = cachedPages[currentPage] = result.value;
-          }
-        } else {
-          currentPage++;
-          textContent = cachedPages[currentPage];
-        }
+        const textContent = getPage(currentPage + 1);
 
         if (textContent) {
+          currentPage++;
+
           const newPage = createPage(textContent);
 
           container.prepend(newPage);
@@ -75,8 +64,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       },
       ArrowLeft: () => {
         if (currentPage !== 0) {
-          currentPage--;
-          page.textContent = cachedPages[currentPage];
+          page.textContent = getPage(--currentPage);
         }
       },
     })
@@ -84,3 +72,41 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   container.append(page);
 });
+
+function buildPagesByGenerator(
+  generator: Generator<string>
+): (pageNumber: number) => string | null {
+  const cachedPages: Array<string> = [];
+  let result: IteratorResult<string>;
+
+  /**
+   * @returns the text content for the given page number, or null if we have reached the end of pages.
+   */
+  return function getPage(pageNumber: number): string | null {
+    const difference = pageNumber - (cachedPages.length - 1);
+
+    if (difference < 0) {
+      return cachedPages[pageNumber];
+    } else if (result?.done) {
+      return cachedPages[pageNumber] || null;
+    } else {
+      const newPages = [];
+      let i = 0;
+
+      while (i < difference) {
+        result = generator.next();
+
+        if (result.done) {
+          break;
+        } else {
+          newPages.push(result.value);
+          i++;
+        }
+      }
+
+      cachedPages.push(...newPages);
+
+      return cachedPages[pageNumber] || null;
+    }
+  };
+}
