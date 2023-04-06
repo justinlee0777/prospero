@@ -4,6 +4,7 @@ export interface CreateElementConfig {
   textContent?: string;
   children?: Array<Node>;
   classnames?: Array<string>;
+  attributes?: Object;
   styles?: Partial<CSSStyleDeclaration>;
   eventListeners?: Partial<EventListenersMap>;
 }
