@@ -6,7 +6,9 @@ import createKeydownListener from '../../elements/create-keydown-listener.functi
 import Page from '../page/page.component';
 import pageSelector from '../page/page-selector.const';
 import PageElement from '../page/page-element.interface';
-import { PageFlipAnimation } from '../page/page-flip-animation.enum';
+import PageFlipAnimation from '../page/page-flip-animation.enum';
+import { CreateElementConfig } from '../../elements/create-element.interface';
+import BookElement from './book-element.interface';
 
 interface BookArgs {
   getPage: GetPage;
@@ -14,23 +16,24 @@ interface BookArgs {
   currentPage?: number;
 }
 
-interface PageChangeEvent {
-  pageNumber: number;
-  animationFinished: Promise<void>;
+interface CreateBookElement {
+  (book: BookArgs, config?: CreateElementConfig): BookElement;
 }
 
-interface BookElement extends HTMLElement {
-  onpagechange?: (event: PageChangeEvent) => void;
-}
-
-export default function Book({ getPage, currentPage }: BookArgs): BookElement {
+const Book: CreateBookElement = ({ getPage, currentPage }, config) => {
   currentPage ??= 0;
+  config ??= {};
+
+  const classnames = [styles.book].concat(config?.classnames ?? []);
+  const attributes = {
+    ...(config.attributes ?? {}),
+    tabindex: 0,
+  };
 
   const book = div({
-    classnames: [styles.book],
-    attributes: {
-      tabindex: 0,
-    },
+    ...config,
+    classnames,
+    attributes,
   }) as BookElement;
 
   const goToPage = createGoToPage(book, getPage);
@@ -58,7 +61,7 @@ export default function Book({ getPage, currentPage }: BookArgs): BookElement {
   goToPage(currentPage);
 
   return book;
-}
+};
 
 function createGoToPage(
   book: BookElement,
@@ -75,7 +78,7 @@ function createGoToPage(
       ...book.querySelectorAll(pageSelector),
     ] as Array<PageElement>;
 
-    const page = Page(textContent);
+    const page = Page({ textContent });
 
     book.prepend(page);
 
@@ -84,3 +87,5 @@ function createGoToPage(
     ).then();
   };
 }
+
+export default Book;

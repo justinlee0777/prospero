@@ -1,12 +1,16 @@
+import CreateElement from '../../elements/create-element.interface';
 import div from '../../elements/div.function';
 import pageClassName from './page-class-name.const';
 import PageElement from './page-element.interface';
-import { PageFlipAnimation } from './page-flip-animation.enum';
+import PageFlipAnimation from './page-flip-animation.enum';
 
-export default function Page(textContent: string): PageElement {
+const Page: CreateElement<PageElement> = (config) => {
+  config ??= {};
+  const classnames = [pageClassName].concat(config?.classnames ?? []);
+
   const page = div({
-    textContent,
-    classnames: [pageClassName],
+    ...config,
+    classnames,
   }) as unknown as PageElement;
 
   let resolveDestruction: (pageFlip?: PageFlipAnimation) => void;
@@ -45,4 +49,6 @@ export default function Page(textContent: string): PageElement {
   };
 
   return page;
-}
+};
+
+export default Page;
