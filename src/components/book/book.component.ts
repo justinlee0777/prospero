@@ -9,6 +9,8 @@ import PageElement from '../page/page-element.interface';
 import PageFlipAnimation from '../page/page-flip-animation.enum';
 import { CreateElementConfig } from '../../elements/create-element.interface';
 import BookElement from './book-element.interface';
+import registerSwipeListener from '../../elements/register-swipe-listener.function';
+import SwipeDirection from '../../elements/swipe-direction.enum';
 
 interface BookArgs {
   getPage: GetPage;
@@ -34,7 +36,7 @@ const Book: CreateBookElement = ({ getPage, currentPage }, config) => {
     ...config,
     classnames,
     attributes,
-  }) as BookElement;
+  }) as unknown as BookElement;
 
   const goToPage = createGoToPage(book, getPage);
 
@@ -50,13 +52,32 @@ const Book: CreateBookElement = ({ getPage, currentPage }, config) => {
     }
   };
 
-  book.addEventListener(
-    'keydown',
-    createKeydownListener({
-      ArrowRight: () => updatePage(currentPage + 1, PageFlipAnimation.RIGHT),
-      ArrowLeft: () => updatePage(currentPage - 1, PageFlipAnimation.LEFT),
-    })
-  );
+  const keydownListener = createKeydownListener({
+    ArrowRight: () => updatePage(currentPage + 1, PageFlipAnimation.RIGHT),
+    ArrowDown: () => updatePage(currentPage + 1, PageFlipAnimation.RIGHT),
+    ArrowLeft: () => updatePage(currentPage - 1, PageFlipAnimation.LEFT),
+    ArrowUp: () => updatePage(currentPage - 1, PageFlipAnimation.LEFT),
+  });
+
+  book.addEventListener('keydown', keydownListener);
+
+  const destroySwipeListener = registerSwipeListener(book, ([direction]) => {
+    switch (direction) {
+      case SwipeDirection.UP:
+        return updatePage(currentPage - 1, PageFlipAnimation.LEFT);
+      case SwipeDirection.RIGHT:
+        return updatePage(currentPage + 1, PageFlipAnimation.RIGHT);
+      case SwipeDirection.DOWN:
+        return updatePage(currentPage + 1, PageFlipAnimation.RIGHT);
+      case SwipeDirection.LEFT:
+        return updatePage(currentPage - 1, PageFlipAnimation.LEFT);
+    }
+  });
+
+  book.destroy = () => {
+    book.removeEventListener('keydown', keydownListener);
+    destroySwipeListener();
+  };
 
   goToPage(currentPage);
 
