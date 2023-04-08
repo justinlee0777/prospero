@@ -1,47 +1,7 @@
+import ContainerStyle from './container-style.interface';
 import getCharacterWidths from './get-character-widths.function';
 import getNormalizedPageHeight from './get-normalized-page-height.function';
 import { newline, tokenExpression, whitespace } from './glyphs.const';
-
-interface ContainerStyle {
-  /** In pixels. */
-  width: number;
-  /** In pixels. */
-  height: number;
-  computedFontSize: string;
-  computedFontFamily: string;
-  /** In pixels. */
-  lineHeight: number;
-  padding: {
-    /** In pixels. */
-    top: number;
-    /** In pixels. */
-    right: number;
-    /** In pixels. */
-    bottom: number;
-    /** In pixels. */
-    left: number;
-  };
-  margin: {
-    /** In pixels. */
-    top: number;
-    /** In pixels. */
-    right: number;
-    /** In pixels. */
-    bottom: number;
-    /** In pixels. */
-    left: number;
-  };
-  border: {
-    /** In pixels. */
-    top: number;
-    /** In pixels. */
-    right: number;
-    /** In pixels. */
-    bottom: number;
-    /** In pixels. */
-    left: number;
-  };
-}
 
 export default function* getTextContent(
   {

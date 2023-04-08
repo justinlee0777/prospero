@@ -11,20 +11,56 @@ import { CreateElementConfig } from '../../elements/create-element.interface';
 import BookElement from './book-element.interface';
 import registerSwipeListener from '../../elements/register-swipe-listener.function';
 import SwipeDirection from '../../elements/swipe-direction.enum';
+import ContainerStyle from '../../container-style.interface';
+import containerStyleToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
 
 interface BookArgs {
   getPage: GetPage;
 
   currentPage?: number;
+  containerStyles?: ContainerStyle;
 }
 
 interface CreateBookElement {
   (book: BookArgs, config?: CreateElementConfig): BookElement;
 }
 
-const Book: CreateBookElement = ({ getPage, currentPage }, config) => {
+const Book: CreateBookElement = (
+  { getPage, currentPage, containerStyles },
+  config
+) => {
   currentPage ??= 0;
   config ??= {};
+
+  let bookStyles: Partial<CSSStyleDeclaration>;
+  let pageStyles: Partial<CSSStyleDeclaration>;
+
+  if (containerStyles) {
+    const styles = containerStyleToStyleDeclaration(containerStyles);
+
+    bookStyles = {
+      width: styles.width,
+      height: styles.height,
+      fontSize: styles.fontSize,
+      fontFamily: styles.fontFamily,
+      lineHeight: styles.lineHeight,
+    };
+
+    pageStyles = {
+      paddingTop: styles.paddingTop,
+      paddingRight: styles.paddingRight,
+      paddingBottom: styles.paddingBottom,
+      paddingLeft: styles.paddingLeft,
+      marginTop: styles.marginTop,
+      marginRight: styles.marginRight,
+      marginBottom: styles.marginBottom,
+      marginLeft: styles.marginLeft,
+      borderTopWidth: styles.borderTopWidth,
+      borderRightWidth: styles.borderRightWidth,
+      borderBottomWidth: styles.borderBottomWidth,
+      borderLeftWidth: styles.borderLeftWidth,
+    };
+  }
 
   const classnames = [styles.book].concat(config?.classnames ?? []);
   const attributes = {
@@ -36,9 +72,10 @@ const Book: CreateBookElement = ({ getPage, currentPage }, config) => {
     ...config,
     classnames,
     attributes,
+    styles: bookStyles,
   }) as unknown as BookElement;
 
-  const goToPage = createGoToPage(book, getPage);
+  const goToPage = createGoToPage(book, getPage, pageStyles);
 
   const updatePage = (newPageNumber: number, pageFlip: PageFlipAnimation) => {
     const pageChangeFinished = goToPage(newPageNumber, pageFlip);
@@ -86,7 +123,8 @@ const Book: CreateBookElement = ({ getPage, currentPage }, config) => {
 
 function createGoToPage(
   book: BookElement,
-  getPage: GetPage
+  getPage: GetPage,
+  pageStyles?: Partial<CSSStyleDeclaration>
 ): (pageNumber: number, animation?: PageFlipAnimation) => Promise<void> | null {
   return (pageNumber, pageFlip) => {
     const textContent = getPage(pageNumber);
@@ -99,7 +137,7 @@ function createGoToPage(
       ...book.querySelectorAll(pageSelector),
     ] as Array<PageElement>;
 
-    const page = Page({ textContent });
+    const page = Page({ textContent, styles: pageStyles });
 
     book.prepend(page);
 

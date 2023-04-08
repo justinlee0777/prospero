@@ -1,19 +1,15 @@
 .page {
   background-color: white;
-  border: 1px solid black;
+  border-color: black;
+  border-style: solid;
   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
-  font-family: Arial;
-  font-size: 16px;
-  height: 100vh;
-  left: 0;
-  line-height: 2;
-  margin: 0;
-  padding: 18px;
+  height: 100%;
   position: absolute;
   top: 0;
   transform-origin: top left;
   transition: 1s transform;
+  /* In contention. */
   white-space: pre-wrap;
-  width: 100vw;
+  width: 100%;
 }
