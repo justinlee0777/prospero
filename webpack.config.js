@@ -58,7 +58,7 @@ module.exports = [
   {
     name: 'production',
     mode: 'production',
-    entry: './src/public-api.ts',
+    entry: './src/index.ts',
     output: {
       filename: 'index.js',
       library: {
@@ -66,7 +66,14 @@ module.exports = [
       },
     },
     module: {
-      rules: moduleRules,
+      rules: moduleRules.map((rule) => {
+        if (rule.use.loader === 'ts-loader') {
+          rule = structuredClone(rule);
+          rule.use.options.configFile = 'tsconfig.prod.json';
+        }
+
+        return rule;
+      }),
     },
     resolve: {
       extensions: resolvedExtensions,
