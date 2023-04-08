@@ -1,7 +1,7 @@
 import ContainerStyle from './container-style.interface';
 import getCharacterWidths from './get-character-widths.function';
 import getNormalizedPageHeight from './get-normalized-page-height.function';
-import { newline, tokenExpression, whitespace } from './glyphs.const';
+import { tokenExpression } from './glyphs.const';
 
 export default function* getTextContent(
   {
@@ -48,12 +48,14 @@ export default function* getTextContent(
   let currentLine = 0;
   let currentTextContent = '';
 
-  for (const [token] of tokens) {
-    const newLine = token === newline;
-    // Whitespace is optional if this is the end of the line.
-    const optional = newLine || token === whitespace;
+  for (const token of tokens) {
+    const { 0: word, groups } = token;
 
-    const wordWidth = [...token].reduce((width, character) => {
+    const newlineExpression = Boolean(groups['newline']);
+    const whitespaceExpression = Boolean(groups['whitespace']);
+    const optional = newlineExpression || whitespaceExpression;
+
+    const wordWidth = [...word].reduce((width, character) => {
       return width + characterToWidth.get(character);
     }, 0);
 
@@ -61,7 +63,7 @@ export default function* getTextContent(
 
     const wordOverflows = newLineWidth >= containerWidth;
 
-    if (newLine) {
+    if (newlineExpression) {
       currentLine++;
       currentLineWidth = 0;
     } else if (wordOverflows) {
@@ -80,9 +82,9 @@ export default function* getTextContent(
       yield currentTextContent;
 
       currentLine = 0;
-      currentTextContent = optional ? '' : token;
+      currentTextContent = optional ? '' : word;
     } else {
-      currentTextContent += token;
+      currentTextContent += word;
     }
   }
 

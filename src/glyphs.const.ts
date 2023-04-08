@@ -23,12 +23,12 @@ const escapedPunctuation = [...punctuation]
  * <newline> = "\n"
  */
 const characterExpression = `[A-Za-z${escapedPunctuation}]+`;
-const whitespaceExpression = '\\s';
+const whitespaceExpression = ' ';
 const newlineExpression = newline;
 const expressions = [
-  characterExpression,
-  whitespaceExpression,
-  newlineExpression,
+  `(?<word>${characterExpression})`,
+  `(?<whitespace>${whitespaceExpression})`,
+  `(?<newline>${newlineExpression})`,
 ];
 
 export const tokenExpression = new RegExp(expressions.join('|'), 'g');
