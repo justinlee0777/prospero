@@ -2,6 +2,7 @@ import ContainerStyle from './container-style.interface';
 import getCharacterWidths from './get-character-widths.function';
 import getNormalizedPageHeight from './get-normalized-page-height.function';
 import { tokenExpression } from './glyphs.const';
+import { formatVariables } from './utils/debug/format-variables.function';
 
 export default function* getTextContent(
   {
@@ -46,47 +47,71 @@ export default function* getTextContent(
 
   let currentLineWidth = 0;
   let currentLine = 0;
-  let currentTextContent = '';
+  let currentLineText = '';
+  let lines: Array<string> = [];
 
   for (const token of tokens) {
     const { 0: word, groups } = token;
 
     const newlineExpression = Boolean(groups['newline']);
     const whitespaceExpression = Boolean(groups['whitespace']);
-    const optional = newlineExpression || whitespaceExpression;
 
     const wordWidth = [...word].reduce((width, character) => {
       return width + characterToWidth.get(character);
     }, 0);
 
-    const newLineWidth = currentLineWidth + wordWidth;
+    const wordOverflows = currentLineWidth + wordWidth >= containerWidth;
 
-    const wordOverflows = newLineWidth >= containerWidth;
+    let newLine: number;
+    let newLineWidth: number;
+    let newLineText: string;
 
     if (newlineExpression) {
-      currentLine++;
-      currentLineWidth = 0;
-    } else if (wordOverflows) {
-      currentLine++;
+      lines = lines.concat(currentLineText + word);
 
-      /*
-       * We must add the token to the text if it is contentful.
-       * This, of course, assumes 'wordWidth' is less than the container width... we will need to work with 'break-word' and 'hyphens'
-       */
-      currentLineWidth = optional ? 0 : wordWidth;
+      newLine = currentLine + 1;
+      newLineWidth = 0;
+      newLineText = '';
+    } else if (whitespaceExpression) {
+      if (wordOverflows) {
+        lines = lines.concat(currentLineText);
+
+        newLine = currentLine + 1;
+        newLineWidth = 0;
+        newLineText = word;
+      } else {
+        newLine = currentLine;
+        newLineWidth = currentLineWidth + wordWidth;
+        newLineText = currentLineText + word;
+      }
     } else {
-      currentLineWidth = newLineWidth;
+      if (wordOverflows) {
+        lines = lines.concat(currentLineText);
+
+        newLine = currentLine + 1;
+        newLineWidth = wordWidth;
+        newLineText = word;
+      } else {
+        newLine = currentLine;
+        newLineWidth = currentLineWidth + wordWidth;
+        newLineText = currentLineText + word;
+      }
     }
 
-    if (currentLine === numLines) {
-      yield currentTextContent;
+    if (newLine === numLines) {
+      yield lines.join('');
 
-      currentLine = 0;
-      currentTextContent = optional ? '' : word;
-    } else {
-      currentTextContent += word;
+      lines = [];
+      newLine = 0;
+      newLineText = newLineText.trim();
     }
+
+    currentLine = newLine;
+    currentLineWidth = newLineWidth;
+    currentLineText = newLineText;
   }
 
-  yield currentTextContent;
+  if (lines.length > 0) {
+    yield [...lines, currentLineText].join('');
+  }
 }
