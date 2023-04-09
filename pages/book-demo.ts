@@ -34,6 +34,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       bottom: 1,
       left: 1,
     },
+    textIndent: '     ',
   };
 
   const getPage = buildPagesByGenerator(getTextContent(containerStyles, text));

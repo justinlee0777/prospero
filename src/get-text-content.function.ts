@@ -4,7 +4,6 @@ import ContainerStyle from './container-style.interface';
 import getNormalizedPageHeight from './get-normalized-page-height.function';
 import { tokenExpression } from './glyphs.const';
 import getWordWidth from './get-word-width.function';
-import { formatVariables } from './utils/debug/format-variables.function';
 
 export default function* getTextContent(
   {
@@ -16,6 +15,7 @@ export default function* getTextContent(
     padding,
     margin,
     border,
+    textIndent = '',
   }: ContainerStyle,
   textContent: string
 ): Generator<string> {
@@ -45,9 +45,11 @@ export default function* getTextContent(
 
   const calculateWordWidth = getWordWidth(computedFontSize, computedFontFamily);
 
-  let currentLineWidth = Big(0);
+  const textIndentWidth = calculateWordWidth(textIndent);
+
+  let currentLineWidth = Big(textIndentWidth);
   let currentLine = 0;
-  let currentLineText = '';
+  let currentLineText = textIndent;
   let lines: Array<string> = [];
 
   for (const token of tokens) {
@@ -69,15 +71,15 @@ export default function* getTextContent(
       if (pageBeginning) {
         // Ignore any newlines for new pages.
         newLine = currentLine;
-        newLineWidth = Big(0);
-        newLineText = '';
+        newLineWidth = Big(textIndentWidth);
+        newLineText = textIndent;
       } else {
         // Cut the current text and begin on a newline.
         lines = lines.concat(currentLineText + word);
 
         newLine = currentLine + 1;
-        newLineWidth = Big(0);
-        newLineText = '';
+        newLineWidth = Big(textIndentWidth);
+        newLineText = textIndent;
       }
     } else if (whitespaceExpression) {
       if (wordOverflows) {
@@ -108,9 +110,7 @@ export default function* getTextContent(
         newLineText = currentLineText + word;
       }
     }
-    console.log(
-      formatVariables({ word, wordWidth, newLine, newLineWidth, newLineText })
-    );
+
     if (newLine === numLines) {
       yield lines.join('');
 

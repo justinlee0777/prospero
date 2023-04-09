@@ -37,4 +37,7 @@ export default interface ContainerStyle {
     /** In pixels. */
     left: number;
   };
+
+  /** Literal character string to put before each paragraph. */
+  textIndent?: string;
 }
