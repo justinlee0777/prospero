@@ -13,12 +13,15 @@ import registerSwipeListener from '../../elements/register-swipe-listener.functi
 import SwipeDirection from '../../elements/swipe-direction.enum';
 import ContainerStyle from '../../container-style.interface';
 import containerStyleToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
+import PageLayout from './page-layout.enum';
+import toPixelUnits from '../../utils/to-pixel-units.function';
 
 interface BookArgs {
   getPage: GetPage;
 
   currentPage?: number;
   containerStyles?: ContainerStyle;
+  pageLayout?: PageLayout;
 }
 
 interface CreateBookElement {
@@ -26,20 +29,25 @@ interface CreateBookElement {
 }
 
 const Book: CreateBookElement = (
-  { getPage, currentPage, containerStyles },
-  config
+  { getPage, currentPage = 0, containerStyles, pageLayout = PageLayout.SINGLE },
+  config = {}
 ) => {
-  currentPage ??= 0;
-  config ??= {};
-
   let bookStyles: Partial<CSSStyleDeclaration>;
   let pageStyles: Partial<CSSStyleDeclaration>;
 
   if (containerStyles) {
     const styles = containerStyleToStyleDeclaration(containerStyles);
 
+    let bookWidth = styles.width;
+    let pageWidth: string;
+
+    if (pageLayout === PageLayout.DOUBLE) {
+      bookWidth = `${toPixelUnits(styles.width) * 2}px`;
+      pageWidth = styles.width;
+    }
+
     bookStyles = {
-      width: styles.width,
+      width: bookWidth,
       height: styles.height,
       fontSize: styles.fontSize,
       fontFamily: styles.fontFamily,
@@ -47,6 +55,7 @@ const Book: CreateBookElement = (
     };
 
     pageStyles = {
+      width: pageWidth,
       paddingTop: styles.paddingTop,
       paddingRight: styles.paddingRight,
       paddingBottom: styles.paddingBottom,
@@ -72,10 +81,22 @@ const Book: CreateBookElement = (
     ...config,
     classnames,
     attributes,
-    styles: bookStyles,
+    styles: {
+      ...(config.styles ?? {}),
+      ...bookStyles,
+    },
   }) as unknown as BookElement;
 
-  const goToPage = createGoToPage(book, getPage, pageStyles);
+  let goToPage;
+  let inc;
+
+  if (pageLayout === PageLayout.SINGLE) {
+    goToPage = createGoToSinglePage(book, getPage, pageStyles);
+    inc = 1;
+  } else {
+    goToPage = createGoToDoublePage(book, getPage, pageStyles);
+    inc = 2;
+  }
 
   const updatePage = (newPageNumber: number, pageFlip: PageFlipAnimation) => {
     const pageChangeFinished = goToPage(newPageNumber, pageFlip);
@@ -90,10 +111,10 @@ const Book: CreateBookElement = (
   };
 
   const keydownListener = createKeydownListener({
-    ArrowRight: () => updatePage(currentPage + 1, PageFlipAnimation.RIGHT),
-    ArrowDown: () => updatePage(currentPage + 1, PageFlipAnimation.RIGHT),
-    ArrowLeft: () => updatePage(currentPage - 1, PageFlipAnimation.LEFT),
-    ArrowUp: () => updatePage(currentPage - 1, PageFlipAnimation.LEFT),
+    ArrowRight: () => updatePage(currentPage + inc, PageFlipAnimation.RIGHT),
+    ArrowDown: () => updatePage(currentPage + inc, PageFlipAnimation.RIGHT),
+    ArrowLeft: () => updatePage(currentPage - inc, PageFlipAnimation.LEFT),
+    ArrowUp: () => updatePage(currentPage - inc, PageFlipAnimation.LEFT),
   });
 
   book.addEventListener('keydown', keydownListener);
@@ -101,13 +122,13 @@ const Book: CreateBookElement = (
   const destroySwipeListener = registerSwipeListener(book, ([direction]) => {
     switch (direction) {
       case SwipeDirection.UP:
-        return updatePage(currentPage - 1, PageFlipAnimation.LEFT);
+        return updatePage(currentPage - inc, PageFlipAnimation.LEFT);
       case SwipeDirection.RIGHT:
-        return updatePage(currentPage + 1, PageFlipAnimation.RIGHT);
+        return updatePage(currentPage + inc, PageFlipAnimation.RIGHT);
       case SwipeDirection.DOWN:
-        return updatePage(currentPage + 1, PageFlipAnimation.RIGHT);
+        return updatePage(currentPage + inc, PageFlipAnimation.RIGHT);
       case SwipeDirection.LEFT:
-        return updatePage(currentPage - 1, PageFlipAnimation.LEFT);
+        return updatePage(currentPage - inc, PageFlipAnimation.LEFT);
     }
   });
 
@@ -121,7 +142,7 @@ const Book: CreateBookElement = (
   return book;
 };
 
-function createGoToPage(
+function createGoToSinglePage(
   book: BookElement,
   getPage: GetPage,
   pageStyles?: Partial<CSSStyleDeclaration>
@@ -140,6 +161,46 @@ function createGoToPage(
     const page = Page({ textContent, styles: pageStyles });
 
     book.prepend(page);
+
+    return Promise.all(
+      oldPages.map((oldPage) => oldPage.destroy({ pageFlip }))
+    ).then();
+  };
+}
+
+function createGoToDoublePage(
+  book: BookElement,
+  getPage: GetPage,
+  pageStyles?: Partial<CSSStyleDeclaration>
+): (pageNumber: number, animation?: PageFlipAnimation) => Promise<void> | null {
+  return (pageNumber, pageFlip) => {
+    let pageNumbers: [number, number];
+
+    if (pageNumber % 2 === 0) {
+      pageNumbers = [pageNumber, pageNumber + 1];
+    } else {
+      pageNumbers = [pageNumber - 1, pageNumber];
+    }
+
+    const pageContent = pageNumbers.map((page) => getPage(page));
+
+    if (pageContent.every((textContent) => !Boolean(textContent))) {
+      return null;
+    }
+
+    const oldPages = [
+      ...book.querySelectorAll(pageSelector),
+    ] as Array<PageElement>;
+
+    const pages = [
+      Page({ textContent: pageContent[0], styles: pageStyles }),
+      Page({
+        textContent: pageContent[1],
+        styles: { ...pageStyles, left: pageStyles.width },
+      }),
+    ];
+
+    book.prepend(...pages);
 
     return Promise.all(
       oldPages.map((oldPage) => oldPage.destroy({ pageFlip }))

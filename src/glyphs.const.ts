@@ -1,6 +1,6 @@
 export const allCapsAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export const lowCapsAlphabet = allCapsAlphabet.toLowerCase();
-export const punctuation = `!?,.:;"'-—“`;
+export const punctuation = `!?,.:;"'’-—“`;
 export const whitespace = ' ';
 
 export const nonWhitespaceGlyphs =

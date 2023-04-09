@@ -8,6 +8,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@types/big.js": "^6.1.6",
     "@types/node": "^18.15.11",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
@@ -21,5 +22,8 @@
     "typescript-plugin-css-modules": "^5.0.0",
     "webpack": "^5.77.0",
     "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "big.js": "^6.2.1"
   }
 }

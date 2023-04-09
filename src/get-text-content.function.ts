@@ -1,7 +1,9 @@
+import Big from 'big.js';
+
 import ContainerStyle from './container-style.interface';
-import getCharacterWidths from './get-character-widths.function';
 import getNormalizedPageHeight from './get-normalized-page-height.function';
 import { tokenExpression } from './glyphs.const';
+import getWordWidth from './get-word-width.function';
 import { formatVariables } from './utils/debug/format-variables.function';
 
 export default function* getTextContent(
@@ -36,16 +38,14 @@ export default function* getTextContent(
       border.bottom,
     lineHeight
   );
-  const characterToWidth = getCharacterWidths(
-    computedFontSize,
-    computedFontFamily
-  );
 
   const numLines = pageHeight / lineHeight;
 
   const tokens = textContent.matchAll(tokenExpression);
 
-  let currentLineWidth = 0;
+  const calculateWordWidth = getWordWidth(computedFontSize, computedFontFamily);
+
+  let currentLineWidth = Big(0);
   let currentLine = 0;
   let currentLineText = '';
   let lines: Array<string> = [];
@@ -56,32 +56,43 @@ export default function* getTextContent(
     const newlineExpression = Boolean(groups['newline']);
     const whitespaceExpression = Boolean(groups['whitespace']);
 
-    const wordWidth = [...word].reduce((width, character) => {
-      return width + characterToWidth.get(character);
-    }, 0);
+    const wordWidth = Big(calculateWordWidth(word)).round(2, 0);
 
-    const wordOverflows = currentLineWidth + wordWidth >= containerWidth;
+    const pageBeginning = currentLine === 0 && currentLineWidth.eq(0);
+    const wordOverflows = currentLineWidth.plus(wordWidth).gte(containerWidth);
 
     let newLine: number;
-    let newLineWidth: number;
+    let newLineWidth: Big;
     let newLineText: string;
 
     if (newlineExpression) {
-      lines = lines.concat(currentLineText + word);
+      if (pageBeginning) {
+        // Ignore any newlines for new pages.
+        newLine = currentLine;
+        newLineWidth = Big(0);
+        newLineText = '';
+      } else {
+        // Cut the current text and begin on a newline.
+        lines = lines.concat(currentLineText + word);
 
-      newLine = currentLine + 1;
-      newLineWidth = 0;
-      newLineText = '';
+        newLine = currentLine + 1;
+        newLineWidth = Big(0);
+        newLineText = '';
+      }
     } else if (whitespaceExpression) {
       if (wordOverflows) {
         lines = lines.concat(currentLineText);
 
         newLine = currentLine + 1;
-        newLineWidth = 0;
+        newLineWidth = Big(0);
         newLineText = word;
+      } else if (pageBeginning) {
+        newLine = currentLine;
+        newLineWidth = currentLineWidth;
+        newLineText = currentLineText;
       } else {
         newLine = currentLine;
-        newLineWidth = currentLineWidth + wordWidth;
+        newLineWidth = currentLineWidth.plus(wordWidth);
         newLineText = currentLineText + word;
       }
     } else {
@@ -93,11 +104,13 @@ export default function* getTextContent(
         newLineText = word;
       } else {
         newLine = currentLine;
-        newLineWidth = currentLineWidth + wordWidth;
+        newLineWidth = currentLineWidth.plus(wordWidth);
         newLineText = currentLineText + word;
       }
     }
-
+    console.log(
+      formatVariables({ word, wordWidth, newLine, newLineWidth, newLineText })
+    );
     if (newLine === numLines) {
       yield lines.join('');
 

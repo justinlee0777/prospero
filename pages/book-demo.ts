@@ -4,14 +4,15 @@ import buildPagesByGenerator from '../src/build-pages-by-generator.function';
 import getTextContent from '../src/get-text-content.function';
 import Book from '../src/components/book/book.component';
 import ContainerStyle from '../src/container-style.interface';
+import PageLayout from '../src/components/book/page-layout.enum';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/ping.txt');
+  const response = await fetch('../text-samples/proteus.txt');
   const text = await response.text();
 
   const containerStyles: ContainerStyle = {
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: 375,
+    height: 667,
     computedFontFamily: 'Arial',
     computedFontSize: '16px',
     lineHeight: 32,
@@ -37,7 +38,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const getPage = buildPagesByGenerator(getTextContent(containerStyles, text));
 
-  const book = Book({ getPage, containerStyles });
+  const book = Book(
+    { getPage, containerStyles, pageLayout: PageLayout.DOUBLE },
+    { styles: { margin: 'auto' } }
+  );
 
   document.body.appendChild(book);
 });
