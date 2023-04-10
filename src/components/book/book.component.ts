@@ -40,6 +40,10 @@ const Book: CreateBookElement = (
       fontSize: styles.fontSize,
       fontFamily: styles.fontFamily,
       lineHeight: styles.lineHeight,
+      borderTopWidth: styles.borderTopWidth,
+      borderRightWidth: styles.borderRightWidth,
+      borderBottomWidth: styles.borderBottomWidth,
+      borderLeftWidth: styles.borderLeftWidth,
     };
 
     pageStyles = {
@@ -52,10 +56,6 @@ const Book: CreateBookElement = (
       marginRight: styles.marginRight,
       marginBottom: styles.marginBottom,
       marginLeft: styles.marginLeft,
-      borderTopWidth: styles.borderTopWidth,
-      borderRightWidth: styles.borderRightWidth,
-      borderBottomWidth: styles.borderBottomWidth,
-      borderLeftWidth: styles.borderLeftWidth,
     };
   }
 
@@ -133,7 +133,7 @@ const Book: CreateBookElement = (
 function createGoToSinglePage(
   book: BookElement,
   getPage: GetPage,
-  pageStyles?: Partial<CSSStyleDeclaration>
+  pageStyles: Partial<CSSStyleDeclaration> = {}
 ): (pageNumber: number, animation?: PageFlipAnimation) => Promise<void> | null {
   return (pageNumber, pageFlip) => {
     const textContent = getPage(pageNumber);
@@ -153,7 +153,7 @@ function createGoToSinglePage(
           pageNumber: pageNumber + 1,
         },
       },
-      { textContent, styles: pageStyles }
+      { textContent, styles: { ...pageStyles, borderRadius: '12px' } }
     );
 
     book.prepend(page);
@@ -167,7 +167,7 @@ function createGoToSinglePage(
 function createGoToDoublePage(
   book: BookElement,
   getPage: GetPage,
-  pageStyles?: Partial<CSSStyleDeclaration>
+  pageStyles: Partial<CSSStyleDeclaration> = {}
 ): (pageNumber: number, animation?: PageFlipAnimation) => Promise<void> | null {
   return (pageNumber, pageFlip) => {
     let pageNumbers: [number, number];
@@ -196,7 +196,13 @@ function createGoToDoublePage(
             pageNumber: pageNumbers[0] + 1,
           },
         },
-        { textContent: pageContent[0], styles: pageStyles }
+        {
+          textContent: pageContent[0],
+          styles: {
+            ...pageStyles,
+            borderRight: '1px solid black',
+          },
+        }
       ),
       Page(
         {
@@ -207,7 +213,10 @@ function createGoToDoublePage(
         },
         {
           textContent: pageContent[1],
-          styles: { ...pageStyles, left: pageStyles.width },
+          styles: {
+            ...pageStyles,
+            left: pageStyles.width,
+          },
         }
       ),
     ];

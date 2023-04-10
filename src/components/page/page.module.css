@@ -1,8 +1,5 @@
 .page {
   background-color: white;
-  border-color: black;
-  border-style: solid;
-  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
   height: 100%;
   position: absolute;
