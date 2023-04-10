@@ -7,26 +7,14 @@ import Page from '../page/page.component';
 import pageSelector from '../page/page-selector.const';
 import PageElement from '../page/page-element.interface';
 import PageFlipAnimation from '../page/page-flip-animation.enum';
-import { CreateElementConfig } from '../../elements/create-element.interface';
 import BookElement from './book-element.interface';
 import registerSwipeListener from '../../elements/register-swipe-listener.function';
 import SwipeDirection from '../../elements/swipe-direction.enum';
-import ContainerStyle from '../../container-style.interface';
 import containerStyleToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
 import PageLayout from './page-layout.enum';
 import toPixelUnits from '../../utils/to-pixel-units.function';
-
-interface BookArgs {
-  getPage: GetPage;
-
-  currentPage?: number;
-  containerStyles?: ContainerStyle;
-  pageLayout?: PageLayout;
-}
-
-interface CreateBookElement {
-  (book: BookArgs, config?: CreateElementConfig): BookElement;
-}
+import CreateBookElement from './create-book-element.interface';
+import PageNumberingAlignment from '../page/page-numbering-alignment.enum';
 
 const Book: CreateBookElement = (
   { getPage, currentPage = 0, containerStyles, pageLayout = PageLayout.SINGLE },
@@ -158,7 +146,15 @@ function createGoToSinglePage(
       ...book.querySelectorAll(pageSelector),
     ] as Array<PageElement>;
 
-    const page = Page({ textContent, styles: pageStyles });
+    const page = Page(
+      {
+        numbering: {
+          alignment: PageNumberingAlignment.LEFT,
+          pageNumber: pageNumber + 1,
+        },
+      },
+      { textContent, styles: pageStyles }
+    );
 
     book.prepend(page);
 
@@ -193,11 +189,27 @@ function createGoToDoublePage(
     ] as Array<PageElement>;
 
     const pages = [
-      Page({ textContent: pageContent[0], styles: pageStyles }),
-      Page({
-        textContent: pageContent[1],
-        styles: { ...pageStyles, left: pageStyles.width },
-      }),
+      Page(
+        {
+          numbering: {
+            alignment: PageNumberingAlignment.LEFT,
+            pageNumber: pageNumbers[0] + 1,
+          },
+        },
+        { textContent: pageContent[0], styles: pageStyles }
+      ),
+      Page(
+        {
+          numbering: {
+            alignment: PageNumberingAlignment.RIGHT,
+            pageNumber: pageNumbers[1] + 1,
+          },
+        },
+        {
+          textContent: pageContent[1],
+          styles: { ...pageStyles, left: pageStyles.width },
+        }
+      ),
     ];
 
     book.prepend(...pages);

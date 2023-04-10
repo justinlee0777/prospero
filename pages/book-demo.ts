@@ -15,12 +15,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     height: 667,
     computedFontFamily: 'Arial',
     computedFontSize: '16px',
-    lineHeight: 32,
+    lineHeight: 24,
     padding: {
-      top: 18,
-      right: 18,
-      bottom: 18,
-      left: 18,
+      top: 24,
+      right: 24,
+      bottom: 24,
+      left: 24,
     },
     margin: {
       top: 0,

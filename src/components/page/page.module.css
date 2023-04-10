@@ -13,3 +13,8 @@
   white-space: pre-wrap;
   width: 100%;
 }
+
+.pageNumber {
+  bottom: 1em;
+  position: absolute;
+}

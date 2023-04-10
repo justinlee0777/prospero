@@ -1,16 +1,26 @@
-import CreateElement from '../../elements/create-element.interface';
+import styles from './page.module.css';
+
 import div from '../../elements/div.function';
+import CreatePageElement from './create-page-element.interface';
 import pageClassName from './page-class-name.const';
 import PageElement from './page-element.interface';
 import PageFlipAnimation from './page-flip-animation.enum';
 
-const Page: CreateElement<PageElement> = (config) => {
-  config ??= {};
+const Page: CreatePageElement = (pageConfig, config = {}) => {
   const classnames = [pageClassName].concat(config?.classnames ?? []);
+
+  const numbering = div({
+    classnames: [styles.pageNumber],
+    textContent: pageConfig.numbering.pageNumber.toString(),
+    styles: {
+      [pageConfig.numbering.alignment]: '1em',
+    },
+  });
 
   const page = div({
     ...config,
     classnames,
+    children: [numbering],
   }) as unknown as PageElement;
 
   let resolveDestruction: (pageFlip?: PageFlipAnimation) => void;
