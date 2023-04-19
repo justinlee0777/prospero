@@ -1,6 +1,6 @@
-import ParseText from '../../models/parse-text.interface';
+import ParseWord from '../../models/parse-word.interface';
 
-const parseWhitespaceAtPageBeginning: ParseText = (state) => {
+const parseWhitespaceAtPageBeginning: ParseWord = (state) => {
   // Do nothing; continue parsing line.
   return {
     ...state,

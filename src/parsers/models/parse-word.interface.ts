@@ -1,7 +1,7 @@
 import ParserState from './parser-state.interface';
 import Word from './word.interface';
 
-export default interface ParseText {
+export default interface ParseWord {
   /**
    * @param state is the current state of the parser.
    * @param word to parse.

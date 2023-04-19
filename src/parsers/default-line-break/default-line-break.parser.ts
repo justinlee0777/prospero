@@ -1,5 +1,5 @@
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
-import ParseText from '../models/parse-text.interface';
+import ParseWord from '../models/parse-word.interface';
 import createNewlineAtPageBeginningParser from './newline/newline-at-page-beginning.parser';
 import createNewlineParser from './newline/newline.parser';
 import parseWhitespaceAtPageBeginning from './whitespace/whitespace-at-page-beginning.parser';
@@ -9,15 +9,15 @@ import createWordAtTextOverflowParser from './word/word-at-text-overflow.parser'
 import parseWord from './word/word.parser';
 
 export class DefaultLinkBreakParser {
-  parseNewlineAtPageBeginning: ParseText;
-  parseNewline: ParseText;
+  parseNewlineAtPageBeginning: ParseWord;
+  parseNewline: ParseWord;
 
-  parseWhitespaceAtPageBeginning: ParseText;
-  parseWhitespaceAtTextOverflow: ParseText;
-  parseWhitespaceInline: ParseText;
+  parseWhitespaceAtPageBeginning: ParseWord;
+  parseWhitespaceAtTextOverflow: ParseWord;
+  parseWhitespaceInline: ParseWord;
 
-  parseWordAtTextOverflow: ParseText;
-  parseWord: ParseText;
+  parseWordAtTextOverflow: ParseWord;
+  parseWord: ParseWord;
 
   constructor(config: CreateTextParserConfig) {
     this.parseNewlineAtPageBeginning =

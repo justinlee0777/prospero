@@ -7,7 +7,7 @@ import getWordWidth from './get-word-width.function';
 import { DefaultLinkBreakParser } from './parsers/default-line-break/default-line-break.parser';
 import ParserState from './parsers/models/parser-state.interface';
 import Word from './parsers/models/word.interface';
-import ParseText from './parsers/models/parse-text.interface';
+import ParseWord from './parsers/models/parse-word.interface';
 
 export default function* getTextContent(
   {
@@ -34,12 +34,12 @@ export default function* getTextContent(
 
   const pageHeight = getNormalizedPageHeight(
     height -
-      padding.top -
-      padding.bottom -
-      margin.top -
-      margin.bottom -
-      border.top -
-      border.bottom,
+    padding.top -
+    padding.bottom -
+    margin.top -
+    margin.bottom -
+    border.top -
+    border.bottom,
     lineHeight
   );
 
@@ -82,7 +82,7 @@ export default function* getTextContent(
       .plus(wordWidth)
       .gte(containerWidth);
 
-    let parseText: ParseText;
+    let parseText: ParseWord;
 
     if (newlineExpression) {
       if (pageBeginning) {

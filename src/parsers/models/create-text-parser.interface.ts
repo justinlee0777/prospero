@@ -1,6 +1,6 @@
 import CreateTextParserConfig from './create-text-parser-config.interface';
-import ParseText from './parse-text.interface';
+import ParseWord from './parse-word.interface';
 
 export default interface CreateTextParser {
-  (config: CreateTextParserConfig): ParseText;
+  (config: CreateTextParserConfig): ParseWord;
 }

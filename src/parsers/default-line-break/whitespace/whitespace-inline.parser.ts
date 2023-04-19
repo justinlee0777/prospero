@@ -1,6 +1,6 @@
-import ParseText from '../../models/parse-text.interface';
+import ParseWord from '../../models/parse-word.interface';
 
-const parseWhitespaceInline: ParseText = (state, word) => {
+const parseWhitespaceInline: ParseWord = (state, word) => {
   return {
     ...state,
     lineWidth: state.lineWidth.plus(word.width),
