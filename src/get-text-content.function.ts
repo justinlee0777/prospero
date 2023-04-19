@@ -56,9 +56,12 @@ export default function* getTextContent(
       text: textIndent,
       width: Big(textIndentWidth),
     },
+    pageLines: numLines,
   });
 
   let parserState: ParserState = {
+    pages: [],
+
     lines: [],
 
     lineWidth: Big(textIndentWidth),
@@ -108,17 +111,10 @@ export default function* getTextContent(
       width: wordWidth,
     };
 
-    let newParserState = parseText(parserState, wordState);
+    const newParserState = parseText(parserState, wordState);
 
-    if (parserState.line === numLines) {
-      yield newParserState.lines.join('');
-
-      newParserState = {
-        ...newParserState,
-        lines: [],
-        line: 0,
-        lineText: newParserState.lineText.trim(),
-      };
+    if (newParserState.pages.length > parserState.pages.length) {
+      yield newParserState.pages[newParserState.pages.length - 1];
     }
 
     parserState = newParserState;

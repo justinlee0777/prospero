@@ -5,7 +5,7 @@ import createNewlineParser from './newline/newline.parser';
 import parseWhitespaceAtPageBeginning from './whitespace/whitespace-at-page-beginning.parser';
 import createWhitespaceAtTextOverflowParser from './whitespace/whitespace-at-text-overflow.parser';
 import parseWhitespaceInline from './whitespace/whitespace-inline.parser';
-import parseWordAtTextOverflow from './word/word-at-text-overflow.parser';
+import createWordAtTextOverflowParser from './word/word-at-text-overflow.parser';
 import parseWord from './word/word.parser';
 
 export class DefaultLinkBreakParser {
@@ -29,7 +29,7 @@ export class DefaultLinkBreakParser {
       createWhitespaceAtTextOverflowParser(config);
     this.parseWhitespaceInline = parseWhitespaceInline;
 
-    this.parseWordAtTextOverflow = parseWordAtTextOverflow;
+    this.parseWordAtTextOverflow = createWordAtTextOverflowParser(config);
     this.parseWord = parseWord;
   }
 }

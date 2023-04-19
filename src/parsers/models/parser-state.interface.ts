@@ -5,6 +5,7 @@ import Big from 'big.js';
  */
 export default interface ParserState {
   // The below section describes the book so far.
+  pages: Array<string>;
 
   // The below section describes the page to be built.
 
