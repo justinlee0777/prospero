@@ -11,26 +11,3 @@ export const nonWhitespaceGlyphs =
 export const glyphs = nonWhitespaceGlyphs + whitespace;
 
 export const newline = '\n';
-
-const escapedPunctuation = [...punctuation]
-  .map((glyph) => `\\${glyph}`)
-  .join('');
-
-/**
- * <token> = <punctuatedWord> | <whitespace> | <newline>
- * <punctuatedWord> = <punctuation> <word> <punctuation>
- * <punctuation> = "!" | "?" ... | ""
- * <word> = alphabetic sequence with at least one character
- * <whitespace> = " "
- * <newline> = "\n"
- */
-const characterExpression = `[A-Za-z0-9${escapedPunctuation}]+`;
-const whitespaceExpression = ' ';
-const newlineExpression = newline;
-const expressions = [
-  `(?<word>${characterExpression})`,
-  `(?<whitespace>${whitespaceExpression})`,
-  `(?<newline>${newlineExpression})`,
-];
-
-export const tokenExpression = new RegExp(expressions.join('|'), 'g');
