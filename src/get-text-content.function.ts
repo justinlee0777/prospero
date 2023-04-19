@@ -4,6 +4,10 @@ import ContainerStyle from './container-style.interface';
 import getNormalizedPageHeight from './get-normalized-page-height.function';
 import { tokenExpression } from './glyphs.const';
 import getWordWidth from './get-word-width.function';
+import { DefaultLinkBreakParser } from './parsers/default-line-break/default-line-break.parser';
+import ParserState from './parsers/models/parser-state.interface';
+import Word from './parsers/models/word.interface';
+import ParseText from './parsers/models/parse-text.interface';
 
 export default function* getTextContent(
   {
@@ -47,10 +51,20 @@ export default function* getTextContent(
 
   const textIndentWidth = calculateWordWidth(textIndent);
 
-  let currentLineWidth = Big(textIndentWidth);
-  let currentLine = 0;
-  let currentLineText = textIndent;
-  let lines: Array<string> = [];
+  const parser = new DefaultLinkBreakParser({
+    textIndent: {
+      text: textIndent,
+      width: Big(textIndentWidth),
+    },
+  });
+
+  let parserState: ParserState = {
+    lines: [],
+
+    lineWidth: Big(textIndentWidth),
+    line: 0,
+    lineText: textIndent,
+  };
 
   for (const token of tokens) {
     const { 0: word, groups } = token;
@@ -60,71 +74,57 @@ export default function* getTextContent(
 
     const wordWidth = Big(calculateWordWidth(word)).round(2, 0);
 
-    const pageBeginning = currentLine === 0 && currentLineWidth.eq(0);
-    const wordOverflows = currentLineWidth.plus(wordWidth).gte(containerWidth);
+    const pageBeginning = parserState.line === 0 && parserState.lineWidth.eq(0);
+    const wordOverflows = parserState.lineWidth
+      .plus(wordWidth)
+      .gte(containerWidth);
 
-    let newLine: number;
-    let newLineWidth: Big;
-    let newLineText: string;
+    let parseText: ParseText;
 
     if (newlineExpression) {
       if (pageBeginning) {
-        // Ignore any newlines for new pages.
-        newLine = currentLine;
-        newLineWidth = Big(textIndentWidth);
-        newLineText = textIndent;
+        parseText = parser.parseNewlineAtPageBeginning;
       } else {
-        // Cut the current text and begin on a newline.
-        lines = lines.concat(currentLineText + word);
-
-        newLine = currentLine + 1;
-        newLineWidth = Big(textIndentWidth);
-        newLineText = textIndent;
+        parseText = parser.parseNewline;
       }
     } else if (whitespaceExpression) {
       if (wordOverflows) {
-        lines = lines.concat(currentLineText);
-
-        newLine = currentLine + 1;
-        newLineWidth = Big(0);
-        newLineText = word;
+        parseText = parser.parseWhitespaceAtTextOverflow;
       } else if (pageBeginning) {
-        newLine = currentLine;
-        newLineWidth = currentLineWidth;
-        newLineText = currentLineText;
+        parseText = parser.parseWhitespaceAtPageBeginning;
       } else {
-        newLine = currentLine;
-        newLineWidth = currentLineWidth.plus(wordWidth);
-        newLineText = currentLineText + word;
+        parseText = parser.parseWhitespaceInline;
       }
     } else {
       if (wordOverflows) {
-        lines = lines.concat(currentLineText);
-
-        newLine = currentLine + 1;
-        newLineWidth = wordWidth;
-        newLineText = word;
+        parseText = parser.parseWordAtTextOverflow;
       } else {
-        newLine = currentLine;
-        newLineWidth = currentLineWidth.plus(wordWidth);
-        newLineText = currentLineText + word;
+        parseText = parser.parseWord;
       }
     }
 
-    if (newLine === numLines) {
-      yield lines.join('');
+    const wordState: Word = {
+      text: word,
+      width: wordWidth,
+    };
 
-      lines = [];
-      newLine = 0;
-      newLineText = newLineText.trim();
+    let newParserState = parseText(parserState, wordState);
+
+    if (parserState.line === numLines) {
+      yield newParserState.lines.join('');
+
+      newParserState = {
+        ...newParserState,
+        lines: [],
+        line: 0,
+        lineText: newParserState.lineText.trim(),
+      };
     }
 
-    currentLine = newLine;
-    currentLineWidth = newLineWidth;
-    currentLineText = newLineText;
+    parserState = newParserState;
   }
 
-  if (lines.length > 0) {
-    yield [...lines, currentLineText].join('');
+  if (parserState.lines.length > 0) {
+    yield [...parserState.lines, parserState.lineText].join('');
   }
 }
