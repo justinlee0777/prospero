@@ -10,7 +10,7 @@ import createWhitespaceAtTextOverflowParser from './whitespace/whitespace-at-tex
 import parseWhitespaceInline from './whitespace/whitespace-inline.parser';
 import createWordAtTextOverflowParser from './word/word-at-text-overflow.parser';
 import parseWord from './word/word.parser';
-import { newline, punctuation } from '../../glyphs.const';
+import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
 import Word from '../models/word.interface';
 
 export class DefaultLinkBreakParser {
@@ -36,11 +36,11 @@ export class DefaultLinkBreakParser {
      * <punctuatedWord> = <punctuation> <word> <punctuation>
      * <punctuation> = "!" | "?" ... | ""
      * <word> = alphabetic sequence with at least one character
-     * <whitespace> = " "
+     * <whitespace> = " -"
      * <newline> = "\n"
      */
     const characterExpression = `[A-Za-z0-9${escapedPunctuation}]+`;
-    const whitespaceExpression = ' ';
+    const whitespaceExpression = `${whitespace}|${dash}`;
     const newlineExpression = newline;
     const expressions = [
       `(?<word>${characterExpression})`,
@@ -63,7 +63,7 @@ export class DefaultLinkBreakParser {
     this.parseWord = parseWord;
   }
 
-  *generatePages(text: string): Generator<string> {
+  *generateParserStates(text: string): Generator<ParserState> {
     const tokens = text.matchAll(this.tokenExpression);
     const calculateWordWidth = this.config.calculateWordWidth;
 
@@ -120,9 +120,22 @@ export class DefaultLinkBreakParser {
         width: wordWidth,
       };
 
-      const newParserState = parseText(parserState, wordState);
+      parserState = parseText(parserState, wordState);
 
-      if (newParserState.pages.length > parserState.pages.length) {
+      yield parserState;
+    }
+  }
+
+  *generatePages(text: string): Generator<string> {
+    const parserStates = this.generateParserStates(text);
+
+    let parserState: ParserState;
+
+    for (const newParserState of parserStates) {
+      if (
+        parserState &&
+        newParserState.pages.length > parserState.pages.length
+      ) {
         yield newParserState.pages[newParserState.pages.length - 1];
       }
 

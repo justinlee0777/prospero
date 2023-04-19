@@ -200,7 +200,8 @@ function createGoToDoublePage(
           textContent: pageContent[0],
           styles: {
             ...pageStyles,
-            borderRight: '1px solid black',
+            // TODO: DISALLOWED!
+            // borderRight: '1px solid black',
           },
         }
       ),

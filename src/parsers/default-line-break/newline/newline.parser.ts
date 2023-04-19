@@ -6,7 +6,9 @@ const createNewlineParser: CreateTextParser = (config) => (state, word) => {
   if (state.line + 1 >= config.pageLines) {
     return {
       ...state,
-      pages: state.pages.concat(state.lines.join('') + word.text),
+      pages: state.pages.concat(
+        state.lines.join('') + state.lineText + word.text
+      ),
       // Cut the current text and begin on a newline.
       lines: [],
       line: 0,

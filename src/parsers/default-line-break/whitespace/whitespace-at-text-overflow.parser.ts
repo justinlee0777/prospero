@@ -7,7 +7,9 @@ const createWhitespaceAtTextOverflowParser: CreateTextParser =
     if (state.line + 1 >= config.pageLines) {
       return {
         ...state,
-        pages: state.pages.concat(state.lines.join('') + word.text),
+        pages: state.pages.concat(
+          state.lines.join('') + state.lineText + word.text
+        ),
         // Cut the current text and begin on a newline.
         lines: [],
         line: 0,
@@ -18,7 +20,7 @@ const createWhitespaceAtTextOverflowParser: CreateTextParser =
       return {
         ...state,
         // Cut the current text and begin on a newline.
-        lines: state.lines.concat(state.lineText + word.text),
+        lines: state.lines.concat(state.lineText),
         line: state.line + 1,
         lineWidth: Big(0),
         lineText: word.text,

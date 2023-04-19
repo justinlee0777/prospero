@@ -29,10 +29,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       left: 0,
     },
     border: {
-      top: 1,
-      right: 1,
-      bottom: 1,
-      left: 1,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
     },
     textIndent: '     ',
   };
