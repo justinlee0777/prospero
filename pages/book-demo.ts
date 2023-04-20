@@ -1,10 +1,9 @@
 import './book-demo.css';
 
-import buildPagesByGenerator from '../src/build-pages-by-generator.function';
-import getTextContent from '../src/get-text-content.function';
-import Book from '../src/components/book/book.component';
+import BookComponent from '../src/components/book/book.component';
 import ContainerStyle from '../src/container-style.interface';
 import PageLayout from '../src/components/book/page-layout.enum';
+import { Pages } from '../src/pages';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch('../text-samples/proteus.txt');
@@ -37,10 +36,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     textIndent: '     ',
   };
 
-  const getPage = buildPagesByGenerator(getTextContent(containerStyles, text));
+  const pages = new Pages(containerStyles, text);
 
-  const book = Book(
-    { getPage, containerStyles, pageLayout: PageLayout.DOUBLE },
+  const book = BookComponent(
+    {
+      getPage: (pageNumber) => pages.get(pageNumber),
+      containerStyles,
+      pageLayout: PageLayout.DOUBLE,
+    },
     { styles: { margin: 'auto' } }
   );
 

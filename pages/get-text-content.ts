@@ -1,11 +1,12 @@
 import './index.css';
 
-import getTextContent from '../src/get-text-content.function';
 import debounce from '../src/utils/debounce.function';
 import toPixelUnits from '../src/utils/to-pixel-units.function';
+import ContainerStyle from '../src/container-style.interface';
+import { Pages } from '../src/pages';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/lorem-ipsum.txt');
+  const response = await fetch('../text-samples/proteus.txt');
   const text = await response.text();
 
   const container = document.body;
@@ -15,34 +16,35 @@ window.addEventListener('DOMContentLoaded', async () => {
   function updateTextContent() {
     const style = window.getComputedStyle(container);
 
-    container.textContent = getTextContent(
-      {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        lineHeight: toPixelUnits(style.lineHeight),
-        computedFontSize: style.fontSize,
-        computedFontFamily: style.fontFamily,
-        padding: {
-          left: toPixelUnits(style.paddingLeft),
-          right: toPixelUnits(style.paddingRight),
-          top: toPixelUnits(style.paddingTop),
-          bottom: toPixelUnits(style.paddingBottom),
-        },
-        margin: {
-          left: toPixelUnits(style.marginLeft),
-          right: toPixelUnits(style.marginRight),
-          top: toPixelUnits(style.marginTop),
-          bottom: toPixelUnits(style.marginBottom),
-        },
-        border: {
-          top: toPixelUnits(style.borderTopWidth),
-          right: toPixelUnits(style.borderRightWidth),
-          bottom: toPixelUnits(style.borderBottomWidth),
-          left: toPixelUnits(style.borderLeftWidth),
-        },
+    const containerStyle: ContainerStyle = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      lineHeight: toPixelUnits(style.lineHeight),
+      computedFontSize: style.fontSize,
+      computedFontFamily: style.fontFamily,
+      padding: {
+        left: toPixelUnits(style.paddingLeft),
+        right: toPixelUnits(style.paddingRight),
+        top: toPixelUnits(style.paddingTop),
+        bottom: toPixelUnits(style.paddingBottom),
       },
-      text
-    ).next().value;
+      margin: {
+        left: toPixelUnits(style.marginLeft),
+        right: toPixelUnits(style.marginRight),
+        top: toPixelUnits(style.marginTop),
+        bottom: toPixelUnits(style.marginBottom),
+      },
+      border: {
+        top: toPixelUnits(style.borderTopWidth),
+        right: toPixelUnits(style.borderRightWidth),
+        bottom: toPixelUnits(style.borderBottomWidth),
+        left: toPixelUnits(style.borderLeftWidth),
+      },
+    };
+
+    const pages = new Pages(containerStyle, text);
+
+    container.textContent = pages.get(0);
   }
 
   window.addEventListener('resize', debounce(updateTextContent), {

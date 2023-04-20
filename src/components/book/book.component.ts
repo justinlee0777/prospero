@@ -3,11 +3,10 @@ import styles from './book.module.css';
 import div from '../../elements/div.function';
 import GetPage from '../../get-page.interface';
 import createKeydownListener from '../../elements/create-keydown-listener.function';
-import Page from '../page/page.component';
+import PageComponent from '../page/page.component';
 import pageSelector from '../page/page-selector.const';
-import PageElement from '../page/page-element.interface';
 import PageFlipAnimation from '../page/page-flip-animation.enum';
-import BookElement from './book-element.interface';
+import BookComponent from './book-element.interface';
 import registerSwipeListener from '../../elements/register-swipe-listener.function';
 import SwipeDirection from '../../elements/swipe-direction.enum';
 import containerStyleToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
@@ -16,7 +15,7 @@ import toPixelUnits from '../../utils/to-pixel-units.function';
 import CreateBookElement from './create-book-element.interface';
 import PageNumberingAlignment from '../page/page-numbering-alignment.enum';
 
-const Book: CreateBookElement = (
+const BookComponent: CreateBookElement = (
   { getPage, currentPage = 0, containerStyles, pageLayout = PageLayout.SINGLE },
   config = {}
 ) => {
@@ -73,7 +72,7 @@ const Book: CreateBookElement = (
       ...(config.styles ?? {}),
       ...bookStyles,
     },
-  }) as unknown as BookElement;
+  }) as unknown as BookComponent;
 
   let goToPage;
   let inc;
@@ -131,7 +130,7 @@ const Book: CreateBookElement = (
 };
 
 function createGoToSinglePage(
-  book: BookElement,
+  book: BookComponent,
   getPage: GetPage,
   pageStyles: Partial<CSSStyleDeclaration> = {}
 ): (pageNumber: number, animation?: PageFlipAnimation) => Promise<void> | null {
@@ -144,9 +143,9 @@ function createGoToSinglePage(
 
     const oldPages = [
       ...book.querySelectorAll(pageSelector),
-    ] as Array<PageElement>;
+    ] as Array<PageComponent>;
 
-    const page = Page(
+    const page = PageComponent(
       {
         numbering: {
           alignment: PageNumberingAlignment.LEFT,
@@ -165,7 +164,7 @@ function createGoToSinglePage(
 }
 
 function createGoToDoublePage(
-  book: BookElement,
+  book: BookComponent,
   getPage: GetPage,
   pageStyles: Partial<CSSStyleDeclaration> = {}
 ): (pageNumber: number, animation?: PageFlipAnimation) => Promise<void> | null {
@@ -186,10 +185,10 @@ function createGoToDoublePage(
 
     const oldPages = [
       ...book.querySelectorAll(pageSelector),
-    ] as Array<PageElement>;
+    ] as Array<PageComponent>;
 
     const pages = [
-      Page(
+      PageComponent(
         {
           numbering: {
             alignment: PageNumberingAlignment.LEFT,
@@ -205,7 +204,7 @@ function createGoToDoublePage(
           },
         }
       ),
-      Page(
+      PageComponent(
         {
           numbering: {
             alignment: PageNumberingAlignment.RIGHT,
@@ -230,4 +229,4 @@ function createGoToDoublePage(
   };
 }
 
-export default Book;
+export default BookComponent;

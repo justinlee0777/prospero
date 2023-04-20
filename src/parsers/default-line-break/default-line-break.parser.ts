@@ -164,8 +164,4 @@ export class DefaultLinkBreakParser {
       yield [...parserState.lines, parserState.lineText].join('');
     }
   }
-
-  getPages(text: string): Array<string> {
-    return [...this.generatePages(text)];
-  }
 }

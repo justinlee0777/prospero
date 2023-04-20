@@ -3,10 +3,10 @@ import styles from './page.module.css';
 import div from '../../elements/div.function';
 import CreatePageElement from './create-page-element.interface';
 import pageClassName from './page-class-name.const';
-import PageElement from './page-element.interface';
+import PageComponent from './page-element.interface';
 import PageFlipAnimation from './page-flip-animation.enum';
 
-const Page: CreatePageElement = (pageConfig, config = {}) => {
+const PageComponent: CreatePageElement = (pageConfig, config = {}) => {
   const classnames = [pageClassName].concat(config?.classnames ?? []);
 
   const numbering = div({
@@ -21,7 +21,7 @@ const Page: CreatePageElement = (pageConfig, config = {}) => {
     ...config,
     classnames,
     children: [numbering],
-  }) as unknown as PageElement;
+  }) as unknown as PageComponent;
 
   let resolveDestruction: (pageFlip?: PageFlipAnimation) => void;
 
@@ -61,4 +61,4 @@ const Page: CreatePageElement = (pageConfig, config = {}) => {
   return page;
 };
 
-export default Page;
+export default PageComponent;
