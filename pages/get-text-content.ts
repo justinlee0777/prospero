@@ -3,7 +3,7 @@ import './index.css';
 import debounce from '../src/utils/debounce.function';
 import toPixelUnits from '../src/utils/to-pixel-units.function';
 import ContainerStyle from '../src/container-style.interface';
-import { Pages } from '../src/pages';
+import Pages from '../src/pages';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch('../text-samples/proteus.txt');

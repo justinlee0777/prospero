@@ -2,7 +2,7 @@ import ContainerStyle from './container-style.interface';
 import GetPage from './get-page.interface';
 import ParserBuilder from './parsers/builders/parser.builder';
 
-export class Pages {
+export default class Pages {
   private pageGenerator: Generator<string>;
 
   private cachedPages: Array<string> = [];

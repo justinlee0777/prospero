@@ -3,7 +3,7 @@ import './book-demo.css';
 import BookComponent from '../src/components/book/book.component';
 import ContainerStyle from '../src/container-style.interface';
 import PageLayout from '../src/components/book/page-layout.enum';
-import { Pages } from '../src/pages';
+import Pages from '../src/pages';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch('../text-samples/proteus.txt');

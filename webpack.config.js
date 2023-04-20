@@ -60,7 +60,7 @@ module.exports = [
     mode: 'production',
     entry: {
       components: './src/components/index.ts',
-      pages: './src/pages.ts',
+      index: './src/index.ts',
     },
     output: {
       filename: '[name].js',
