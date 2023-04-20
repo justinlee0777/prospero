@@ -6,6 +6,4 @@ export default interface CreateTextParserConfig {
   pageLines: number;
   /** The width of the page, in pixels. */
   pageWidth: number;
-
-  calculateWordWidth(word: string): number;
 }

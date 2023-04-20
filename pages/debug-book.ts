@@ -1,14 +1,10 @@
 import './debug-book.css';
 
-import Big from 'big.js';
-
 import ContainerStyle from '../src/container-style.interface';
-import getWordWidth from '../src/get-word-width.function';
-import getNormalizedPageHeight from '../src/get-normalized-page-height.function';
-import { DefaultLinkBreakParser } from '../src/parsers/default-line-break/default-line-break.parser';
 import div from '../src/elements/div.function';
 import { formatVariables } from '../src/utils/debug/format-variables.function';
 import ParserState from '../src/parsers/models/parser-state.interface';
+import ParserBuilder from '../src/parsers/builders/parser.builder';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch('../text-samples/proteus.txt');
@@ -41,38 +37,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     textIndent: '     ',
   };
 
-  const containerWidth =
-    containerStyles.width -
-    containerStyles.padding.left -
-    containerStyles.padding.right -
-    containerStyles.margin.left -
-    containerStyles.margin.right -
-    containerStyles.border.left -
-    containerStyles.border.right;
-
-  const pageHeight = getNormalizedPageHeight(
-    containerStyles.height -
-      containerStyles.padding.top -
-      containerStyles.padding.bottom -
-      containerStyles.margin.top -
-      containerStyles.margin.bottom -
-      containerStyles.border.top -
-      containerStyles.border.bottom,
-    containerStyles.lineHeight
-  );
-
-  const numLines = pageHeight / containerStyles.lineHeight;
-
-  const calculateWordWidth = getWordWidth(
-    containerStyles.computedFontSize,
-    containerStyles.computedFontFamily
-  );
-
-  const textIndentWidth = calculateWordWidth(containerStyles.textIndent);
+  const parser = ParserBuilder.fromContainerStyle(containerStyles);
 
   document.body.appendChild(
     div({
-      textContent: `container width: ${containerWidth}px`,
+      textContent: `container width: ${parser.debug.pageWidth}px`,
       styles: {
         position: 'fixed',
         top: '3em',
@@ -80,16 +49,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       },
     })
   );
-
-  const parser = new DefaultLinkBreakParser({
-    textIndent: {
-      text: containerStyles.textIndent,
-      width: Big(textIndentWidth),
-    },
-    pageLines: numLines,
-    pageWidth: containerWidth,
-    calculateWordWidth,
-  });
 
   const filter = (parserState: ParserState) => parserState.pages.length === 13;
 

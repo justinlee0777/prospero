@@ -1,6 +1,6 @@
 import './index.css';
 
-import getNormalizedPageHeight from '../src/get-normalized-page-height.function';
+import getNormalizedPageHeight from '../src/parsers/builders/get-normalized-page-height.function';
 import debounce from '../src/utils/debounce.function';
 import toPixelUnits from '../src/utils/to-pixel-units.function';
 

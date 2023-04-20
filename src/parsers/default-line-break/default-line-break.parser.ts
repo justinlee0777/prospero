@@ -12,8 +12,16 @@ import createWordAtTextOverflowParser from './word/word-at-text-overflow.parser'
 import parseWord from './word/word.parser';
 import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
 import Word from '../models/word.interface';
+import CalculateWordWidth from '../builders/calculate-word-width.interface';
 
 export class DefaultLinkBreakParser {
+  /**
+   * This is used to debug the parser. Beware if you use this directly. Or don't, I don't really care beyond documentation.
+   */
+  public debug: {
+    pageWidth: number;
+  };
+
   private readonly tokenExpression: RegExp;
 
   private readonly parseNewlineAtPageBeginning: ParseWord;
@@ -26,7 +34,13 @@ export class DefaultLinkBreakParser {
   private readonly parseWordAtTextOverflow: ParseWord;
   private readonly parseWord: ParseWord;
 
+  private calculateWordWidth: CalculateWordWidth;
+
   constructor(private config: CreateTextParserConfig) {
+    this.debug = {
+      pageWidth: config.pageWidth,
+    };
+
     const escapedPunctuation = [...punctuation]
       .map((glyph) => `\\${glyph}`)
       .join('');
@@ -63,9 +77,13 @@ export class DefaultLinkBreakParser {
     this.parseWord = parseWord;
   }
 
+  setCalculateWordWidth(calculateWordWidth: CalculateWordWidth): void {
+    this.calculateWordWidth = calculateWordWidth;
+  }
+
   *generateParserStates(text: string): Generator<ParserState> {
     const tokens = text.matchAll(this.tokenExpression);
-    const calculateWordWidth = this.config.calculateWordWidth;
+    const calculateWordWidth = this.calculateWordWidth;
 
     let parserState: ParserState = {
       pages: [],
