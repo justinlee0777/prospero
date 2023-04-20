@@ -58,9 +58,12 @@ module.exports = [
   {
     name: 'production',
     mode: 'production',
-    entry: './src/index.ts',
+    entry: {
+      components: './src/components/index.ts',
+      pages: './src/pages.ts',
+    },
     output: {
-      filename: 'index.js',
+      filename: '[name].js',
       library: {
         type: 'commonjs-module',
       },
