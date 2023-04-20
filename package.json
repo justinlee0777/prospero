@@ -24,6 +24,7 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
-    "big.js": "^6.2.1"
+    "big.js": "^6.2.1",
+    "canvas": "^2.11.2"
   }
 }

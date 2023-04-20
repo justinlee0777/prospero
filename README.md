@@ -13,3 +13,7 @@ As Prospero set aside his books, forsaking their awesome powers, so we shall set
 This is a work in progress. I am researching how feasible the concept is.
 
 After installing node dependencies, `yarn start` can be ran to see various experiments in how the browser renders text.
+
+### Installing dependencies
+
+The project relies on the package `canvas` so that certain functions work on the server. `canvas` has unique compilation if your OS does not support it out-of-the-box. Please refer to the "Compiling" section of the [GitHub](https://github.com/Automattic/node-canvas).
