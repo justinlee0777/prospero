@@ -6,7 +6,7 @@ import PageLayout from '../src/components/book/page-layout.enum';
 import Pages from '../src/pages';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/ping.txt');
+  const response = await fetch('../text-samples/color-example.txt');
   const text = await response.text();
 
   const containerStyles: ContainerStyle = {
@@ -33,7 +33,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       bottom: 0,
       left: 0,
     },
-    textIndent: '     ',
   };
 
   const pages = new Pages(containerStyles, text);

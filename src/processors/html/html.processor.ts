@@ -82,9 +82,13 @@ export default class HTMLProcessor implements Processor {
       const relevantTags = this.htmlTags
         .filter((htmlTag) => {
           const {
-            indices: { begin },
+            indices: { begin, end },
           } = htmlTag;
-          return nextPageBegin < begin && begin < nextPageEnd;
+
+          return (
+            (nextPageBegin <= begin && begin <= nextPageEnd) ||
+            (nextPageBegin <= end && end <= nextPageEnd)
+          );
         })
         // reversing the tags so that we may work backwards and not be confused by changing indexes
         .reverse();
