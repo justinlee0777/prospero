@@ -2,6 +2,7 @@ import EventListenersMap from './event-listeners-map.interface';
 
 export interface CreateElementConfig {
   textContent?: string;
+  innerHTML?: string;
   children?: Array<Node>;
   classnames?: Array<string>;
   attributes?: Object;

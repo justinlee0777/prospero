@@ -135,9 +135,9 @@ function createGoToSinglePage(
   pageStyles: Partial<CSSStyleDeclaration> = {}
 ): (pageNumber: number, animation?: PageFlipAnimation) => Promise<void> | null {
   return (pageNumber, pageFlip) => {
-    const textContent = getPage(pageNumber);
+    const innerHTML = getPage(pageNumber);
 
-    if (!textContent) {
+    if (!innerHTML) {
       return null;
     }
 
@@ -152,7 +152,7 @@ function createGoToSinglePage(
           pageNumber: pageNumber + 1,
         },
       },
-      { textContent, styles: { ...pageStyles, borderRadius: '12px' } }
+      { innerHTML, styles: { ...pageStyles, borderRadius: '12px' } }
     );
 
     book.prepend(page);
@@ -196,7 +196,7 @@ function createGoToDoublePage(
           },
         },
         {
-          textContent: pageContent[0],
+          innerHTML: pageContent[0],
           styles: {
             ...pageStyles,
             // TODO: DISALLOWED!
@@ -212,7 +212,7 @@ function createGoToDoublePage(
           },
         },
         {
-          textContent: pageContent[1],
+          innerHTML: pageContent[1],
           styles: {
             ...pageStyles,
             left: pageStyles.width,

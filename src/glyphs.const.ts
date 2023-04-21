@@ -3,7 +3,7 @@ export const lowCapsAlphabet = allCapsAlphabet.toLowerCase();
 export const numbers = '1234567890';
 export const accented = 'é';
 export const dash = '-';
-export const punctuation = `!?,.:;"'’—“”…`;
+export const punctuation = `!?,.:;"'’—“”…<>\\/=`;
 export const whitespace = ' ';
 
 export const nonWhitespaceGlyphs =

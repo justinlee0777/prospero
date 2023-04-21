@@ -6,7 +6,7 @@ import PageLayout from '../src/components/book/page-layout.enum';
 import Pages from '../src/pages';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/proteus.txt');
+  const response = await fetch('../text-samples/ping.txt');
   const text = await response.text();
 
   const containerStyles: ContainerStyle = {
@@ -42,7 +42,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     {
       getPage: (pageNumber) => pages.get(pageNumber),
       containerStyles,
-      pageLayout: PageLayout.DOUBLE,
+      // pageLayout: PageLayout.DOUBLE,
     },
     { styles: { margin: 'auto' } }
   );

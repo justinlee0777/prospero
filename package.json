@@ -12,6 +12,7 @@
     "@types/big.js": "^6.1.6",
     "@types/jest": "^29.5.1",
     "@types/node": "^18.15.11",
+    "@types/sanitize-html": "^2.9.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
     "html-webpack-plugin": "^5.5.0",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "big.js": "^6.2.1",
-    "canvas": "^2.11.2"
+    "canvas": "^2.11.2",
+    "sanitize-html": "^2.10.0"
   }
 }
