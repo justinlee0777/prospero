@@ -1,3 +1,6 @@
+import Processor from '../models/processor.interface';
+import TextStyle from '../models/text-style.interface';
+
 interface HTMLTag {
   openingTag: string;
   tagName: string;
@@ -7,7 +10,7 @@ interface HTMLTag {
   };
 }
 
-export default class HTMLProcessor {
+export default class HTMLProcessor implements Processor {
   /**
    * Omitting non-closing tags for the time-being as those - afaik - are not allowed.
    * Capture groups
@@ -34,9 +37,9 @@ export default class HTMLProcessor {
   private preprocessedPages: Array<string> = [];
   private nextPageBegin = 0;
 
-  preprocess(text: string, textIndent: string): string {
+  preprocess(text: string, textStyle: TextStyle): string {
     // Offsetting the index returned by 'replace' after the replacement has occurred (as the function does not do so.)
-    let normalizedOffset = -textIndent.length;
+    let normalizedOffset = -(textStyle.textIndent ?? '').length;
 
     return text.replace(
       HTMLProcessor.HTMLRegex,

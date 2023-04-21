@@ -17,7 +17,7 @@ export default class Pages {
 
     text = sanitize(text);
 
-    text = this.processor.preprocess(text, containerStyle.textIndent ?? '');
+    text = this.processor.preprocess(text, containerStyle);
 
     this.pageGenerator = parser.generatePages(text);
   }
