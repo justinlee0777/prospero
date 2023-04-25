@@ -2,7 +2,9 @@ import { cloneDeep } from 'lodash-es';
 
 import ParserState from '../../parsers/models/parser-state.interface';
 import Processor from '../models/processor.interface';
-import TextChange from '../../parsers/models/text-change.interface';
+import TextChange, {
+  DeleteWordChange,
+} from '../../parsers/models/text-change.interface';
 import TextChangeType from '../../parsers/models/text-change-type.enum';
 
 interface HTMLTag {
@@ -82,15 +84,29 @@ export default class HTMLProcessor implements Processor {
     const pageDifference = parserState.pages.length - pageLength;
 
     if (pageDifference > 0) {
-      newParserState.pages = [
-        ...newParserState.pages.slice(0, pageLength),
-        ...newParserState.pages.slice(pageLength).map((page, i) => {
-          const changes = parserState.changes[pageLength + i].values.filter(
-            (change) => change.type === TextChangeType.DELETE_WORD
-          );
-          return this.processPage(page, changes);
-        }),
-      ];
+      const pages = newParserState.pages.slice(0, pageLength);
+      const newPages = newParserState.pages.slice(pageLength);
+
+      const changes = newParserState.changes.slice(0, pageLength);
+      const newChanges = newParserState.changes.slice(pageLength);
+
+      for (let i = 0; i < newPages.length; i++) {
+        const pageChanges = newChanges[i].values.filter(
+          (change) => change.type === TextChangeType.DELETE_WORD
+        ) as Array<DeleteWordChange>;
+        const { text, changes: addedChanges } = this.processPage(
+          newPages[i],
+          pageChanges
+        );
+
+        pages.push(text);
+        changes.push({
+          values: [...pageChanges, ...addedChanges],
+        });
+      }
+
+      newParserState.pages = pages;
+      newParserState.changes = changes;
     }
 
     this.previousParserState = newParserState;
@@ -98,7 +114,10 @@ export default class HTMLProcessor implements Processor {
     return newParserState;
   }
 
-  private processPage(page: string, changes: Array<TextChange>): string {
+  private processPage(
+    page: string,
+    changes: Array<DeleteWordChange>
+  ): { text: string; changes: Array<TextChange> } {
     this.preprocessedPages.push(page);
 
     let { nextPageBegin } = this;
@@ -132,6 +151,7 @@ export default class HTMLProcessor implements Processor {
       .reverse();
 
     let postProccessedPage = page;
+    const newChanges: Array<TextChange> = [];
 
     relevantTags.forEach((tag) => {
       const {
@@ -147,11 +167,21 @@ export default class HTMLProcessor implements Processor {
         0,
         normalizedBegin
       )}${reconstructedTag}${postProccessedPage.slice(normalizedEnd)}`;
+
+      newChanges.unshift({
+        original: textContent,
+        replacement: reconstructedTag,
+        textIndex: normalizedBegin + nextPageBegin,
+        type: TextChangeType.REPLACE,
+      });
     });
 
     this.nextPageBegin = nextPageBegin + pageLength;
 
-    return postProccessedPage;
+    return {
+      text: postProccessedPage,
+      changes: newChanges,
+    };
   }
 
   private reconstructHTMLString(
