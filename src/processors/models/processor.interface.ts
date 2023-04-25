@@ -1,9 +1,10 @@
-import TextStyle from './text-style.interface';
+import ParserState from '../../parsers/models/parser-state.interface';
 
 /**
  * Processors decorate text.
  * Prospero by default only handles text. Processors can be used to analyze hints within the text itself to
  * enhance the text, so long as the hints do not change the text height or word widths.
+ * Processors cannot be reused across multiple parsers. Please create a unique processor for each unique parser.
  */
 export default interface Processor {
   /**
@@ -11,12 +12,9 @@ export default interface Processor {
    * @param text is the text the user passes in.
    * @returns the text without decorations.
    */
-  preprocess(text: string, textStyle: TextStyle): string;
+  preprocess(text: string): string;
 
   /**
-   * Ran after pages are created. Used to transform the text using hints.
-   * @param pages created. These are pages added, in order; the processor is expected to remember details of past pages.
-   * @returns the transformed pages.
    */
-  postprocess(...pages: Array<string>): Array<string>;
+  postprocess(parserState: ParserState): ParserState;
 }

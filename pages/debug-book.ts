@@ -1,43 +1,18 @@
 import './debug-book.css';
 
-import ContainerStyle from '../src/container-style.interface';
 import div from '../src/elements/div.function';
 import { formatVariables } from '../src/utils/debug/format-variables.function';
 import ParserState from '../src/parsers/models/parser-state.interface';
 import ParserBuilder from '../src/parsers/builders/parser.builder';
+import getTextSample from './get-text-sample.function';
+import containerStyles from './container-style.const';
+import HTMLProcessor from '../src/processors/html/html.processor';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/proteus.txt');
-  const text = await response.text();
-
-  const containerStyles: ContainerStyle = {
-    width: 375,
-    height: 667,
-    computedFontFamily: 'Arial',
-    computedFontSize: '16px',
-    lineHeight: 24,
-    padding: {
-      top: 24,
-      right: 24,
-      bottom: 24,
-      left: 24,
-    },
-    margin: {
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-    },
-    border: {
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-    },
-    textIndent: '     ',
-  };
+  const text = await getTextSample();
 
   const parser = ParserBuilder.fromContainerStyle(containerStyles);
+  parser.setProcessors([new HTMLProcessor()]);
 
   document.body.appendChild(
     div({
@@ -50,7 +25,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     })
   );
 
-  const filter = (parserState: ParserState) => parserState.pages.length === 13;
+  const filter = (parserState: ParserState) => parserState.pages.length === 2;
 
   const parserStates = parser.generateParserStates(text);
 

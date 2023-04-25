@@ -9,8 +9,13 @@ const createNewlineParser: CreateTextParser = (config) => (state, word) => {
       pages: state.pages.concat(
         state.lines.join('') + state.lineText + word.text
       ),
+      changes: state.changes.concat({
+        values: state.pageChanges,
+      }),
+      textIndex: state.textIndex + word.text.length,
       // Cut the current text and begin on a newline.
       lines: [],
+      pageChanges: [],
       line: 0,
       lineWidth: Big(config.textIndent.width),
       lineText: '',
@@ -18,6 +23,7 @@ const createNewlineParser: CreateTextParser = (config) => (state, word) => {
   } else {
     return {
       ...state,
+      textIndex: state.textIndex + word.text.length,
       // Cut the current text and begin on a newline.
       lines: state.lines.concat(state.lineText + word.text),
       line: state.line + 1,

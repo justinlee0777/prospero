@@ -13,8 +13,11 @@ import parseWord from './word/word.parser';
 import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
 import Word from '../models/word.interface';
 import CalculateWordWidth from '../builders/calculate-word-width.interface';
+import Parser from '../models/parser.interface';
+import Processor from '../../processors/models/processor.interface';
+import parseEnd from './end.parser';
 
-export class DefaultLinkBreakParser {
+export class DefaultLinkBreakParser implements Parser {
   /**
    * This is used to debug the parser. Beware if you use this directly. Or don't, I don't really care beyond documentation.
    */
@@ -35,6 +38,7 @@ export class DefaultLinkBreakParser {
   private readonly parseWord: ParseWord;
 
   private calculateWordWidth: CalculateWordWidth;
+  private processors: Array<Processor> = [];
 
   constructor(private config: CreateTextParserConfig) {
     this.debug = {
@@ -81,14 +85,26 @@ export class DefaultLinkBreakParser {
     this.calculateWordWidth = calculateWordWidth;
   }
 
+  setProcessors(processors: Processor[]): void {
+    this.processors = processors;
+  }
+
   *generateParserStates(text: string): Generator<ParserState> {
+    text = this.processors.reduce(
+      (newText, processor) => processor.preprocess(newText),
+      text
+    );
+
     const tokens = text.matchAll(this.tokenExpression);
     const calculateWordWidth = this.calculateWordWidth;
 
     let parserState: ParserState = {
       pages: [],
+      textIndex: 0,
+      changes: [],
 
       lines: [],
+      pageChanges: [],
 
       lineWidth: Big(this.config.textIndent.width),
       line: 0,
@@ -139,9 +155,14 @@ export class DefaultLinkBreakParser {
       };
 
       parserState = parseText(parserState, wordState);
-
+      parserState = this.postprocessParserState(parserState);
       yield parserState;
     }
+
+    parserState = parseEnd(parserState, { text: '', width: Big(0) });
+    parserState = this.postprocessParserState(parserState);
+
+    yield parserState;
   }
 
   *generatePages(text: string): Generator<string> {
@@ -159,9 +180,12 @@ export class DefaultLinkBreakParser {
 
       parserState = newParserState;
     }
+  }
 
-    if (parserState.lines.length > 0) {
-      yield [...parserState.lines, parserState.lineText].join('');
-    }
+  private postprocessParserState(parserState: ParserState): ParserState {
+    return this.processors.reduce(
+      (newParserState, processor) => processor.postprocess(newParserState),
+      parserState
+    );
   }
 }

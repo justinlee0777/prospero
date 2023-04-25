@@ -17,7 +17,7 @@ export default class Pages {
 
     text = sanitize(text);
 
-    text = this.processor.preprocess(text, containerStyle);
+    parser.setProcessors([this.processor]);
 
     this.pageGenerator = parser.generatePages(text);
   }
@@ -44,9 +44,7 @@ export default class Pages {
         }
       }
 
-      const postprocessedPages = this.processor.postprocess(...newPages);
-
-      this.cachedPages.push(...postprocessedPages);
+      this.cachedPages.push(...newPages);
 
       return this.cachedPages[pageNumber] || null;
     }

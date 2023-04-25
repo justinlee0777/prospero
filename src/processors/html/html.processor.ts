@@ -1,5 +1,9 @@
+import { cloneDeep } from 'lodash-es';
+
+import ParserState from '../../parsers/models/parser-state.interface';
 import Processor from '../models/processor.interface';
-import TextStyle from '../models/text-style.interface';
+import TextChange from '../../parsers/models/text-change.interface';
+import TextChangeType from '../../parsers/models/text-change-type.enum';
 
 interface HTMLTag {
   openingTag: string;
@@ -35,11 +39,12 @@ export default class HTMLProcessor implements Processor {
   private htmlTags: Array<HTMLTag> = [];
 
   private preprocessedPages: Array<string> = [];
+  private previousParserState: ParserState | undefined;
   private nextPageBegin = 0;
 
-  preprocess(text: string, textStyle: TextStyle): string {
+  preprocess(text: string): string {
     // Offsetting the index returned by 'replace' after the replacement has occurred (as the function does not do so.)
-    let normalizedOffset = -(textStyle.textIndent ?? '').length;
+    let normalizedOffset = 0;
 
     return text.replace(
       HTMLProcessor.HTMLRegex,
@@ -70,52 +75,83 @@ export default class HTMLProcessor implements Processor {
     );
   }
 
-  postprocess(...pages: Array<string>): Array<string> {
-    return pages.map((page) => {
-      this.preprocessedPages.push(page);
+  postprocess(parserState: ParserState): ParserState {
+    const newParserState = cloneDeep(parserState);
 
-      const { nextPageBegin } = this;
-      const pageLength = page.length;
+    const pageLength = this.previousParserState?.pages.length ?? 0;
+    const pageDifference = parserState.pages.length - pageLength;
 
-      const nextPageEnd = nextPageBegin + pageLength;
-
-      const relevantTags = this.htmlTags
-        .filter((htmlTag) => {
-          const {
-            indices: { begin, end },
-          } = htmlTag;
-
-          return (
-            (nextPageBegin <= begin && begin <= nextPageEnd) ||
-            (nextPageBegin <= end && end <= nextPageEnd)
+    if (pageDifference > 0) {
+      newParserState.pages = [
+        ...newParserState.pages.slice(0, pageLength),
+        ...newParserState.pages.slice(pageLength).map((page, i) => {
+          const changes = parserState.changes[pageLength + i].values.filter(
+            (change) => change.type === TextChangeType.DELETE_WORD
           );
-        })
-        // reversing the tags so that we may work backwards and not be confused by changing indexes
-        .reverse();
+          return this.processPage(page, changes);
+        }),
+      ];
+    }
 
-      let postProccessedPage = page;
+    this.previousParserState = newParserState;
 
-      relevantTags.forEach((tag) => {
+    return newParserState;
+  }
+
+  private processPage(page: string, changes: Array<TextChange>): string {
+    this.preprocessedPages.push(page);
+
+    let { nextPageBegin } = this;
+    const pageLength = page.length;
+
+    let nextPageEnd = nextPageBegin + pageLength;
+
+    const relevantTags = this.htmlTags
+      .filter((htmlTag) => {
         const {
           indices: { begin, end },
-        } = tag;
-        const normalizedBegin = Math.max(begin - nextPageBegin, 0);
-        const normalizedEnd = Math.min(end - nextPageBegin, pageLength);
+        } = htmlTag;
 
-        const textContent = page.slice(normalizedBegin, normalizedEnd);
+        const relevantChanges = changes.filter(
+          (change) => begin >= change.textIndex
+        );
 
-        const reconstructedTag = this.reconstructHTMLString(tag, textContent);
+        relevantChanges.forEach(
+          (change) => (nextPageBegin += change.word.length)
+        );
 
-        postProccessedPage = `${postProccessedPage.slice(
-          0,
-          normalizedBegin
-        )}${reconstructedTag}${postProccessedPage.slice(normalizedEnd)}`;
-      });
+        // assuming changes are ordered
+        changes = changes.slice(relevantChanges.length);
 
-      this.nextPageBegin += pageLength;
+        return (
+          (nextPageBegin <= begin && begin <= nextPageEnd) ||
+          (nextPageBegin <= end && end <= nextPageEnd)
+        );
+      })
+      // reversing the tags so that we may work backwards and not be confused by changing indexes
+      .reverse();
 
-      return postProccessedPage;
+    let postProccessedPage = page;
+
+    relevantTags.forEach((tag) => {
+      const {
+        indices: { begin, end },
+      } = tag;
+      const normalizedBegin = Math.max(begin - nextPageBegin, 0);
+      const normalizedEnd = Math.min(end - nextPageBegin, pageLength);
+      const textContent = page.slice(normalizedBegin, normalizedEnd);
+
+      const reconstructedTag = this.reconstructHTMLString(tag, textContent);
+
+      postProccessedPage = `${postProccessedPage.slice(
+        0,
+        normalizedBegin
+      )}${reconstructedTag}${postProccessedPage.slice(normalizedEnd)}`;
     });
+
+    this.nextPageBegin = nextPageBegin + pageLength;
+
+    return postProccessedPage;
   }
 
   private reconstructHTMLString(
