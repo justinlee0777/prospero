@@ -8,6 +8,7 @@ const options: sanitizeHtml.IOptions = {
   allowedStyles: {
     '*': {
       color: [
+        /[a-z]+/i,
         /^#(0x)?[0-9a-f]+$/i,
         /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/,
       ],
