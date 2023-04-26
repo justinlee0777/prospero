@@ -93,11 +93,18 @@ export default class HTMLProcessor implements Processor {
       for (let i = 0; i < newPages.length; i++) {
         const pageChanges = newChanges[i].values.filter(
           (change) => change.type === TextChangeType.DELETE_WORD
-        ) as Array<DeleteWordChange>;
-        const { text, changes: addedChanges } = this.processPage(
-          newPages[i],
-          pageChanges
         );
+
+        pageChanges.forEach((change: DeleteWordChange) => {
+          this.htmlTags.forEach(htmlTag => {
+            if (htmlTag.indices.begin >= change.textIndex) {
+              htmlTag.indices.begin = htmlTag.indices.begin - change.word.length;
+              htmlTag.indices.end = htmlTag.indices.end - change.word.length;
+            }
+          });
+        });
+
+        const { text, changes: addedChanges } = this.processPage(newPages[i]);
 
         pages.push(text);
         changes.push({
@@ -114,10 +121,7 @@ export default class HTMLProcessor implements Processor {
     return newParserState;
   }
 
-  private processPage(
-    page: string,
-    changes: Array<DeleteWordChange>
-  ): { text: string; changes: Array<TextChange> } {
+  private processPage(page: string): { text: string; changes: Array<TextChange> } {
     this.preprocessedPages.push(page);
 
     let { nextPageBegin } = this;
@@ -130,17 +134,6 @@ export default class HTMLProcessor implements Processor {
         const {
           indices: { begin, end },
         } = htmlTag;
-
-        const relevantChanges = changes.filter(
-          (change) => begin >= change.textIndex
-        );
-
-        relevantChanges.forEach(
-          (change) => (nextPageBegin += change.word.length)
-        );
-
-        // assuming changes are ordered
-        changes = changes.slice(relevantChanges.length);
 
         return (
           (nextPageBegin <= begin && begin <= nextPageEnd) ||
