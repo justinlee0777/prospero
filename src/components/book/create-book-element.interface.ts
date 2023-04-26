@@ -9,6 +9,7 @@ interface BookArgs {
 
   currentPage?: number;
   containerStyles?: ContainerStyle;
+  pageStyles?: Partial<CSSStyleDeclaration>;
   pageLayout?: PageLayout;
 }
 

@@ -16,7 +16,13 @@ import CreateBookElement from './create-book-element.interface';
 import PageNumberingAlignment from '../page/page-numbering-alignment.enum';
 
 const BookComponent: CreateBookElement = (
-  { getPage, currentPage = 0, containerStyles, pageLayout = PageLayout.SINGLE },
+  {
+    getPage,
+    currentPage = 0,
+    pageStyles: userDefinedPageStyles = {},
+    containerStyles,
+    pageLayout = PageLayout.SINGLE,
+  },
   config = {}
 ) => {
   let bookStyles: Partial<CSSStyleDeclaration>;
@@ -46,6 +52,7 @@ const BookComponent: CreateBookElement = (
     };
 
     pageStyles = {
+      ...userDefinedPageStyles,
       width: pageWidth,
       paddingTop: styles.paddingTop,
       paddingRight: styles.paddingRight,
