@@ -16,8 +16,9 @@ import Parser from '../models/parser.interface';
 import Processor from '../../processors/models/processor.interface';
 import parseEnd from './end.parser';
 import WordWidthCalculator from '../../word-width.calculator';
+import sanitize from '../../sanitizers/html.sanitizer';
 
-export class DefaultLinkBreakParser implements Parser {
+export default class DefaultLinkBreakParser implements Parser {
   /**
    * This is used to debug the parser. Beware if you use this directly. Or don't, I don't really care beyond documentation.
    */
@@ -90,6 +91,8 @@ export class DefaultLinkBreakParser implements Parser {
   }
 
   *generateParserStates(text: string): Generator<ParserState> {
+    text = sanitize(text);
+
     text = this.processors.reduce(
       (newText, processor) => processor.preprocess?.(newText) ?? newText,
       text
@@ -179,7 +182,7 @@ export class DefaultLinkBreakParser implements Parser {
         parserState &&
         newParserState.pages.length > parserState.pages.length
       ) {
-        yield newParserState.pages[newParserState.pages.length - 1];
+        yield newParserState.pages.at(-1);
       }
 
       parserState = newParserState;
@@ -189,7 +192,7 @@ export class DefaultLinkBreakParser implements Parser {
   private postprocessParserState(parserState: ParserState): ParserState {
     return this.processors.reduce(
       (newParserState, processor) =>
-        processor.postprocess?.(newParserState) ?? newParserState,
+        processor.process?.(newParserState) ?? newParserState,
       parserState
     );
   }

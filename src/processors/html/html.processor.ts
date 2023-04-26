@@ -3,20 +3,32 @@ import { cloneDeep } from 'lodash-es';
 import ParserState from '../../parsers/models/parser-state.interface';
 import Processor from '../models/processor.interface';
 import TextChange, {
-  AddWordChange,
-  DeleteWordChange,
+  AddTextChange,
+  DeleteTextChange,
 } from '../../parsers/models/text-change.interface';
 import TextChangeType from '../../parsers/models/text-change-type.enum';
 
+/**
+ * Memorized description of HTML tags for (ideally) quick and simple replacements in the text.
+ */
 interface HTMLTag {
+  /**
+   * This is saved as the opening tag contains all the important HTML attributes, thanks to HTML conventions.
+   * ex. <span style="color: red">
+   */
   openingTag: string;
+  /** ex. span, div, p */
   tagName: string;
+  /** Indices in the original text where the tags were found. */
   indices: {
     begin: number;
     end: number;
   };
 }
 
+/**
+ * Remove and add HTML tags into pages.
+ */
 export default class HTMLProcessor implements Processor {
   /**
    * Omitting non-closing tags for the time-being as those - afaik - are not allowed.
@@ -41,8 +53,8 @@ export default class HTMLProcessor implements Processor {
 
   private htmlTags: Array<HTMLTag> = [];
 
-  private preprocessedPages: Array<string> = [];
   private previousParserState: ParserState | undefined;
+  /** Keeps track of the page lengths before changes are made, as the HTML replacements will cause a human to go insane. */
   private nextPageBegin = 0;
 
   preprocess(text: string): string {
@@ -78,13 +90,15 @@ export default class HTMLProcessor implements Processor {
     );
   }
 
-  postprocess(parserState: ParserState): ParserState {
+  process(parserState: ParserState): ParserState {
     const newParserState = cloneDeep(parserState);
 
     const pageLength = this.previousParserState?.pages.length ?? 0;
     const pageDifference = parserState.pages.length - pageLength;
 
     if (pageDifference > 0) {
+      // Only act on pages so that the entire page text can be operated on, rather than line chunks.
+
       const pages = newParserState.pages.slice(0, pageLength);
       const newPages = newParserState.pages.slice(pageLength);
 
@@ -92,16 +106,22 @@ export default class HTMLProcessor implements Processor {
       const newChanges = newParserState.changes.slice(pageLength);
 
       for (let i = 0; i < newPages.length; i++) {
+        // Get the relevant page changes that change the text indices.
         const pageChanges = newChanges[i].values.filter(
           (change) =>
             change.type === TextChangeType.DELETE_WORD ||
             change.type === TextChangeType.ADD_WORD
         );
 
-        pageChanges.forEach((change: AddWordChange | DeleteWordChange) => {
+        /*
+         * Using the page changes, adjust the existing word tag indices.
+         * We adjust every tag that happens at or after the word change.
+         */
+        pageChanges.forEach((change: AddTextChange | DeleteTextChange) => {
           this.htmlTags.forEach((htmlTag) => {
+            // If words are added, push the index by the word amount. If words are deleted, set it back.
             const offset = change.type === TextChangeType.ADD_WORD ? 1 : -1;
-            const wordLength = offset * change.word.length;
+            const wordLength = offset * change.text.length;
 
             if (htmlTag.indices.begin >= change.textIndex) {
               htmlTag.indices.begin = htmlTag.indices.begin + wordLength;
@@ -118,7 +138,9 @@ export default class HTMLProcessor implements Processor {
         });
       }
 
+      // Update the parser state to manifest the changes.
       newParserState.pages = pages;
+      // Remember to inform other processors of your own changes.
       newParserState.changes = changes;
     }
 
@@ -127,17 +149,24 @@ export default class HTMLProcessor implements Processor {
     return newParserState;
   }
 
+  /**
+   * @param page text generated.
+   * @returns the transformed text with tags and changes describing the operations.
+   */
   private processPage(page: string): {
     text: string;
     changes: Array<TextChange>;
   } {
-    this.preprocessedPages.push(page);
-
     let { nextPageBegin } = this;
     const pageLength = page.length;
 
     let nextPageEnd = nextPageBegin + pageLength;
 
+    /*
+     * Using the indices from the original text (and NOT the page's indices) as the bounds,
+     * find the tags that need to be applied for this page.
+     * As pages can cut off tags, we want a union of tags that include the beginning index and ending index.
+     */
     const relevantTags = this.htmlTags
       .filter((htmlTag) => {
         const {
@@ -155,6 +184,13 @@ export default class HTMLProcessor implements Processor {
     let postProccessedPage = page;
     const newChanges: Array<TextChange> = [];
 
+    /*
+     * For each relevant tag,
+     * - calculate the normalized beginning and end (as in, convert the index for the entire text into the page's index (bigger bounds to smaller))
+     * - reconstruct the HTML string: foo -> <span style="color: red">foo</span>
+     * - replace the text content -> text content bound by tag
+     * - record a description of the changes
+     */
     relevantTags.forEach((tag) => {
       const {
         indices: { begin, end },
@@ -186,6 +222,9 @@ export default class HTMLProcessor implements Processor {
     };
   }
 
+  /**
+   * @returns the text content bound by the HTML tag.
+   */
   private reconstructHTMLString(
     { openingTag, tagName }: HTMLTag,
     withTextContent = ''

@@ -1,9 +1,7 @@
 import ContainerStyle from './container-style.interface';
 import GetPage from './get-page.interface';
 import ParserBuilder from './parsers/builders/parser.builder';
-import HTMLProcessor from './processors/html/html.processor';
 import Processor from './processors/models/processor.interface';
-import sanitize from './sanitizers/html.sanitizer';
 
 export default class Pages {
   private pageGenerator: Generator<string>;
@@ -23,8 +21,6 @@ export default class Pages {
     }
 
     const parser = parserBuilder.build();
-
-    text = sanitize(text);
 
     this.pageGenerator = parser.generatePages(text);
   }

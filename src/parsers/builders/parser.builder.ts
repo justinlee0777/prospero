@@ -1,11 +1,12 @@
 import ContainerStyle from '../../container-style.interface';
-import { DefaultLinkBreakParser } from '../default-line-break/default-line-break.parser';
 import getNormalizedPageHeight from './get-normalized-page-height.function';
 import Processor from '../../processors/models/processor.interface';
 import WordWidthCalculator from '../../word-width.calculator';
+import Parser from '../models/parser.interface';
+import DefaultLinkBreakParser from '../default-line-break/default-line-break.parser';
 
 export default class ParserBuilder {
-  private parser: DefaultLinkBreakParser | undefined;
+  private parser: Parser | undefined;
 
   private calculator: WordWidthCalculator | undefined;
 
@@ -68,7 +69,7 @@ export default class ParserBuilder {
     return this;
   }
 
-  build(): DefaultLinkBreakParser {
+  build(): Parser {
     return this.parser;
   }
 }

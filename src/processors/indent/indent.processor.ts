@@ -6,11 +6,17 @@ import ProcessorConfig from '../models/processor.config';
 import Processor from '../models/processor.interface';
 import TextChangeType from '../../parsers/models/text-change-type.enum';
 
+/**
+ * Add indentation to new paragraphs.
+ */
 export default class IndentProcessor implements Processor {
   private indent: Word;
 
   constructor(private spaces: number) {}
 
+  /**
+   * Calculates the size of the indentation in pixels.
+   */
   configure({ calculator }: ProcessorConfig): void {
     const text = Array(this.spaces).fill(' ').join('');
 
@@ -20,29 +26,47 @@ export default class IndentProcessor implements Processor {
     };
   }
 
-  postprocess(parserState: ParserState): ParserState {
-    let newlineFound: boolean;
+  process(parserState: ParserState): ParserState {
+    let addIndentation: boolean;
 
     if (parserState.lineText.length > 0) {
-      newlineFound = false;
+      // If the current line already has text, then no indentation should be added.
+      addIndentation = false;
     } else if (parserState.lines.length > 0) {
-      newlineFound = parserState.lines.at(-1) === '\n';
+      /*
+       * As the current line has no text,
+       * If there are previous lines, check if the last character was a newline.
+       */
+      addIndentation = parserState.lines.at(-1) === '\n';
     } else if (parserState.pages.length > 0) {
-      newlineFound = parserState.pages.at(-1) === '\n';
+      /*
+       * As the current line has no text,
+       * and there are no previous lines (this is a new page),
+       * check if the last character on the last page was a newline.
+       */
+      addIndentation = parserState.pages.at(-1) === '\n';
     } else {
-      newlineFound = true;
+      /*
+       * The current line has no text,
+       * there are no previous lines,
+       * there are not even previous pages,
+       * so this is the beginning of the text. Add an indentation.
+       */
+      addIndentation = true;
     }
 
-    if (newlineFound) {
+    if (addIndentation) {
       return {
         ...parserState,
+        // Tell the parser the indentation was added.
         pageChanges: parserState.pageChanges.concat({
           textIndex: parserState.textIndex,
-          word: this.indent.text,
+          text: this.indent.text,
           type: TextChangeType.ADD_WORD,
         }),
         textIndex: parserState.textIndex + this.indent.text.length,
         lineWidth: this.indent.width,
+        // Set the indentation. No concat'ing here as this should be the start of the line.
         lineText: this.indent.text,
       };
     } else {

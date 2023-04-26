@@ -6,7 +6,7 @@ const parseWhitespaceAtPageBeginning: ParseWord = (state, word) => {
   return {
     ...state,
     pageChanges: state.pageChanges.concat({
-      word: word.text,
+      text: word.text,
       textIndex: state.textIndex,
       type: TextChangeType.DELETE_WORD,
     }),
