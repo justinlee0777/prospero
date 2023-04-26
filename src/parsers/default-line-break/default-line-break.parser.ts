@@ -18,7 +18,7 @@ import parseEnd from './end.parser';
 import WordWidthCalculator from '../../word-width.calculator';
 import sanitize from '../../sanitizers/html.sanitizer';
 
-export default class DefaultLinkBreakParser implements Parser {
+export default class DefaultLineBreakParser implements Parser {
   /**
    * This is used to debug the parser. Beware if you use this directly. Or don't, I don't really care beyond documentation.
    */
