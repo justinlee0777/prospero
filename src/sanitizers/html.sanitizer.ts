@@ -1,8 +1,9 @@
 import sanitizeHtml from 'sanitize-html';
 
 const options: sanitizeHtml.IOptions = {
-  allowedTags: ['span'],
+  allowedTags: ['a', 'code', 'em', 'span'],
   allowedAttributes: {
+    a: ['href'],
     span: ['style'],
   },
   allowedStyles: {

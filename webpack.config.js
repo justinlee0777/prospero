@@ -140,6 +140,7 @@ module.exports = [
             from: './text-samples',
             to: 'text-samples',
           },
+          'README.md',
         ],
       }),
       ...plugins,
