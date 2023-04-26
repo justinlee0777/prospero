@@ -5,11 +5,12 @@ import PageLayout from '../src/components/book/page-layout.enum';
 import Pages from '../src/pages';
 import getTextSample from './get-text-sample.function';
 import containerStyles from './container-style.const';
+import processors from './processors.const';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const text = await getTextSample();
 
-  const pages = new Pages(containerStyles, text);
+  const pages = new Pages(containerStyles, text, processors);
 
   const book = BookComponent(
     {

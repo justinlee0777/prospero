@@ -1,5 +1,11 @@
 import TextChangeType from './text-change-type.enum';
 
+export interface AddWordChange {
+  word: string;
+  textIndex: number;
+  type: TextChangeType.ADD_WORD;
+}
+
 export interface DeleteWordChange {
   word: string;
   textIndex: number;
@@ -13,6 +19,6 @@ export interface ReplaceChange {
   type: TextChangeType.REPLACE;
 }
 
-type TextChange = DeleteWordChange | ReplaceChange;
+type TextChange = AddWordChange | DeleteWordChange | ReplaceChange;
 
 export default TextChange;

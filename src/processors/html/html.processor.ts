@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash-es';
 import ParserState from '../../parsers/models/parser-state.interface';
 import Processor from '../models/processor.interface';
 import TextChange, {
+  AddWordChange,
   DeleteWordChange,
 } from '../../parsers/models/text-change.interface';
 import TextChangeType from '../../parsers/models/text-change-type.enum';
@@ -92,14 +93,19 @@ export default class HTMLProcessor implements Processor {
 
       for (let i = 0; i < newPages.length; i++) {
         const pageChanges = newChanges[i].values.filter(
-          (change) => change.type === TextChangeType.DELETE_WORD
+          (change) =>
+            change.type === TextChangeType.DELETE_WORD ||
+            change.type === TextChangeType.ADD_WORD
         );
 
-        pageChanges.forEach((change: DeleteWordChange) => {
-          this.htmlTags.forEach(htmlTag => {
+        pageChanges.forEach((change: AddWordChange | DeleteWordChange) => {
+          this.htmlTags.forEach((htmlTag) => {
+            const offset = change.type === TextChangeType.ADD_WORD ? 1 : -1;
+            const wordLength = offset * change.word.length;
+
             if (htmlTag.indices.begin >= change.textIndex) {
-              htmlTag.indices.begin = htmlTag.indices.begin - change.word.length;
-              htmlTag.indices.end = htmlTag.indices.end - change.word.length;
+              htmlTag.indices.begin = htmlTag.indices.begin + wordLength;
+              htmlTag.indices.end = htmlTag.indices.end + wordLength;
             }
           });
         });
@@ -121,7 +127,10 @@ export default class HTMLProcessor implements Processor {
     return newParserState;
   }
 
-  private processPage(page: string): { text: string; changes: Array<TextChange> } {
+  private processPage(page: string): {
+    text: string;
+    changes: Array<TextChange>;
+  } {
     this.preprocessedPages.push(page);
 
     let { nextPageBegin } = this;

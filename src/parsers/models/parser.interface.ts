@@ -1,5 +1,5 @@
 import Processor from '../../processors/models/processor.interface';
-import CalculateWordWidth from '../builders/calculate-word-width.interface';
+import WordWidthCalculator from '../../word-width.calculator';
 import ParserState from './parser-state.interface';
 
 export default interface Parser {
@@ -10,7 +10,7 @@ export default interface Parser {
     pageWidth: number;
   };
 
-  setCalculateWordWidth(calculateWordWidth: CalculateWordWidth): void;
+  setCalculator(calculator: WordWidthCalculator): void;
 
   setProcessors(processors: Array<Processor>): void;
 

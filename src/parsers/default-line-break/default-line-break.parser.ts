@@ -12,10 +12,10 @@ import createWordAtTextOverflowParser from './word/word-at-text-overflow.parser'
 import parseWord from './word/word.parser';
 import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
 import Word from '../models/word.interface';
-import CalculateWordWidth from '../builders/calculate-word-width.interface';
 import Parser from '../models/parser.interface';
 import Processor from '../../processors/models/processor.interface';
 import parseEnd from './end.parser';
+import WordWidthCalculator from '../../word-width.calculator';
 
 export class DefaultLinkBreakParser implements Parser {
   /**
@@ -37,7 +37,7 @@ export class DefaultLinkBreakParser implements Parser {
   private readonly parseWordAtTextOverflow: ParseWord;
   private readonly parseWord: ParseWord;
 
-  private calculateWordWidth: CalculateWordWidth;
+  private calculator: WordWidthCalculator;
   private processors: Array<Processor> = [];
 
   constructor(private config: CreateTextParserConfig) {
@@ -81,8 +81,8 @@ export class DefaultLinkBreakParser implements Parser {
     this.parseWord = parseWord;
   }
 
-  setCalculateWordWidth(calculateWordWidth: CalculateWordWidth): void {
-    this.calculateWordWidth = calculateWordWidth;
+  setCalculator(calculator: WordWidthCalculator): void {
+    this.calculator = calculator;
   }
 
   setProcessors(processors: Processor[]): void {
@@ -91,12 +91,12 @@ export class DefaultLinkBreakParser implements Parser {
 
   *generateParserStates(text: string): Generator<ParserState> {
     text = this.processors.reduce(
-      (newText, processor) => processor.preprocess(newText),
+      (newText, processor) => processor.preprocess?.(newText) ?? newText,
       text
     );
 
     const tokens = text.matchAll(this.tokenExpression);
-    const calculateWordWidth = this.calculateWordWidth;
+    const calculateWordWidth = (word) => this.calculator.calculate(word);
 
     let parserState: ParserState = {
       pages: [],
@@ -106,10 +106,14 @@ export class DefaultLinkBreakParser implements Parser {
       lines: [],
       pageChanges: [],
 
-      lineWidth: Big(this.config.textIndent.width),
+      lineWidth: Big(0),
       line: 0,
-      lineText: this.config.textIndent.text,
+      lineText: '',
     };
+
+    parserState = this.postprocessParserState(parserState);
+
+    yield parserState;
 
     for (const token of tokens) {
       const { 0: word, groups } = token;
@@ -184,7 +188,8 @@ export class DefaultLinkBreakParser implements Parser {
 
   private postprocessParserState(parserState: ParserState): ParserState {
     return this.processors.reduce(
-      (newParserState, processor) => processor.postprocess(newParserState),
+      (newParserState, processor) =>
+        processor.postprocess?.(newParserState) ?? newParserState,
       parserState
     );
   }

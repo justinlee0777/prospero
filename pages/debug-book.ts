@@ -6,13 +6,15 @@ import ParserState from '../src/parsers/models/parser-state.interface';
 import ParserBuilder from '../src/parsers/builders/parser.builder';
 import getTextSample from './get-text-sample.function';
 import containerStyles from './container-style.const';
-import HTMLProcessor from '../src/processors/html/html.processor';
+import processors from './processors.const';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const text = await getTextSample();
 
-  const parser = ParserBuilder.fromContainerStyle(containerStyles);
-  parser.setProcessors([new HTMLProcessor()]);
+  const parser = new ParserBuilder()
+    .fromContainerStyle(containerStyles)
+    .processors(processors)
+    .build();
 
   document.body.appendChild(
     div({
@@ -25,7 +27,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     })
   );
 
-  const filter = (parserState: ParserState) => parserState.pages.length === 2;
+  const filter = (parserState: ParserState) => parserState.pages.length === 0;
 
   const parserStates = parser.generateParserStates(text);
 

@@ -17,7 +17,7 @@ const createNewlineParser: CreateTextParser = (config) => (state, word) => {
       lines: [],
       pageChanges: [],
       line: 0,
-      lineWidth: Big(config.textIndent.width),
+      lineWidth: Big(0),
       lineText: '',
     };
   } else {
@@ -27,8 +27,8 @@ const createNewlineParser: CreateTextParser = (config) => (state, word) => {
       // Cut the current text and begin on a newline.
       lines: state.lines.concat(state.lineText + word.text),
       line: state.line + 1,
-      lineWidth: Big(config.textIndent.width),
-      lineText: config.textIndent.text,
+      lineWidth: Big(0),
+      lineText: '',
     };
   }
 };
