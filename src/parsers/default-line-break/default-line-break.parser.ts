@@ -12,9 +12,13 @@ import createWordAtTextOverflowParser from './word/word-at-text-overflow.parser'
 import parseWord from './word/word.parser';
 import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
 import Word from '../models/word.interface';
-import CalculateWordWidth from '../builders/calculate-word-width.interface';
+import Parser from '../models/parser.interface';
+import Processor from '../../processors/models/processor.interface';
+import parseEnd from './end.parser';
+import WordWidthCalculator from '../../word-width.calculator';
+import sanitize from '../../sanitizers/html.sanitizer';
 
-export class DefaultLinkBreakParser {
+export default class DefaultLineBreakParser implements Parser {
   /**
    * This is used to debug the parser. Beware if you use this directly. Or don't, I don't really care beyond documentation.
    */
@@ -34,7 +38,8 @@ export class DefaultLinkBreakParser {
   private readonly parseWordAtTextOverflow: ParseWord;
   private readonly parseWord: ParseWord;
 
-  private calculateWordWidth: CalculateWordWidth;
+  private calculator: WordWidthCalculator;
+  private processors: Array<Processor> = [];
 
   constructor(private config: CreateTextParserConfig) {
     this.debug = {
@@ -77,23 +82,41 @@ export class DefaultLinkBreakParser {
     this.parseWord = parseWord;
   }
 
-  setCalculateWordWidth(calculateWordWidth: CalculateWordWidth): void {
-    this.calculateWordWidth = calculateWordWidth;
+  setCalculator(calculator: WordWidthCalculator): void {
+    this.calculator = calculator;
+  }
+
+  setProcessors(processors: Processor[]): void {
+    this.processors = processors;
   }
 
   *generateParserStates(text: string): Generator<ParserState> {
+    text = sanitize(text);
+
+    text = this.processors.reduce(
+      (newText, processor) => processor.preprocess?.(newText) ?? newText,
+      text
+    );
+
     const tokens = text.matchAll(this.tokenExpression);
-    const calculateWordWidth = this.calculateWordWidth;
+    const calculateWordWidth = (word) => this.calculator.calculate(word);
 
     let parserState: ParserState = {
       pages: [],
+      textIndex: 0,
+      changes: [],
 
       lines: [],
+      pageChanges: [],
 
-      lineWidth: Big(this.config.textIndent.width),
+      lineWidth: Big(0),
       line: 0,
-      lineText: this.config.textIndent.text,
+      lineText: '',
     };
+
+    parserState = this.postprocessParserState(parserState);
+
+    yield parserState;
 
     for (const token of tokens) {
       const { 0: word, groups } = token;
@@ -139,9 +162,14 @@ export class DefaultLinkBreakParser {
       };
 
       parserState = parseText(parserState, wordState);
-
+      parserState = this.postprocessParserState(parserState);
       yield parserState;
     }
+
+    parserState = parseEnd(parserState, { text: '', width: Big(0) });
+    parserState = this.postprocessParserState(parserState);
+
+    yield parserState;
   }
 
   *generatePages(text: string): Generator<string> {
@@ -154,14 +182,18 @@ export class DefaultLinkBreakParser {
         parserState &&
         newParserState.pages.length > parserState.pages.length
       ) {
-        yield newParserState.pages[newParserState.pages.length - 1];
+        yield newParserState.pages.at(-1);
       }
 
       parserState = newParserState;
     }
+  }
 
-    if (parserState.lines.length > 0) {
-      yield [...parserState.lines, parserState.lineText].join('');
-    }
+  private postprocessParserState(parserState: ParserState): ParserState {
+    return this.processors.reduce(
+      (newParserState, processor) =>
+        processor.process?.(newParserState) ?? newParserState,
+      parserState
+    );
   }
 }

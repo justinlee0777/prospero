@@ -1,6 +1,7 @@
 import ContainerStyle from './container-style.interface';
 import GetPage from './get-page.interface';
 import ParserBuilder from './parsers/builders/parser.builder';
+import Processor from './processors/models/processor.interface';
 
 export default class Pages {
   private pageGenerator: Generator<string>;
@@ -8,8 +9,19 @@ export default class Pages {
   private cachedPages: Array<string> = [];
   private lastGeneratorResult: IteratorResult<string> | undefined;
 
-  constructor(containerStyle: ContainerStyle, text: string) {
-    const parser = ParserBuilder.fromContainerStyle(containerStyle);
+  constructor(
+    containerStyle: ContainerStyle,
+    text: string,
+    processors?: Array<Processor>
+  ) {
+    let parserBuilder = new ParserBuilder().fromContainerStyle(containerStyle);
+
+    if (processors) {
+      parserBuilder.processors(processors);
+    }
+
+    const parser = parserBuilder.build();
+
     this.pageGenerator = parser.generatePages(text);
   }
 
@@ -21,7 +33,7 @@ export default class Pages {
     } else if (this.lastGeneratorResult?.done) {
       return this.cachedPages[pageNumber] || null;
     } else {
-      const newPages = [];
+      const newPages: Array<string> = [];
       let i = 0;
 
       while (i < difference) {

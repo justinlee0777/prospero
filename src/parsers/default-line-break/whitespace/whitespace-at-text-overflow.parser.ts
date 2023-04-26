@@ -10,8 +10,13 @@ const createWhitespaceAtTextOverflowParser: CreateTextParser =
         pages: state.pages.concat(
           state.lines.join('') + state.lineText + word.text
         ),
+        changes: state.changes.concat({
+          values: state.pageChanges,
+        }),
+        textIndex: state.textIndex + word.text.length,
         // Cut the current text and begin on a newline.
         lines: [],
+        pageChanges: [],
         line: 0,
         lineWidth: Big(0),
         lineText: '',
@@ -19,6 +24,7 @@ const createWhitespaceAtTextOverflowParser: CreateTextParser =
     } else {
       return {
         ...state,
+        textIndex: state.textIndex + word.text.length,
         // Cut the current text and begin on a newline.
         lines: state.lines.concat(state.lineText),
         line: state.line + 1,

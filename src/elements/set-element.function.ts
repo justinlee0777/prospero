@@ -3,6 +3,7 @@ import setAttributes from './set-attributes.function';
 import setChildren from './set-children.function';
 import setClassNames from './set-class-names.function';
 import setEventListeners from './set-event-listeners.function';
+import setInnerHTML from './set-inner-html.function';
 import setStyles from './set-styles.function';
 import setTextContent from './set-text-content.function';
 
@@ -15,6 +16,7 @@ export function setElement(
   }
 
   config.textContent && setTextContent(element, config.textContent);
+  config.innerHTML && setInnerHTML(element, config.innerHTML);
   config.children && setChildren(element, config.children);
   config.classnames && setClassNames(element, config.classnames);
   config.attributes && setAttributes(element, config.attributes);

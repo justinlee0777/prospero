@@ -6,8 +6,13 @@ const createWordAtTextOverflowParser: CreateTextParser =
       return {
         ...state,
         pages: state.pages.concat(state.lines.join('') + state.lineText),
+        changes: state.changes.concat({
+          values: state.pageChanges,
+        }),
+        textIndex: state.textIndex + word.text.length,
         // Cut the current text and begin on a newline.
         lines: [],
+        pageChanges: [],
         line: 0,
         lineWidth: word.width,
         lineText: word.text,
@@ -15,6 +20,7 @@ const createWordAtTextOverflowParser: CreateTextParser =
     } else {
       return {
         ...state,
+        textIndex: state.textIndex + word.text.length,
         // Cut the current text and begin on a newline.
         lines: state.lines.concat(state.lineText),
         line: state.line + 1,
