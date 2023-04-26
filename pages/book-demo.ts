@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     {
       getPage: (pageNumber) => pages.get(pageNumber),
       containerStyles,
-      // pageLayout: PageLayout.DOUBLE,
+      pageLayout: PageLayout.DOUBLE,
     },
     { styles: { margin: 'auto' } }
   );
