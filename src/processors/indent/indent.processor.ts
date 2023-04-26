@@ -26,7 +26,16 @@ export default class IndentProcessor implements Processor {
     };
   }
 
+  /**
+   * @throws an error if the processor has not been configured with a proper calculator.
+   */
   process(parserState: ParserState): ParserState {
+    if (!this.indent) {
+      throw new Error(
+        "Please run 'configure' with a proper calculator before processing."
+      );
+    }
+
     let addIndentation: boolean;
 
     if (parserState.lineText.length > 0) {
@@ -37,14 +46,14 @@ export default class IndentProcessor implements Processor {
        * As the current line has no text,
        * If there are previous lines, check if the last character was a newline.
        */
-      addIndentation = parserState.lines.at(-1) === '\n';
+      addIndentation = parserState.lines.at(-1).at(-1) === '\n';
     } else if (parserState.pages.length > 0) {
       /*
        * As the current line has no text,
        * and there are no previous lines (this is a new page),
        * check if the last character on the last page was a newline.
        */
-      addIndentation = parserState.pages.at(-1) === '\n';
+      addIndentation = parserState.pages.at(-1).at(-1) === '\n';
     } else {
       /*
        * The current line has no text,
