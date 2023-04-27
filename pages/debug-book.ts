@@ -1,5 +1,7 @@
 import './debug-book.css';
 
+import { cloneDeep } from 'lodash-es';
+
 import div from '../src/elements/div.function';
 import { formatVariables } from '../src/utils/debug/format-variables.function';
 import ParserState from '../src/parsers/models/parser-state.interface';
@@ -27,13 +29,15 @@ window.addEventListener('DOMContentLoaded', async () => {
     })
   );
 
-  const filter = (parserState: ParserState) => parserState.pages.length === 0;
+  const filter = (parserState: ParserState) => parserState.pages.length === 2;
 
   const parserStates = parser.generateParserStates(text);
 
   for (const parserState of parserStates) {
     if (filter(parserState)) {
-      const copy = { ...parserState };
+      const copy = cloneDeep(parserState);
+      delete copy['changes'];
+      delete copy['pageChanges'];
       delete copy['pages'];
       delete copy['lines'];
 
