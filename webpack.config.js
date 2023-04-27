@@ -54,39 +54,63 @@ const pageHtml = extensionlessFilenames.map((filename) => {
   });
 });
 
+const productionModuleRules = moduleRules.map((rule) => {
+  if (rule.use.loader === 'ts-loader') {
+    rule = structuredClone(rule);
+    rule.use.options.configFile = 'tsconfig.prod.json';
+  }
+
+  return rule;
+});
+
+const productionConfig = {
+  mode: 'production',
+  output: {
+    filename: '[name].js',
+    library: {
+      type: 'commonjs-module',
+    },
+  },
+  module: {
+    rules: productionModuleRules,
+  },
+  resolve: {
+    extensions: resolvedExtensions,
+  },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: ['package.json'],
+    }),
+    ...plugins,
+  ],
+};
+
 module.exports = [
   {
-    name: 'production',
-    mode: 'production',
+    ...productionConfig,
+    name: 'production-web',
     entry: {
       components: './src/components/index.ts',
+    },
+    target: 'web',
+  },
+  {
+    ...productionConfig,
+    name: 'production-server',
+    entry: {
+      loaders: './src/loaders/index.ts',
       index: './src/index.ts',
     },
-    output: {
-      filename: '[name].js',
-      library: {
-        type: 'commonjs-module',
-      },
-    },
     module: {
-      rules: moduleRules.map((rule) => {
-        if (rule.use.loader === 'ts-loader') {
-          rule = structuredClone(rule);
-          rule.use.options.configFile = 'tsconfig.prod.json';
-        }
-
-        return rule;
-      }),
+      rules: [
+        {
+          test: /\.node$/,
+          loader: 'node-loader',
+        },
+        ...productionModuleRules,
+      ],
     },
-    resolve: {
-      extensions: resolvedExtensions,
-    },
-    plugins: [
-      new CopyWebpackPlugin({
-        patterns: ['package.json'],
-      }),
-      ...plugins,
-    ],
+    target: 'node',
   },
   {
     name: 'development',
