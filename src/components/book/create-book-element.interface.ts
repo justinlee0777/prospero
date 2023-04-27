@@ -1,8 +1,7 @@
 import ContainerStyle from '../../container-style.interface';
-import { CreateElementConfig } from '../../elements/create-element.interface';
+import CreateElementConfig from '../../elements/create-element.config';
 import GetPage from '../../get-page.interface';
 import BookElement from './book-element.interface';
-import PageLayout from './page-layout.enum';
 
 interface BookArgs {
   getPage: GetPage;
@@ -10,7 +9,7 @@ interface BookArgs {
   currentPage?: number;
   containerStyles?: ContainerStyle;
   pageStyles?: Partial<CSSStyleDeclaration>;
-  pageLayout?: PageLayout;
+  pagesShown?: number;
 }
 
 export default interface CreateBookElement {

@@ -1,7 +1,6 @@
 import './book-demo.css';
 
 import BookComponent from '../src/components/book/book.component';
-import PageLayout from '../src/components/book/page-layout.enum';
 import Pages from '../src/pages';
 import getTextSample from './get-text-sample.function';
 import containerStyles from './container-style.const';
@@ -19,7 +18,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       pageStyles: {
         backgroundColor: '#f9d8a7',
       },
-      pageLayout: PageLayout.DOUBLE,
+      pagesShown: 3,
     },
     { styles: { margin: 'auto' } }
   );
