@@ -1,5 +1,6 @@
 import ContainerStyle from './container-style.interface';
 import GetPage from './get-page.interface';
+import PagesOutput from './pages-output.interface';
 import ParserBuilder from './parsers/builders/parser.builder';
 import Processor from './processors/models/processor.interface';
 
@@ -10,7 +11,7 @@ export default class Pages {
   private lastGeneratorResult: IteratorResult<string> | undefined;
 
   constructor(
-    containerStyle: ContainerStyle,
+    private containerStyle: ContainerStyle,
     text: string,
     processors?: Array<Processor>
   ) {
@@ -55,5 +56,16 @@ export default class Pages {
 
   getAll(): Array<string> {
     return [...this.pageGenerator];
+  }
+
+  /**
+   * @returns a JS object that is compatable with the structured clone algorithm. This behavior will be unit tested.
+   * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
+   */
+  getData(): PagesOutput {
+    return {
+      pages: this.getAll(),
+      containerStyles: this.containerStyle,
+    };
   }
 }

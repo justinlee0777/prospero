@@ -6,17 +6,36 @@ import updateHandler from './initialization/update-handler.function';
 import initialize from './initialization/initialize.function';
 import listenToKeyboardEvents from './initialization/listen-to-keyboard-events.function';
 import listenToSwipeEvents from './initialization/listen-to-swipe-events.function';
+import GetPage from '../../get-page.interface';
 
 const BookComponent: CreateBookElement = (
+  args,
   {
-    getPage,
     currentPage = 0,
     pageStyles: userDefinedPageStyles = {},
-    containerStyles,
     pagesShown = 1,
+  } = {
+    currentPage: 0,
+    pageStyles: {},
+    pagesShown: 1,
   },
   config = {}
 ) => {
+  const { containerStyles } = args;
+  let getPage: GetPage;
+
+  if ('pages' in args) {
+    getPage = (pageNumber) => {
+      if (pageNumber < 0 || pageNumber >= args.pages.length) {
+        return null;
+      } else {
+        return args.pages[pageNumber];
+      }
+    };
+  } else {
+    getPage = args.getPage;
+  }
+
   let bookStyles: Partial<CSSStyleDeclaration>;
   let pageStyles: Partial<CSSStyleDeclaration>;
 

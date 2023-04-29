@@ -1,3 +1,5 @@
+import PagesBuilder from './pages.builder';
+
 import Pages from './pages';
 
-export { Pages };
+export { PagesBuilder, Pages };

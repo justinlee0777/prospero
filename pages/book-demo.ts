@@ -32,6 +32,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     {
       getPage: (pageNumber) => pages.get(pageNumber),
       containerStyles,
+    },
+    {
       pageStyles: {
         backgroundColor: '#f9d8a7',
       },
