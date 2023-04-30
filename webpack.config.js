@@ -111,6 +111,9 @@ module.exports = [
       ],
     },
     target: 'node',
+    externals: {
+      canvas: 'canvas',
+    },
   },
   {
     name: 'development',

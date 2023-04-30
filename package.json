@@ -29,11 +29,11 @@
     "typescript": "^5.0.3",
     "typescript-plugin-css-modules": "^5.0.0",
     "webpack": "^5.77.0",
-    "webpack-cli": "^5.0.1"
+    "webpack-cli": "^5.0.1",
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
     "big.js": "^6.2.1",
-    "canvas": "^2.11.2",
     "lodash-es": "^4.17.21",
     "rehype-stringify": "^9.0.3",
     "remark-gfm": "^3.0.1",
@@ -41,5 +41,8 @@
     "remark-rehype": "^10.1.0",
     "sanitize-html": "^2.10.0",
     "unified": "^10.1.2"
+  },
+  "peerDependencies": {
+    "canvas": "^2.11.2"
   }
 }
