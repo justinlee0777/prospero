@@ -5,7 +5,7 @@ module.exports = {
   name: 'production-web',
   mode: 'production',
   entry: {
-    components: './src/components/index.ts',
+    web: ['./src/components/index.ts'],
   },
   output: {
     filename: '[name].js',

@@ -4,7 +4,7 @@ import path from 'path';
 import containerStyles from './container-style.const';
 import getTextSample from './get-text-sample.function';
 import processors from './processors.const';
-import { Pages } from '../src';
+import { Pages } from '../src/server';
 import { pagesJsonLocation } from './pages-json-location.const';
 
 const text = await getTextSample();

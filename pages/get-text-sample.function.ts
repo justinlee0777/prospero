@@ -1,4 +1,4 @@
-import { LoaderBuilder } from '../src/loaders';
+import { LoaderBuilder } from '../src/loaders/public-api';
 
 export default async function getTextSample(): Promise<string> {
   const url = './text-samples/ping.txt';

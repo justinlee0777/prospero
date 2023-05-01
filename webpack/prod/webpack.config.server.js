@@ -4,11 +4,8 @@ module.exports = {
   name: 'production-server',
   mode: 'production',
   entry: {
-    loaders: './src/loaders/index.ts',
-    index: './src/index.ts',
-    processors: './src/processors/index.ts',
+    server: './src/server.ts',
   },
-
   output: {
     filename: '[name].js',
     library: {
