@@ -100,6 +100,7 @@ module.exports = [
     entry: {
       loaders: './src/loaders/index.ts',
       index: './src/index.ts',
+      processors: './src/processors/index.ts',
     },
     module: {
       rules: [

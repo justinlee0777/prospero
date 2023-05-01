@@ -13,12 +13,17 @@ export default class Pages {
   constructor(
     private containerStyle: ContainerStyle,
     text: string,
-    processors?: Array<Processor>
+    processors?: Array<Processor>,
+    { fontLocation }: { fontLocation?: string } = {}
   ) {
     let parserBuilder = new ParserBuilder().fromContainerStyle(containerStyle);
 
     if (processors) {
-      parserBuilder.processors(processors);
+      parserBuilder.setProcessors(processors);
+    }
+
+    if (fontLocation) {
+      parserBuilder.setFontLocation(fontLocation);
     }
 
     const parser = parserBuilder.build();

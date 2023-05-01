@@ -10,5 +10,6 @@
         "name": "typescript-plugin-css-modules"
       }
     ]
-  }
+  },
+  "exclude": ["**/*.spec.ts"]
 }

@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const parser = new ParserBuilder()
     .fromContainerStyle(containerStyles)
-    .processors(processors)
+    .setProcessors(processors)
     .build();
 
   document.body.appendChild(

@@ -19,6 +19,7 @@ export default class PagesBuilder {
   ];
 
   private font: Pick<ContainerStyle, 'computedFontSize' | 'computedFontFamily'>;
+  private fontLocation: string;
 
   private lineHeight: number;
 
@@ -51,12 +52,14 @@ export default class PagesBuilder {
 
   [setFontMethod](
     computedFontSize: string,
-    computedFontFamily: string
+    computedFontFamily: string,
+    fontLocation?: string
   ): PagesBuilder {
     this.font = {
       computedFontSize,
       computedFontFamily,
     };
+    this.fontLocation = fontLocation;
 
     return this;
   }
@@ -132,7 +135,8 @@ export default class PagesBuilder {
               ...this.box,
             },
             this.text,
-            this.processors
+            this.processors,
+            { fontLocation: this.fontLocation }
           );
         })
     );
