@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "build": "rm -rf dist && webpack",
-    "start": "npm run build -- --config-name=development && http-server -c-1 ./dist",
+    "start": "./scripts/start-dev-server.sh",
     "build:lib": "npm run build -- --config-name production-web production-server",
     "format": "prettier --write .",
     "test": "jest"

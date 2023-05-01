@@ -1,3 +1,4 @@
+import { readFile } from 'fs';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
@@ -23,12 +24,6 @@ export default class LoaderBuilder {
   }
 
   static async fromFile(filePath: string): Promise<LoaderBuilder> {
-    const fsModule = 'fs';
-    // Yes this is a cheat.
-    const fs = await import(fsModule);
-
-    const { readFile } = fs;
-
     const text = await new Promise<string>((resolve, reject) =>
       readFile(filePath, 'utf8', (err, file) =>
         err ? reject(err) : resolve(file)

@@ -6,12 +6,13 @@ import div from '../src/elements/div.function';
 import { formatVariables } from '../src/utils/debug/format-variables.function';
 import ParserState from '../src/parsers/models/parser-state.interface';
 import ParserBuilder from '../src/parsers/builders/parser.builder';
-import getTextSample from './get-text-sample.function';
 import containerStyles from './container-style.const';
 import processors from './processors.const';
+import { pagesJsonLocation } from './pages-json-location.const';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const text = await getTextSample();
+  const response = await fetch(pagesJsonLocation);
+  const text = await response.text();
 
   const parser = new ParserBuilder()
     .fromContainerStyle(containerStyles)

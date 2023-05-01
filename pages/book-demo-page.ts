@@ -1,16 +1,11 @@
 import './book-demo.css';
 
 import BookComponent from '../src/components/book/book.component';
-import Pages from '../src/pages';
-import getTextSample from './get-text-sample.function';
-import containerStyles from './container-style.const';
-import processors from './processors.const';
 import { MediaQueryListenerFactory } from '../src/components';
+import { getPages } from './get-pages.function';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const text = await getTextSample();
-
-  const pages = new Pages(containerStyles, text, processors);
+  const pageData = await getPages();
 
   MediaQueryListenerFactory.create(
     () => console.log('fallback'),
@@ -29,10 +24,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   );
 
   const book = BookComponent(
-    {
-      getPage: (pageNumber) => pages.get(pageNumber),
-      containerStyles,
-    },
+    pageData,
     {
       pageStyles: {
         backgroundColor: '#f9d8a7',
