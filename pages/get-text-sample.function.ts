@@ -1,7 +1,7 @@
 import { LoaderBuilder } from '../src/loaders';
 
 export default async function getTextSample(): Promise<string> {
-  const url = '../text-samples/proteus.txt';
+  const url = '../text-samples/ping.txt';
 
   const builder = await LoaderBuilder.fromWebHost(url);
 

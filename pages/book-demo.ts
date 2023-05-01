@@ -37,7 +37,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       pageStyles: {
         backgroundColor: '#f9d8a7',
       },
-      pagesShown: 3,
+      pagesShown: 2,
     },
     { styles: { margin: 'auto' } }
   );

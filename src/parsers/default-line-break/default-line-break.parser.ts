@@ -16,7 +16,6 @@ import Parser from '../models/parser.interface';
 import Processor from '../../processors/models/processor.interface';
 import parseEnd from './end.parser';
 import WordWidthCalculator from '../../word-width.calculator';
-import sanitize from '../../sanitizers/html.sanitizer';
 
 export default class DefaultLineBreakParser implements Parser {
   /**
@@ -91,8 +90,6 @@ export default class DefaultLineBreakParser implements Parser {
   }
 
   *generateParserStates(text: string): Generator<ParserState> {
-    text = sanitize(text);
-
     text = this.processors.reduce(
       (newText, processor) => processor.preprocess?.(newText) ?? newText,
       text
