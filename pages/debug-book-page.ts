@@ -3,12 +3,12 @@ import './debug-book.css';
 import { cloneDeep } from 'lodash-es';
 
 import div from '../src/elements/div.function';
-import { formatVariables } from '../src/utils/debug/format-variables.function';
-import ParserState from '../src/parsers/models/parser-state.interface';
 import ParserBuilder from '../src/parsers/builders/parser.builder';
+import ParserState from '../src/parsers/models/parser-state.interface';
+import { formatVariables } from '../src/utils/debug/format-variables.function';
 import containerStyles from './container-style.const';
-import processors from './processors.const';
 import { pagesJsonLocation } from './pages-json-location.const';
+import processors from './processors.const';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch(pagesJsonLocation);

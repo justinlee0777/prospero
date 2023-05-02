@@ -1,10 +1,10 @@
 import ContainerStyle from '../../container-style.interface';
-import getNormalizedPageHeight from './get-normalized-page-height.function';
 import Processor from '../../processors/models/processor.interface';
+import Optional from '../../utils/optional.type';
 import WordWidthCalculator from '../../word-width.calculator';
 import Parser from '../models/parser.interface';
 import ParserFactory from '../parser.factory';
-import Optional from '../../utils/optional.type';
+import getNormalizedPageHeight from './get-normalized-page-height.function';
 
 const fromContainerStyle = 'fromContainerStyle';
 

@@ -1,8 +1,8 @@
 import './book-demo.css';
 
 import BookComponent from '../src/components/book/book.component';
-import { getPages } from './get-pages.function';
 import BooksComponent from '../src/components/books/books.component';
+import { getPages } from './get-pages.function';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const { desktop, mobile } = await getPages();

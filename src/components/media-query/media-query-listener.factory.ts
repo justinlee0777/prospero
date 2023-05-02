@@ -1,7 +1,6 @@
 import debounce from '../../utils/debounce.function';
 import NullaryFn from '../../utils/nullary-fn.type';
 import MediaQueryListenerConfig from './media-query-listener-config.interface';
-import MediaQueryListener from './media-query-listener.interface';
 import MediaQueryPattern from './media-query-pattern.interface';
 
 /**

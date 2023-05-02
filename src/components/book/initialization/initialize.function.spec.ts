@@ -1,5 +1,5 @@
-import initialize from './initialize.function';
 import BookSymbol from '../book.symbol';
+import initialize from './initialize.function';
 
 describe('BookComponent initialize()', () => {
   test('creates a BookComponent', () => {

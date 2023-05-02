@@ -1,7 +1,7 @@
 import Big from 'big.js';
 
-import TextChanges from './text-changes.interface';
 import TextChange from './text-change.interface';
+import TextChanges from './text-changes.interface';
 
 /**
  * The current state of the text parser.

@@ -1,13 +1,13 @@
-import BookComponent from './book-element.interface';
+import GetPage from '../../get-page.interface';
 import containerStyleToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
 import toPixelUnits from '../../utils/to-pixel-units.function';
+import BookComponent from './book-element.interface';
+import BookIdentifier from './book.symbol';
 import CreateBookElement from './create-book-element.interface';
-import updateHandler from './initialization/update-handler.function';
 import initialize from './initialization/initialize.function';
 import listenToKeyboardEvents from './initialization/listen-to-keyboard-events.function';
 import listenToSwipeEvents from './initialization/listen-to-swipe-events.function';
-import GetPage from '../../get-page.interface';
-import BookIdentifier from './book.symbol';
+import updateHandler from './initialization/update-handler.function';
 
 const BookComponent: CreateBookElement = (
   args,

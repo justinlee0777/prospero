@@ -1,11 +1,11 @@
 import { writeFileSync } from 'fs';
 import path from 'path';
 
+import { PagesBuilder } from '../src/server';
 import containerStyles from './container-style.const';
 import getTextSample from './get-text-sample.function';
-import processors from './processors.const';
-import { PagesBuilder } from '../src/server';
 import { pagesJsonLocation } from './pages-json-location.const';
+import processors from './processors.const';
 
 const text = await getTextSample();
 
