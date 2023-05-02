@@ -73,16 +73,22 @@ const BookComponent: CreateBookElement = (
     };
   }
 
-  const book = initialize({
-    ...config,
-    styles: {
-      ...(config.styles ?? {}),
-      ...bookStyles,
-    },
-  });
+  const destroyCallbacks = [];
 
-  book.elementTagIdentifier = BookIdentifier;
-  book.media = media;
+  const book = initialize(
+    {
+      elementTagIdentifier: BookIdentifier,
+      media,
+      destroy: () => destroyCallbacks.forEach((callback) => callback()),
+    },
+    {
+      ...config,
+      styles: {
+        ...(config.styles ?? {}),
+        ...bookStyles,
+      },
+    }
+  );
 
   const goToPage = updateHandler(book, {
     get: getPage,
@@ -105,10 +111,7 @@ const BookComponent: CreateBookElement = (
     increment,
   ]);
 
-  book.destroy = () => {
-    destroyKeyboardListener();
-    destroySwipeListener();
-  };
+  destroyCallbacks.push(destroyKeyboardListener, destroySwipeListener);
 
   goToPage(currentPage);
 

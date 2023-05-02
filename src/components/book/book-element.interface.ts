@@ -6,5 +6,6 @@ export default interface BookElement
   extends HTMLElement,
     Component,
     BookAttributes {
+  /** User callback for when a page changes. */
   onpagechange?: (event: PageChangeEvent) => void;
 }
