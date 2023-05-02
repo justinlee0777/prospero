@@ -22,11 +22,19 @@ const BooksComponent: CreateBooksElement = (config) => {
       child.elementTagIdentifier === BookIdentifier
   ) as Array<BookElement>;
 
-  const fallback = books.find((book) => !Boolean(book.media));
+  const fallbacks = books.filter((book) => !Boolean(book.media));
+  const [fallback, ...unusedFallbacks] = fallbacks;
 
   if (!fallback) {
-    throw new Error();
+    throw new Error(
+      `BooksComponent could not be created. There must be one fallback Book (does not has a 'media' attribute defined).`
+    );
   }
+
+  // Hide unused books.
+  unusedFallbacks.forEach((book) => {
+    bookVisibilityState(book).hide();
+  });
 
   const booksForSpecificMedia = books.filter((book) => Boolean(book.media));
 
@@ -46,6 +54,9 @@ const BooksComponent: CreateBooksElement = (config) => {
 
   booksElement.destroy = () => {
     destroyMediaQueryListener();
+
+    /** Destroy books for client. */
+    books.forEach((book) => book.destroy());
   };
 
   return booksElement;
