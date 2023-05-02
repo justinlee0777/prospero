@@ -7,6 +7,7 @@ import initialize from './initialization/initialize.function';
 import listenToKeyboardEvents from './initialization/listen-to-keyboard-events.function';
 import listenToSwipeEvents from './initialization/listen-to-swipe-events.function';
 import GetPage from '../../get-page.interface';
+import BookIdentifier from './book.symbol';
 
 const BookComponent: CreateBookElement = (
   args,
@@ -14,6 +15,7 @@ const BookComponent: CreateBookElement = (
     currentPage = 0,
     pageStyles: userDefinedPageStyles = {},
     pagesShown = 1,
+    media,
   } = {
     currentPage: 0,
     pageStyles: {},
@@ -78,6 +80,9 @@ const BookComponent: CreateBookElement = (
       ...bookStyles,
     },
   });
+
+  book.elementTagIdentifier = BookIdentifier;
+  book.media = media;
 
   const goToPage = updateHandler(book, {
     get: getPage,
