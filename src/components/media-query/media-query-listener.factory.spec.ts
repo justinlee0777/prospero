@@ -31,21 +31,38 @@ describe('MediaQueryListenerFactory', () => {
   });
 
   test('creates a listener for several viewport widths', () => {
-    let value: string;
+    const values = Array(3);
 
-    const foo = jest.fn().mockImplementation(() => (value = 'foo'));
-    const bar = jest.fn().mockImplementation(() => (value = 'bar'));
-    const baz = jest.fn().mockImplementation(() => (value = 'baz'));
+    const foo = jest
+      .fn()
+      .mockImplementation(
+        (state: boolean) => (values[0] = state ? 'show' : 'hide')
+      );
+    const bar = jest
+      .fn()
+      .mockImplementation(
+        (state: boolean) => (values[1] = state ? 'show' : 'hide')
+      );
+    const baz = jest
+      .fn()
+      .mockImplementation(
+        (state: boolean) => (values[2] = state ? 'show' : 'hide')
+      );
 
     const destroy = MediaQueryListenerFactory.create(
-      foo,
+      {
+        show: () => foo(true),
+        hide: () => foo(false),
+      },
       {
         minWidth: 500,
-        callback: baz,
+        show: () => baz(true),
+        hide: () => baz(false),
       },
       {
         minWidth: 800,
-        callback: bar,
+        show: () => bar(true),
+        hide: () => bar(false),
       }
     );
 
@@ -53,23 +70,23 @@ describe('MediaQueryListenerFactory', () => {
     const [barMedia, bazMedia] = media;
 
     expect(foo).toHaveBeenCalledTimes(1);
-    expect(value).toBe('foo');
+    expect(values).toEqual(['show', 'hide', 'hide']);
 
     (bazMedia as any).matches = true;
     window.dispatchEvent(new Event('resize'));
 
     jest.advanceTimersByTime(300);
 
-    expect(value).toBe('baz');
-    expect(baz).toHaveBeenCalledTimes(1);
+    expect(values).toEqual(['hide', 'hide', 'show']);
+    expect(baz).toHaveBeenCalledTimes(2);
 
     // No redundant calls
 
     jest.advanceTimersByTime(300);
     window.dispatchEvent(new Event('resize'));
 
-    expect(value).toBe('baz');
-    expect(baz).toHaveBeenCalledTimes(1);
+    expect(values).toEqual(['hide', 'hide', 'show']);
+    expect(baz).toHaveBeenCalledTimes(2);
 
     (bazMedia as any).matches = false;
     (barMedia as any).matches = true;
@@ -77,8 +94,8 @@ describe('MediaQueryListenerFactory', () => {
     jest.advanceTimersByTime(300);
     window.dispatchEvent(new Event('resize'));
 
-    expect(value).toBe('bar');
-    expect(bar).toHaveBeenCalledTimes(1);
+    expect(values).toEqual(['hide', 'show', 'hide']);
+    expect(bar).toHaveBeenCalledTimes(3);
 
     destroy();
   });

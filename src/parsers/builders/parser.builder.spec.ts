@@ -1,11 +1,25 @@
-const mockParser: Parser = {
-  setCalculator: jest.fn(),
-  setProcessors: jest.fn(),
-} as any;
+let mockParser: Parser;
 
 jest.mock('../parser.factory', () => {
   return {
-    create: jest.fn().mockReturnValue(mockParser),
+    create: jest.fn().mockImplementation(
+      () =>
+        (mockParser = {
+          setCalculator: jest.fn(),
+          setProcessors: jest.fn(),
+        } as any)
+    ),
+  };
+});
+
+let MockWordWidthCalculatorConstructor;
+
+jest.mock('../../word-width.calculator', () => {
+  return class MockWordWidthCalculator {
+    constructor(...args) {
+      MockWordWidthCalculatorConstructor = jest.fn();
+      MockWordWidthCalculatorConstructor(...args);
+    }
   };
 });
 
@@ -18,33 +32,17 @@ describe('ParserBuilder', () => {
     configure = jest.fn();
   }
 
-  test('should throw an error when a parser has not been built yet', () => {
-    const parserBuilder = new ParserBuilder();
+  let containerStyle;
 
-    expect(() => parserBuilder.build()).toThrowError(
-      `The parser has not been built yet. Please start from entrypoints: ${ParserBuilder.entrypoints.join(
-        ','
-      )}.`
-    );
+  beforeEach(() => {
+    containerStyle = {
+      width: 600,
+      height: 400,
+      lineHeight: 24,
+      computedFontFamily: 'Times New Roman',
+      computedFontSize: '16px',
+    };
   });
-
-  test('should throw an error if processors are added to an unbuilt parser', () => {
-    const parserBuilder = new ParserBuilder();
-
-    expect(() => parserBuilder.processors([new MockProcessor()])).toThrowError(
-      `The parser has not been built yet. Please start from entrypoints: ${ParserBuilder.entrypoints.join(
-        ','
-      )}.`
-    );
-  });
-
-  const containerStyle = {
-    width: 600,
-    height: 400,
-    lineHeight: 24,
-    computedFontFamily: 'Times New Roman',
-    computedFontSize: '16px',
-  };
 
   test('should build a parser', () => {
     expect(new ParserBuilder().fromContainerStyle(containerStyle).build()).toBe(
@@ -58,10 +56,39 @@ describe('ParserBuilder', () => {
     expect(
       new ParserBuilder()
         .fromContainerStyle(containerStyle)
-        .processors([processor])
+        .setProcessors([processor])
         .build()
     ).toBe(mockParser);
 
     expect(processor.configure).toHaveBeenCalledTimes(1);
+
+    expect(new ParserBuilder().fromContainerStyle(containerStyle).build()).toBe(
+      mockParser
+    );
+  });
+
+  test('should build a parser using a custom font', () => {
+    containerStyle = {
+      ...containerStyle,
+      computedFontFamily: 'Bookerly',
+    };
+
+    expect(
+      new ParserBuilder()
+        .fromContainerStyle(containerStyle)
+        .setFontLocation('/Bookerly.tiff')
+        .build()
+    ).toBe(mockParser);
+
+    expect(MockWordWidthCalculatorConstructor).toHaveBeenCalledTimes(1);
+    expect(MockWordWidthCalculatorConstructor).toHaveBeenCalledWith(
+      '16px',
+      'Bookerly',
+      '/Bookerly.tiff'
+    );
+
+    expect(new ParserBuilder().fromContainerStyle(containerStyle).build()).toBe(
+      mockParser
+    );
   });
 });
