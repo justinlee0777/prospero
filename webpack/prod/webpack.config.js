@@ -1,8 +1,10 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
 module.exports = {
-  name: 'production-server',
+  name: 'production',
   mode: 'production',
   entry: {
-    server: './src/server.ts',
+    types: './src/types.ts',
   },
   output: {
     filename: '[name].js',
@@ -12,10 +14,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.node$/,
-        loader: 'node-loader',
-      },
       {
         test: /\.ts$/,
         exclude: /node_modules/,
@@ -31,8 +29,9 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  target: 'node',
-  externals: {
-    canvas: 'canvas',
-  },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: ['package.json'],
+    }),
+  ],
 };

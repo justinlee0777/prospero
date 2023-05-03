@@ -1,11 +1,10 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   name: 'production-web',
   mode: 'production',
   entry: {
-    web: ['./src/components/index.ts'],
+    web: ['./src/web.ts'],
   },
   output: {
     filename: '[name].js',
@@ -43,11 +42,6 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  plugins: [
-    new CopyWebpackPlugin({
-      patterns: ['package.json'],
-    }),
-    new MiniCssExtractPlugin(),
-  ],
+  plugins: [new MiniCssExtractPlugin()],
   target: 'web',
 };
