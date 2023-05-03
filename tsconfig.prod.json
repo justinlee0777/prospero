@@ -4,5 +4,5 @@
     "rootDir": "src",
     "declaration": true
   },
-  "exclude": ["pages"]
+  "exclude": ["pages", "**/*.spec.ts"]
 }

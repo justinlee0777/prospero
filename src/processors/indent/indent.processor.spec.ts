@@ -1,9 +1,9 @@
 import Big from 'big.js';
 
 import ParserState from '../../parsers/models/parser-state.interface';
-import IndentProcessor from './indent.processor';
-import WordWidthCalculator from '../../word-width.calculator';
 import TextChangeType from '../../parsers/models/text-change-type.enum';
+import WordWidthCalculator from '../../word-width.calculator';
+import IndentProcessor from './indent.processor';
 
 describe('IndentProcessor', () => {
   const bookBeginning: ParserState = {

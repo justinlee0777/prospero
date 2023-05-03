@@ -1,12 +1,13 @@
 import { cloneDeep } from 'lodash-es';
 
 import ParserState from '../../parsers/models/parser-state.interface';
-import Processor from '../models/processor.interface';
+import TextChangeType from '../../parsers/models/text-change-type.enum';
 import TextChange, {
   AddTextChange,
   DeleteTextChange,
 } from '../../parsers/models/text-change.interface';
-import TextChangeType from '../../parsers/models/text-change-type.enum';
+import sanitize from '../../sanitizers/html.sanitizer';
+import Processor from '../models/processor.interface';
 
 /**
  * Memorized description of HTML tags for (ideally) quick and simple replacements in the text.
@@ -58,6 +59,8 @@ export default class HTMLProcessor implements Processor {
   private nextPageBegin = 0;
 
   preprocess(text: string): string {
+    text = sanitize(text);
+
     // Offsetting the index returned by 'replace' after the replacement has occurred (as the function does not do so.)
     let normalizedOffset = 0;
 

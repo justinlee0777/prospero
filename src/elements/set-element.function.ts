@@ -7,7 +7,7 @@ import setInnerHTML from './set-inner-html.function';
 import setStyles from './set-styles.function';
 import setTextContent from './set-text-content.function';
 
-export function setElement(
+export default function setElement(
   element: HTMLElement,
   ...[config]: Parameters<CreateElement<HTMLElement>>
 ): void {

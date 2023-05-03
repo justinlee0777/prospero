@@ -1,4 +1,13 @@
+import { LoaderBuilder } from '../src/loaders/public-api';
+
 export default async function getTextSample(): Promise<string> {
-  const response = await fetch('../text-samples/color-example.txt');
-  return await response.text();
+  const url = './text-samples/proteus.txt';
+
+  const builder = await LoaderBuilder.fromFile(url);
+
+  if (url.includes('.md')) {
+    await builder.asMarkdown();
+  }
+
+  return builder.getText();
 }

@@ -1,10 +1,10 @@
 import Big from 'big.js';
 
 import ParserState from '../../parsers/models/parser-state.interface';
+import TextChangeType from '../../parsers/models/text-change-type.enum';
 import Word from '../../parsers/models/word.interface';
 import ProcessorConfig from '../models/processor.config';
 import Processor from '../models/processor.interface';
-import TextChangeType from '../../parsers/models/text-change-type.enum';
 
 /**
  * Add indentation to new paragraphs.

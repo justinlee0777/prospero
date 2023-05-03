@@ -1,14 +1,4 @@
-import EventListenersMap from './event-listeners-map.interface';
-
-export interface CreateElementConfig {
-  textContent?: string;
-  innerHTML?: string;
-  children?: Array<Node>;
-  classnames?: Array<string>;
-  attributes?: Object;
-  styles?: Partial<CSSStyleDeclaration>;
-  eventListeners?: Partial<EventListenersMap>;
-}
+import CreateElementConfig from './create-element.config';
 
 export default interface CreateElement<T extends HTMLElement> {
   (config?: CreateElementConfig): T;

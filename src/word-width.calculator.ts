@@ -1,4 +1,4 @@
-import { CanvasRenderingContext2D, createCanvas } from 'canvas';
+import { CanvasRenderingContext2D, createCanvas, registerFont } from 'canvas';
 import CalculateWordWidth from './parsers/builders/calculate-word-width.interface';
 
 /**
@@ -7,7 +7,9 @@ import CalculateWordWidth from './parsers/builders/calculate-word-width.interfac
 export default class WordWidthCalculator {
   private context: CanvasRenderingContext2D;
 
-  constructor(fontSize: string, fontFamily: string) {
+  constructor(fontSize: string, fontFamily: string, fontLocation?: string) {
+    fontLocation && registerFont(fontLocation, { family: fontFamily });
+
     const canvas = createCanvas(0, 0);
     const ctx = (this.context = canvas.getContext('2d'));
     ctx.font = `${fontSize} ${fontFamily}`;

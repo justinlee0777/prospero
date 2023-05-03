@@ -1,5 +1,3 @@
-import Big from 'big.js';
-
 import CreateTextParser from '../../models/create-text-parser.interface';
 import TextChangeType from '../../models/text-change-type.enum';
 

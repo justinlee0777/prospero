@@ -1,3 +1,7 @@
 import BookComponent from './book/book.component';
 
-export { BookComponent };
+import BooksComponent from './books/books.component';
+
+import MediaQueryListenerFactory from './media-query/media-query-listener.factory';
+
+export { BookComponent, BooksComponent, MediaQueryListenerFactory };

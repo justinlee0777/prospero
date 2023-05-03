@@ -1,33 +1,74 @@
 import ContainerStyle from '../../container-style.interface';
-import getNormalizedPageHeight from './get-normalized-page-height.function';
 import Processor from '../../processors/models/processor.interface';
+import Optional from '../../utils/optional.type';
 import WordWidthCalculator from '../../word-width.calculator';
 import Parser from '../models/parser.interface';
 import ParserFactory from '../parser.factory';
-import Optional from '../../utils/optional.type';
+import getNormalizedPageHeight from './get-normalized-page-height.function';
 
 const fromContainerStyle = 'fromContainerStyle';
 
 export default class ParserBuilder {
   static entrypoints = [fromContainerStyle];
 
-  private parser: Parser | undefined;
+  private containerStyle: ContainerStyle;
 
-  private calculator: WordWidthCalculator | undefined;
+  private processors: Array<Processor> = [];
+
+  private fontLocation: string;
 
   /**
    * Use ContainerStyle to initialize much of what you need for a parser.
    */
-  [fromContainerStyle]({
-    width,
-    height,
-    computedFontFamily,
-    computedFontSize,
-    lineHeight,
-    padding = { top: 0, right: 0, bottom: 0, left: 0 },
-    margin = { top: 0, right: 0, bottom: 0, left: 0 },
-    border = { top: 0, right: 0, bottom: 0, left: 0 },
-  }: Optional<ContainerStyle, 'padding' | 'margin' | 'border'>): ParserBuilder {
+  [fromContainerStyle](
+    containerStyle: Optional<ContainerStyle, 'padding' | 'margin' | 'border'>
+  ): ParserBuilder {
+    this.containerStyle = {
+      ...containerStyle,
+      padding: containerStyle.padding ?? {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      },
+      margin: containerStyle.margin ?? { top: 0, right: 0, bottom: 0, left: 0 },
+      border: containerStyle.border ?? { top: 0, right: 0, bottom: 0, left: 0 },
+    };
+
+    return this;
+  }
+
+  /**
+   * Set processors on the building parser.
+   */
+  setProcessors(processors: Array<Processor>): ParserBuilder {
+    this.processors = processors;
+
+    return this;
+  }
+
+  setFontLocation(url: string): ParserBuilder {
+    this.fontLocation = url;
+
+    return this;
+  }
+
+  /**
+   * Get the built parser.
+   * @throws if there is no internal parser yet.
+   */
+  build(): Parser {
+    const {
+      width,
+      height,
+      computedFontFamily,
+      computedFontSize,
+      lineHeight,
+      padding,
+      margin,
+      border,
+    } = this.containerStyle;
+
     const containerWidth =
       width -
       padding.left -
@@ -50,55 +91,29 @@ export default class ParserBuilder {
 
     const numLines = pageHeight / lineHeight;
 
-    const calculator = (this.calculator = new WordWidthCalculator(
+    const calculator = new WordWidthCalculator(
       computedFontSize,
-      computedFontFamily
-    ));
+      computedFontFamily,
+      this.fontLocation
+    );
 
-    const parser = (this.parser = ParserFactory.create({
+    const parser = ParserFactory.create({
       pageLines: numLines,
       pageWidth: containerWidth,
-    }));
+    });
 
     parser.setCalculator(calculator);
 
-    return this;
-  }
-
-  /**
-   * Set processors on the building parser.
-   */
-  processors(processors: Array<Processor>): ParserBuilder {
-    if (!this.parser) {
-      throw new Error(this.writeErrorMessage());
-    }
+    const { processors } = this;
 
     processors.forEach((processor) =>
       processor.configure?.({
-        calculator: this.calculator,
+        calculator,
       })
     );
 
-    this.parser.setProcessors(processors);
+    parser.setProcessors(processors);
 
-    return this;
-  }
-
-  /**
-   * Get the built parser.
-   * @throws if there is no internal parser yet.
-   */
-  build(): Parser {
-    if (!this.parser) {
-      throw new Error(this.writeErrorMessage());
-    }
-
-    return this.parser;
-  }
-
-  private writeErrorMessage(): string {
-    return `The parser has not been built yet. Please start from entrypoints: ${ParserBuilder.entrypoints.join(
-      ','
-    )}.`;
+    return parser;
   }
 }

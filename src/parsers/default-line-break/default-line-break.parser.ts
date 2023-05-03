@@ -1,8 +1,14 @@
 import Big from 'big.js';
 
+import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
+import Processor from '../../processors/models/processor.interface';
+import WordWidthCalculator from '../../word-width.calculator';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import ParseWord from '../models/parse-word.interface';
 import ParserState from '../models/parser-state.interface';
+import Parser from '../models/parser.interface';
+import Word from '../models/word.interface';
+import parseEnd from './end.parser';
 import createNewlineAtPageBeginningParser from './newline/newline-at-page-beginning.parser';
 import createNewlineParser from './newline/newline.parser';
 import parseWhitespaceAtPageBeginning from './whitespace/whitespace-at-page-beginning.parser';
@@ -10,13 +16,6 @@ import createWhitespaceAtTextOverflowParser from './whitespace/whitespace-at-tex
 import parseWhitespaceInline from './whitespace/whitespace-inline.parser';
 import createWordAtTextOverflowParser from './word/word-at-text-overflow.parser';
 import parseWord from './word/word.parser';
-import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
-import Word from '../models/word.interface';
-import Parser from '../models/parser.interface';
-import Processor from '../../processors/models/processor.interface';
-import parseEnd from './end.parser';
-import WordWidthCalculator from '../../word-width.calculator';
-import sanitize from '../../sanitizers/html.sanitizer';
 
 export default class DefaultLineBreakParser implements Parser {
   /**
@@ -91,8 +90,6 @@ export default class DefaultLineBreakParser implements Parser {
   }
 
   *generateParserStates(text: string): Generator<ParserState> {
-    text = sanitize(text);
-
     text = this.processors.reduce(
       (newText, processor) => processor.preprocess?.(newText) ?? newText,
       text

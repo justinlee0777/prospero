@@ -1,43 +1,51 @@
-import styles from './book.module.css';
-
-import div from '../../elements/div.function';
 import GetPage from '../../get-page.interface';
-import createKeydownListener from '../../elements/create-keydown-listener.function';
-import PageComponent from '../page/page.component';
-import pageSelector from '../page/page-selector.const';
-import PageFlipAnimation from '../page/page-flip-animation.enum';
-import BookComponent from './book-element.interface';
-import registerSwipeListener from '../../elements/register-swipe-listener.function';
-import SwipeDirection from '../../elements/swipe-direction.enum';
 import containerStyleToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
-import PageLayout from './page-layout.enum';
 import toPixelUnits from '../../utils/to-pixel-units.function';
+import BookComponent from './book-element.interface';
+import BookIdentifier from './book.symbol';
 import CreateBookElement from './create-book-element.interface';
-import PageNumberingAlignment from '../page/page-numbering-alignment.enum';
+import initialize from './initialization/initialize.function';
+import listenToKeyboardEvents from './initialization/listen-to-keyboard-events.function';
+import listenToSwipeEvents from './initialization/listen-to-swipe-events.function';
+import updateHandler from './initialization/update-handler.function';
 
 const BookComponent: CreateBookElement = (
+  args,
   {
-    getPage,
     currentPage = 0,
     pageStyles: userDefinedPageStyles = {},
-    containerStyles,
-    pageLayout = PageLayout.SINGLE,
+    pagesShown = 1,
+    media,
+  } = {
+    currentPage: 0,
+    pageStyles: {},
+    pagesShown: 1,
   },
   config = {}
 ) => {
+  const { containerStyles } = args;
+  let getPage: GetPage;
+
+  if ('pages' in args) {
+    getPage = (pageNumber) => {
+      if (pageNumber < 0 || pageNumber >= args.pages.length) {
+        return null;
+      } else {
+        return args.pages[pageNumber];
+      }
+    };
+  } else {
+    getPage = args.getPage;
+  }
+
   let bookStyles: Partial<CSSStyleDeclaration>;
   let pageStyles: Partial<CSSStyleDeclaration>;
 
   if (containerStyles) {
     const styles = containerStyleToStyleDeclaration(containerStyles);
 
-    let bookWidth = styles.width;
-    let pageWidth: string;
-
-    if (pageLayout === PageLayout.DOUBLE) {
-      bookWidth = `${toPixelUnits(styles.width) * 2}px`;
-      pageWidth = styles.width;
-    }
+    const bookWidth = `${toPixelUnits(styles.width) * pagesShown}px`;
+    const pageWidth = styles.width;
 
     bookStyles = {
       width: bookWidth,
@@ -65,175 +73,49 @@ const BookComponent: CreateBookElement = (
     };
   }
 
-  const classnames = [styles.book].concat(config?.classnames ?? []);
-  const attributes = {
-    ...(config.attributes ?? {}),
-    tabindex: 0,
-  };
+  const destroyCallbacks = [];
 
-  const book = div({
-    ...config,
-    classnames,
-    attributes,
-    styles: {
-      ...(config.styles ?? {}),
-      ...bookStyles,
+  const book = initialize(
+    {
+      elementTagIdentifier: BookIdentifier,
+      media,
+      destroy: () => destroyCallbacks.forEach((callback) => callback()),
     },
-  }) as unknown as BookComponent;
-
-  let goToPage;
-  let inc;
-
-  if (pageLayout === PageLayout.SINGLE) {
-    goToPage = createGoToSinglePage(book, getPage, pageStyles);
-    inc = 1;
-  } else {
-    goToPage = createGoToDoublePage(book, getPage, pageStyles);
-    inc = 2;
-  }
-
-  const updatePage = (newPageNumber: number, pageFlip: PageFlipAnimation) => {
-    const pageChangeFinished = goToPage(newPageNumber, pageFlip);
-
-    if (pageChangeFinished) {
-      currentPage = newPageNumber;
-      book.onpagechange?.({
-        pageNumber: newPageNumber,
-        animationFinished: pageChangeFinished,
-      });
+    {
+      ...config,
+      styles: {
+        ...(config.styles ?? {}),
+        ...bookStyles,
+      },
     }
-  };
+  );
 
-  const keydownListener = createKeydownListener({
-    ArrowRight: () => updatePage(currentPage + inc, PageFlipAnimation.RIGHT),
-    ArrowDown: () => updatePage(currentPage + inc, PageFlipAnimation.RIGHT),
-    ArrowLeft: () => updatePage(currentPage - inc, PageFlipAnimation.LEFT),
-    ArrowUp: () => updatePage(currentPage - inc, PageFlipAnimation.LEFT),
+  const goToPage = updateHandler(book, {
+    get: getPage,
+    pagesShown,
+    styles: pageStyles,
   });
 
-  book.addEventListener('keydown', keydownListener);
+  const decrement = () =>
+    goToPage(currentPage - pagesShown) && (currentPage -= pagesShown);
+  const increment = () =>
+    goToPage(currentPage + pagesShown) && (currentPage += pagesShown);
 
-  const destroySwipeListener = registerSwipeListener(book, ([direction]) => {
-    switch (direction) {
-      case SwipeDirection.UP:
-        return updatePage(currentPage - inc, PageFlipAnimation.LEFT);
-      case SwipeDirection.RIGHT:
-        return updatePage(currentPage + inc, PageFlipAnimation.RIGHT);
-      case SwipeDirection.DOWN:
-        return updatePage(currentPage + inc, PageFlipAnimation.RIGHT);
-      case SwipeDirection.LEFT:
-        return updatePage(currentPage - inc, PageFlipAnimation.LEFT);
-    }
-  });
+  const destroyKeyboardListener = listenToKeyboardEvents(book, [
+    decrement,
+    increment,
+  ]);
 
-  book.destroy = () => {
-    book.removeEventListener('keydown', keydownListener);
-    destroySwipeListener();
-  };
+  const destroySwipeListener = listenToSwipeEvents(book, [
+    decrement,
+    increment,
+  ]);
+
+  destroyCallbacks.push(destroyKeyboardListener, destroySwipeListener);
 
   goToPage(currentPage);
 
   return book;
 };
-
-function createGoToSinglePage(
-  book: BookComponent,
-  getPage: GetPage,
-  pageStyles: Partial<CSSStyleDeclaration> = {}
-): (pageNumber: number, animation?: PageFlipAnimation) => Promise<void> | null {
-  return (pageNumber, pageFlip) => {
-    const innerHTML = getPage(pageNumber);
-
-    if (!innerHTML) {
-      return null;
-    }
-
-    const oldPages = [
-      ...book.querySelectorAll(pageSelector),
-    ] as Array<PageComponent>;
-
-    const page = PageComponent(
-      {
-        numbering: {
-          alignment: PageNumberingAlignment.LEFT,
-          pageNumber: pageNumber + 1,
-        },
-      },
-      { innerHTML, styles: { ...pageStyles, borderRadius: '12px' } }
-    );
-
-    book.prepend(page);
-
-    return Promise.all(
-      oldPages.map((oldPage) => oldPage.destroy({ pageFlip }))
-    ).then();
-  };
-}
-
-function createGoToDoublePage(
-  book: BookComponent,
-  getPage: GetPage,
-  pageStyles: Partial<CSSStyleDeclaration> = {}
-): (pageNumber: number, animation?: PageFlipAnimation) => Promise<void> | null {
-  return (pageNumber, pageFlip) => {
-    let pageNumbers: [number, number];
-
-    if (pageNumber % 2 === 0) {
-      pageNumbers = [pageNumber, pageNumber + 1];
-    } else {
-      pageNumbers = [pageNumber - 1, pageNumber];
-    }
-
-    const pageContent = pageNumbers.map((page) => getPage(page));
-
-    if (pageContent.every((textContent) => !Boolean(textContent))) {
-      return null;
-    }
-
-    const oldPages = [
-      ...book.querySelectorAll(pageSelector),
-    ] as Array<PageComponent>;
-
-    const pages = [
-      PageComponent(
-        {
-          numbering: {
-            alignment: PageNumberingAlignment.LEFT,
-            pageNumber: pageNumbers[0] + 1,
-          },
-        },
-        {
-          innerHTML: pageContent[0],
-          styles: {
-            ...pageStyles,
-            // TODO: DISALLOWED!
-            // borderRight: '1px solid black',
-          },
-        }
-      ),
-      PageComponent(
-        {
-          numbering: {
-            alignment: PageNumberingAlignment.RIGHT,
-            pageNumber: pageNumbers[1] + 1,
-          },
-        },
-        {
-          innerHTML: pageContent[1],
-          styles: {
-            ...pageStyles,
-            left: pageStyles.width,
-          },
-        }
-      ),
-    ];
-
-    book.prepend(...pages);
-
-    return Promise.all(
-      oldPages.map((oldPage) => oldPage.destroy({ pageFlip }))
-    ).then();
-  };
-}
 
 export default BookComponent;

@@ -1,19 +1,22 @@
 import './debug-book.css';
 
+import { cloneDeep } from 'lodash-es';
+
 import div from '../src/elements/div.function';
-import { formatVariables } from '../src/utils/debug/format-variables.function';
-import ParserState from '../src/parsers/models/parser-state.interface';
 import ParserBuilder from '../src/parsers/builders/parser.builder';
-import getTextSample from './get-text-sample.function';
+import ParserState from '../src/parsers/models/parser-state.interface';
+import { formatVariables } from '../src/utils/debug/format-variables.function';
 import containerStyles from './container-style.const';
+import { pagesJsonLocation } from './pages-json-location.const';
 import processors from './processors.const';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const text = await getTextSample();
+  const response = await fetch(pagesJsonLocation);
+  const text = await response.text();
 
   const parser = new ParserBuilder()
     .fromContainerStyle(containerStyles)
-    .processors(processors)
+    .setProcessors(processors)
     .build();
 
   document.body.appendChild(
@@ -27,13 +30,15 @@ window.addEventListener('DOMContentLoaded', async () => {
     })
   );
 
-  const filter = (parserState: ParserState) => parserState.pages.length === 0;
+  const filter = (parserState: ParserState) => parserState.pages.length === 2;
 
   const parserStates = parser.generateParserStates(text);
 
   for (const parserState of parserStates) {
     if (filter(parserState)) {
-      const copy = { ...parserState };
+      const copy = cloneDeep(parserState);
+      delete copy['changes'];
+      delete copy['pageChanges'];
       delete copy['pages'];
       delete copy['lines'];
 

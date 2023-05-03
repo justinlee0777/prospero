@@ -1,10 +1,11 @@
 {
   "name": "prospero",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "scripts": {
     "build": "rm -rf dist && webpack",
-    "start": "npm run build -- --config-name=development && http-server -c-1 ./dist",
-    "build:lib": "npm run build -- --config-name=production",
+    "start": "./scripts/start-dev-server.sh",
+    "build:lib": "npm run build -- --config-name production production-web production-server",
+    "release": "npm run build:lib && npm publish ./dist",
     "format": "prettier --write .",
     "test": "jest"
   },
@@ -19,8 +20,12 @@
     "html-webpack-plugin": "^5.5.0",
     "http-server": "^14.1.1",
     "jest": "^29.5.0",
+    "jest-css-modules": "^2.1.0",
+    "jest-environment-jsdom": "^29.5.0",
     "mini-css-extract-plugin": "^2.7.5",
+    "node-loader": "^2.0.0",
     "prettier": "^2.8.7",
+    "prettier-plugin-organize-imports": "^3.2.2",
     "style-loader": "^3.3.2",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.2",
@@ -31,8 +36,15 @@
   },
   "dependencies": {
     "big.js": "^6.2.1",
-    "canvas": "^2.11.2",
     "lodash-es": "^4.17.21",
-    "sanitize-html": "^2.10.0"
+    "rehype-stringify": "^9.0.3",
+    "remark-gfm": "^3.0.1",
+    "remark-parse": "^10.0.1",
+    "remark-rehype": "^10.1.0",
+    "sanitize-html": "^2.10.0",
+    "unified": "^10.1.2"
+  },
+  "peerDependencies": {
+    "canvas": "^2.11.2"
   }
 }
