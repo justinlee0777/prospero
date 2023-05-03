@@ -5,6 +5,7 @@
     "build": "rm -rf dist && webpack",
     "start": "./scripts/start-dev-server.sh",
     "build:lib": "npm run build -- --config-name production-web production-server",
+    "release": "npm run build:lib && npm publish ./dist",
     "format": "prettier --write .",
     "test": "jest"
   },
