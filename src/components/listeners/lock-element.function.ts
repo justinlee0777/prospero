@@ -1,4 +1,4 @@
-import NullaryFn from '../../../utils/nullary-fn.type';
+import NullaryFn from '../../utils/nullary-fn.type';
 
 export default function lockElement(book: HTMLElement): NullaryFn {
   let destroy: NullaryFn;

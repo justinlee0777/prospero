@@ -1,13 +1,12 @@
 import GetPage from '../../get-page.interface';
 import containerStyleToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
 import toPixelUnits from '../../utils/to-pixel-units.function';
+import listenToKeyboardEvents from '../listeners/listen-to-keyboard-events.function';
+import listenToSwipeEvents from '../listeners/listen-to-swipe-events.function';
 import BookComponent from './book-element.interface';
 import BookIdentifier from './book.symbol';
 import CreateBookElement from './create-book-element.interface';
 import initialize from './initialization/initialize.function';
-import listenToKeyboardEvents from './initialization/listen-to-keyboard-events.function';
-import listenToSwipeEvents from './initialization/listen-to-swipe-events.function';
-import lockElement from './initialization/lock-element.function';
 import updateHandler from './initialization/update-handler.function';
 
 const BookComponent: CreateBookElement = (
@@ -17,10 +16,12 @@ const BookComponent: CreateBookElement = (
     pageStyles: userDefinedPageStyles = {},
     pagesShown = 1,
     media,
+    listeners = [listenToKeyboardEvents, listenToSwipeEvents],
   } = {
     currentPage: 0,
     pageStyles: {},
     pagesShown: 1,
+    listeners: [listenToKeyboardEvents, listenToSwipeEvents],
   },
   config = {}
 ) => {
@@ -102,22 +103,8 @@ const BookComponent: CreateBookElement = (
   const increment = () =>
     goToPage(currentPage + pagesShown) && (currentPage += pagesShown);
 
-  const destroyKeyboardListener = listenToKeyboardEvents(book, [
-    decrement,
-    increment,
-  ]);
-
-  const destroySwipeListener = listenToSwipeEvents(book, [
-    decrement,
-    increment,
-  ]);
-
-  const destroyLock = lockElement(book);
-
   destroyCallbacks.push(
-    destroyKeyboardListener,
-    destroySwipeListener,
-    destroyLock
+    ...listeners.map((listener) => listener(book, [decrement, increment]))
   );
 
   goToPage(currentPage);
