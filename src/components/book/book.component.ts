@@ -7,6 +7,7 @@ import CreateBookElement from './create-book-element.interface';
 import initialize from './initialization/initialize.function';
 import listenToKeyboardEvents from './initialization/listen-to-keyboard-events.function';
 import listenToSwipeEvents from './initialization/listen-to-swipe-events.function';
+import lockElement from './initialization/lock-element.function';
 import updateHandler from './initialization/update-handler.function';
 
 const BookComponent: CreateBookElement = (
@@ -111,7 +112,13 @@ const BookComponent: CreateBookElement = (
     increment,
   ]);
 
-  destroyCallbacks.push(destroyKeyboardListener, destroySwipeListener);
+  const destroyLock = lockElement(book);
+
+  destroyCallbacks.push(
+    destroyKeyboardListener,
+    destroySwipeListener,
+    destroyLock
+  );
 
   goToPage(currentPage);
 
