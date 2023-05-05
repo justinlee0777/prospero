@@ -16,6 +16,7 @@ const BookComponent: CreateBookElement = (
     pageStyles: userDefinedPageStyles = {},
     pagesShown = 1,
     media,
+    animation,
     listeners = [listenToKeyboardEvents, listenToSwipeEvents],
   } = {
     currentPage: 0,
@@ -96,6 +97,7 @@ const BookComponent: CreateBookElement = (
     get: getPage,
     pagesShown,
     styles: pageStyles,
+    animation,
   });
 
   const decrement = () =>
