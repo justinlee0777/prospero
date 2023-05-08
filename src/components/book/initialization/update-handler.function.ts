@@ -2,12 +2,14 @@ import GetPage from '../../../get-page.interface';
 import PageNumberingAlignment from '../../page/page-numbering-alignment.enum';
 import pageSelector from '../../page/page-selector.const';
 import PageComponent from '../../page/page.component';
+import BookAnimation from '../book-animation.interface';
 import BookComponent from '../book.component';
 import PageChangeEvent from '../page-change-event.interface';
 
 interface PageConfig {
   get: GetPage;
   pagesShown: number;
+  animation: BookAnimation;
 
   styles?: Partial<CSSStyleDeclaration>;
 }
@@ -22,7 +24,7 @@ type UpdatePage = (this: void, currentPage: number) => boolean;
  */
 export default function updateHandler(
   book: BookComponent,
-  { get, pagesShown, styles = {} }: PageConfig
+  { get, pagesShown, animation, styles = {} }: PageConfig
 ): UpdatePage {
   return (pageNumber: number) => {
     const leftmostPage = pageNumber - (pageNumber % pagesShown);
@@ -66,13 +68,20 @@ export default function updateHandler(
       )
     );
 
-    book.prepend(...pages);
+    /*
+     * The animation handles the actual page changing as it may need to control
+     * how and when the pages are deleted.
+     */
+    const animationFinished = animation.changePage(
+      book,
+      pageNumber,
+      oldPages,
+      pages
+    );
 
     const pageChangeEvent: PageChangeEvent = {
       pageNumber,
-      animationFinished: Promise.all(
-        oldPages.map((oldPage) => oldPage.destroy())
-      ).then(),
+      animationFinished,
     };
 
     book.onpagechange?.(pageChangeEvent);

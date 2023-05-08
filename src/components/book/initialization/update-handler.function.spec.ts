@@ -1,4 +1,5 @@
 import PagesOutput from '../../../pages-output.interface';
+import DefaultPageFlipAnimation from '../animations/default-page-flip.animation';
 import BookComponent from '../book.component';
 import updateHandler from './update-handler.function';
 
@@ -39,6 +40,7 @@ describe('BookComponent updateHandler()', () => {
     book.onpagechange = jest.fn();
 
     const callback = updateHandler(book, {
+      animation: new DefaultPageFlipAnimation(),
       get: jest.fn().mockImplementation((pageNumber) => {
         if (pageNumber < 0 || pageNumber >= pages.length) {
           return null;
@@ -66,6 +68,7 @@ describe('BookComponent updateHandler()', () => {
     book.onpagechange = jest.fn();
 
     const callback = updateHandler(book, {
+      animation: new DefaultPageFlipAnimation(),
       get: jest.fn().mockImplementation((pageNumber) => {
         if (pageNumber < 0 || pageNumber >= pages.length) {
           return null;
@@ -95,6 +98,7 @@ describe('BookComponent updateHandler()', () => {
     book.onpagechange = jest.fn();
 
     const callback = updateHandler(book, {
+      animation: new DefaultPageFlipAnimation(),
       get: jest.fn().mockImplementation((pageNumber) => {
         if (pageNumber < 0 || pageNumber >= pages.length) {
           return null;

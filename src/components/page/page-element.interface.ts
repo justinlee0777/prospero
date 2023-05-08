@@ -1,8 +1,6 @@
-import DestructionAnimation from './destruction-animation.interface';
-
 export default interface PageElement extends HTMLElement {
   /**
-   * @returns a Promise that resolves when the destruction is completed.
+   * Removes the page from the book.
    */
-  destroy(animation?: DestructionAnimation): Promise<void>;
+  destroy(): void;
 }

@@ -1,0 +1,20 @@
+.doublePageAnimating {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.doublePageAnimating.leftPage {
+  transform-origin: top right;
+}
+
+.doublePageAnimating.leftPage.unveiling {
+  transform: rotateY(-180deg);
+}
+
+.doublePageAnimating.rightPage {
+  transform-origin: top left;
+}
+
+.doublePageAnimating.rightPage.unveiling {
+  transform: rotateY(180deg);
+}
