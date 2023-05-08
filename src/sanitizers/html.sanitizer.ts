@@ -1,26 +1,10 @@
-import sanitizeHtml from 'sanitize-html';
+import { Config, sanitize as domPurifySanitize } from 'isomorphic-dompurify';
 
-const plainEnglish = /[a-z]+/i;
-
-const options: sanitizeHtml.IOptions = {
-  allowedTags: ['a', 'code', 'del', 'em', 'pre', 'span', 'strong'],
-  allowedAttributes: {
-    a: ['href'],
-    span: ['style'],
-  },
-  allowedStyles: {
-    '*': {
-      color: [
-        plainEnglish,
-        /^#(0x)?[0-9a-f]+$/i,
-        /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/,
-      ],
-      'text-align': [plainEnglish],
-      'font-weight': [plainEnglish, /\d+/],
-    },
-  },
+const options: Config = {
+  ALLOWED_TAGS: ['a', 'code', 'del', 'em', 'pre', 'span', 'strong'],
+  ALLOWED_ATTR: ['style', 'href'],
 };
 
 export default function sanitize(text: string): string {
-  return sanitizeHtml(text, options);
+  return domPurifySanitize(text, options) as string;
 }
