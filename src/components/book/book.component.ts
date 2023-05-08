@@ -3,6 +3,7 @@ import containerStyleToStyleDeclaration from '../../utils/container-style-to-sty
 import toPixelUnits from '../../utils/to-pixel-units.function';
 import listenToKeyboardEvents from '../listeners/listen-to-keyboard-events.function';
 import listenToSwipeEvents from '../listeners/listen-to-swipe-events.function';
+import DefaultPageFlipAnimation from './animations/default-page-flip.animation';
 import BookComponent from './book-element.interface';
 import BookIdentifier from './book.symbol';
 import CreateBookElement from './create-book-element.interface';
@@ -16,12 +17,13 @@ const BookComponent: CreateBookElement = (
     pageStyles: userDefinedPageStyles = {},
     pagesShown = 1,
     media,
-    animation,
+    animation = new DefaultPageFlipAnimation(),
     listeners = [listenToKeyboardEvents, listenToSwipeEvents],
   } = {
     currentPage: 0,
     pageStyles: {},
     pagesShown: 1,
+    animation: new DefaultPageFlipAnimation(),
     listeners: [listenToKeyboardEvents, listenToSwipeEvents],
   },
   config = {}

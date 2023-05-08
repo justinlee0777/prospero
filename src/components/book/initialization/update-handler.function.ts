@@ -9,8 +9,8 @@ import PageChangeEvent from '../page-change-event.interface';
 interface PageConfig {
   get: GetPage;
   pagesShown: number;
+  animation: BookAnimation;
 
-  animation?: BookAnimation;
   styles?: Partial<CSSStyleDeclaration>;
 }
 
@@ -68,18 +68,16 @@ export default function updateHandler(
       )
     );
 
-    let animationFinished = animation?.changePage(
+    /*
+     * The animation handles the actual page changing as it may need to control
+     * how and when the pages are deleted.
+     */
+    const animationFinished = animation.changePage(
       book,
       pageNumber,
       oldPages,
       pages
     );
-
-    if (!animationFinished) {
-      book.prepend(...pages);
-      oldPages.forEach((page) => page.destroy());
-      animationFinished = Promise.resolve();
-    }
 
     const pageChangeEvent: PageChangeEvent = {
       pageNumber,
