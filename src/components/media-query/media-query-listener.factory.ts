@@ -67,19 +67,25 @@ export default class MediaQueryListenerFactory {
   /**
    * Create a listener for the resizing of the viewport.
    */
-  static createSizer(config: MediaQuerySizerConfig): NullaryFn {
+  static createSizer(
+    config: MediaQuerySizerConfig,
+    container: HTMLElement
+  ): NullaryFn {
+    const getSizes: () => [number, number] = () => [
+      container.clientWidth,
+      container.clientHeight,
+    ];
+
     const resize = () => {
-      config.size(window.innerWidth, window.innerHeight);
+      config.size(...getSizes());
     };
 
     const debouncedResize = debounce(resize);
 
-    window.addEventListener('resize', debouncedResize, {
-      passive: true,
-    });
+    const resizeObserver = new ResizeObserver(debouncedResize);
 
-    resize();
+    resizeObserver.observe(container, { box: 'border-box' });
 
-    return () => window.removeEventListener('resize', debouncedResize);
+    return () => resizeObserver.disconnect();
   }
 }

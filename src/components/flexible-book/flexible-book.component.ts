@@ -1,3 +1,6 @@
+import { merge } from 'lodash-es';
+
+import CreateElementConfig from '../../elements/create-element.config';
 import div from '../../elements/div.function';
 import PagesBuilder from '../../pages.builder';
 import BookConfig from '../book/book-config.interface';
@@ -15,10 +18,8 @@ import FlexibleBookIdentifier from './flexible-book.symbol';
  */
 const FlexibleBookComponent: CreateFlexibleBookElement = (
   { config, containerStyle, text },
-  { fontLocation, createProcessors, margin } = {
-    margin: { top: 0, right: 0, bottom: 0, left: 0 },
-  },
-  elementConfig
+  { fontLocation, createProcessors } = {},
+  elementConfig = {}
 ) => {
   let fallback: BookConfig;
   let mediaQueryList: Array<FlexibleBookMediaQuery & { matches: boolean }> = [];
@@ -46,20 +47,21 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
     fallback = config;
   }
 
-  const flexibleBookElement = div({
+  const defaultElementConfig: CreateElementConfig = {
     styles: {
-      margin: `${margin.top}px ${margin.right}px ${margin.bottom}px ${margin.left}px`,
+      width: '100vw',
+      height: '100vh',
     },
-    ...elementConfig,
-  }) as unknown as FlexibleBookElement;
+  };
+
+  const flexibleBookElement = div(
+    merge(defaultElementConfig, elementConfig)
+  ) as unknown as FlexibleBookElement;
   let bookElement: BookElement | undefined;
 
   const size: MediaQuerySizerConfig['size'] = (width, height) => {
     bookElement?.destroy();
     bookElement?.remove();
-
-    width = width - margin.right - margin.left;
-    height = height - margin.top - margin.bottom;
 
     const bookConfig =
       mediaQueryList.find((mediaQuery) => mediaQuery.matches)?.config ??
@@ -93,9 +95,12 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
     flexibleBookElement.appendChild(bookElement);
   };
 
-  const destroySizer = MediaQueryListenerFactory.createSizer({
-    size,
-  });
+  const destroySizer = MediaQueryListenerFactory.createSizer(
+    {
+      size,
+    },
+    flexibleBookElement
+  );
 
   flexibleBookElement.destroy = () => {
     bookElement?.destroy();

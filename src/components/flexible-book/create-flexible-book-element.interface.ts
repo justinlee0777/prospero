@@ -14,7 +14,6 @@ interface RequiredArgs {
 interface OptionalArgs {
   fontLocation?: string;
   createProcessors?: () => Array<Processor>;
-  margin?: ContainerStyle['margin'];
 }
 
 export default interface CreateFlexibleBookElement {

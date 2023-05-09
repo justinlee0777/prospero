@@ -61,7 +61,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     },
     {
       createProcessors: () => [new HTMLProcessor()],
-      margin: { top: 24, right: 12, bottom: 24, left: 12 },
+    },
+    {
+      styles: {
+        width: '80vw',
+        height: '90vh',
+        maxWidth: '1200px',
+        margin: 'auto',
+      },
     }
   );
 
