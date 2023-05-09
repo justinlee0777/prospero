@@ -29,7 +29,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           left: 8,
         },
       },
-      config: [
+      mediaQueryList: [
         {
           pagesShown: 1,
           animation: new SinglePageBookAnimation(),

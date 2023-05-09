@@ -18,18 +18,20 @@ import normalizeContainerStyle from './normalize-container-style.function';
  * A magic book that stretches to the edges of the screen.
  */
 const FlexibleBookComponent: CreateFlexibleBookElement = (
-  { config, containerStyle, text },
+  requiredArgs,
   { fontLocation, createProcessors } = {},
   elementConfig = {}
 ) => {
+  const { containerStyle, text } = requiredArgs;
+
   const normalizedContainerStyle = normalizeContainerStyle(containerStyle);
 
   let fallback: BookConfig;
   let mediaQueryList: Array<FlexibleBookMediaQuery & { matches: boolean }> = [];
 
-  if (Symbol.iterator in config) {
-    fallback = config[0];
-    const [, ...configs] = [...config];
+  if ('mediaQueryList' in requiredArgs) {
+    fallback = requiredArgs.mediaQueryList[0];
+    const [, ...configs] = [...requiredArgs.mediaQueryList];
     mediaQueryList = configs
       .sort(
         (queryA, queryB) => queryB.pattern.minWidth - queryA.pattern.minWidth
@@ -47,7 +49,7 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
         };
       });
   } else {
-    fallback = config;
+    fallback = requiredArgs.config;
   }
 
   const defaultElementConfig: CreateElementConfig = {
