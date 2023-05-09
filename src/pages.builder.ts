@@ -122,24 +122,19 @@ export default class PagesBuilder {
       );
     }
 
-    return (
-      this.sizes
-        // Sort sizes if the user is going to build media queries from these.
-        .sort((sizeA, sizeB) => sizeA.width - sizeB.width)
-        .map((size) => {
-          return new Pages(
-            {
-              ...size,
-              lineHeight: this.lineHeight,
-              ...this.font,
-              ...this.box,
-            },
-            this.text,
-            this.processors,
-            { fontLocation: this.fontLocation }
-          );
-        })
-    );
+    return this.sizes.map((size) => {
+      return new Pages(
+        {
+          ...size,
+          lineHeight: this.lineHeight,
+          ...this.font,
+          ...this.box,
+        },
+        this.text,
+        this.processors,
+        { fontLocation: this.fontLocation }
+      );
+    });
   }
 
   private validate(): boolean {

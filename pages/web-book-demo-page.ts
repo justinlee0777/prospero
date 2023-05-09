@@ -28,18 +28,6 @@ window.addEventListener('DOMContentLoaded', async () => {
           bottom: 36,
           left: 8,
         },
-        margin: {
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-        },
-        border: {
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-        },
       },
       config: [
         {

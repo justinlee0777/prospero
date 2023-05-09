@@ -12,6 +12,7 @@ import CreateFlexibleBookElement from './create-flexible-book-element.interface'
 import FlexibleBookElement from './flexible-book-element.interface';
 import FlexibleBookMediaQuery from './flexible-book-media-query.interface';
 import FlexibleBookIdentifier from './flexible-book.symbol';
+import normalizeContainerStyle from './normalize-container-style.function';
 
 /**
  * A magic book that stretches to the edges of the screen.
@@ -21,6 +22,8 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
   { fontLocation, createProcessors } = {},
   elementConfig = {}
 ) => {
+  const normalizedContainerStyle = normalizeContainerStyle(containerStyle);
+
   let fallback: BookConfig;
   let mediaQueryList: Array<FlexibleBookMediaQuery & { matches: boolean }> = [];
 
@@ -71,14 +74,14 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
 
     const [pages] = new PagesBuilder()
       .setFont(
-        containerStyle.computedFontSize,
-        containerStyle.computedFontFamily,
+        normalizedContainerStyle.computedFontSize,
+        normalizedContainerStyle.computedFontFamily,
         fontLocation
       )
-      .setLineHeight(containerStyle.lineHeight)
-      .setMargin(containerStyle.margin)
-      .setPadding(containerStyle.padding)
-      .setBorder(containerStyle.border)
+      .setLineHeight(normalizedContainerStyle.lineHeight)
+      .setMargin(normalizedContainerStyle.margin)
+      .setPadding(normalizedContainerStyle.padding)
+      .setBorder(normalizedContainerStyle.border)
       .setProcessors(processors)
       .setText(text)
       .addSize(width / (bookConfig.pagesShown ?? 1), height)
