@@ -99,4 +99,56 @@ describe('MediaQueryListenerFactory', () => {
 
     destroy();
   });
+
+  test('creates a listener for an element resizing', () => {
+    const mockObserve = jest.fn();
+    const mockUnobserve = jest.fn();
+    const mockDisconnect = jest.fn();
+
+    let trigger;
+
+    window.ResizeObserver = class MockResizeObserver {
+      constructor(public size) {
+        trigger = () => size();
+      }
+
+      observe = mockObserve;
+      unobserve = mockUnobserve;
+      disconnect = mockDisconnect;
+    };
+
+    const element = document.createElement('div');
+    document.body.appendChild(element);
+
+    const mockSize = jest.fn();
+
+    const destroy = MediaQueryListenerFactory.createSizer(
+      {
+        size: mockSize,
+      },
+      element
+    );
+
+    expect(mockObserve).toHaveBeenCalledTimes(1);
+    expect(mockObserve).toHaveBeenCalledWith(element, { box: 'border-box' });
+
+    trigger();
+
+    jest.advanceTimersByTime(300);
+
+    expect(mockSize).toHaveBeenCalledTimes(1);
+    // Sadly JSDOM does not do any calculation, so we'll have to be happy with this.
+    expect(mockSize).toHaveBeenCalledWith(0, 0);
+
+    trigger();
+
+    jest.advanceTimersByTime(300);
+
+    expect(mockSize).toHaveBeenCalledTimes(2);
+
+    document.body.removeChild(element);
+    destroy();
+
+    expect(mockDisconnect).toHaveBeenCalledTimes(1);
+  });
 });

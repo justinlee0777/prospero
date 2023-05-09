@@ -1,0 +1,21 @@
+.defaultBookTheme {
+  border-color: black;
+  border-radius: 12px;
+  border-style: solid;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+  color: #333;
+}
+
+.defaultBookTheme > * {
+  background-color: #faf9f6;
+}
+
+.defaultBookTheme > *:nth-of-type(n + 2)::before {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  content: '';
+  display: block;
+  height: 100%;
+  left: -0.5px;
+  position: absolute;
+  top: 0;
+}

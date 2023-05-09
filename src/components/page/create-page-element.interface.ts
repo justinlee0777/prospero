@@ -3,7 +3,7 @@ import PageElement from './page-element.interface';
 import PageNumberingAlignment from './page-numbering-alignment.enum';
 
 interface PageArgs {
-  numbering: {
+  numbering?: {
     pageNumber: number;
     alignment: PageNumberingAlignment;
   };

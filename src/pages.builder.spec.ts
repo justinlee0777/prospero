@@ -25,7 +25,7 @@ describe('PagesBuilder', () => {
 
     expect(pages.length).toBe(3);
 
-    const [pixel, galaxy, ipad] = pages.map((page: any) => ({
+    const [pixel, ipad, galaxy] = pages.map((page: any) => ({
       containerStyle: page.containerStyle,
       text: page.text,
       processors: page.processors,

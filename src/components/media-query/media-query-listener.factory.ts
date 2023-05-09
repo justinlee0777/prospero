@@ -2,6 +2,7 @@ import debounce from '../../utils/debounce.function';
 import NullaryFn from '../../utils/nullary-fn.type';
 import MediaQueryListenerConfig from './media-query-listener-config.interface';
 import MediaQueryPattern from './media-query-pattern.interface';
+import MediaQuerySizerConfig from './media-query-sizer-config.interface';
 
 /**
  * Platform for getting certain pieces of data depending on the media query.
@@ -10,6 +11,7 @@ import MediaQueryPattern from './media-query-pattern.interface';
  */
 export default class MediaQueryListenerFactory {
   /**
+   * Creates a window listener that calls the 'show' and 'hide' functions based on the breakpoints configured.
    * @returns a function that destroys the listeners.
    */
   static create(
@@ -60,5 +62,30 @@ export default class MediaQueryListenerFactory {
     resize();
 
     return () => window.removeEventListener('resize', debouncedResize);
+  }
+
+  /**
+   * Create a listener for the resizing of the viewport.
+   */
+  static createSizer(
+    config: MediaQuerySizerConfig,
+    container: HTMLElement
+  ): NullaryFn {
+    const getSizes: () => [number, number] = () => [
+      container.clientWidth,
+      container.clientHeight,
+    ];
+
+    const resize = () => {
+      config.size(...getSizes());
+    };
+
+    const debouncedResize = debounce(resize);
+
+    const resizeObserver = new ResizeObserver(debouncedResize);
+
+    resizeObserver.observe(container, { box: 'border-box' });
+
+    return () => resizeObserver.disconnect();
   }
 }

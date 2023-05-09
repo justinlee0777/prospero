@@ -1,6 +1,7 @@
 import './book-demo.css';
 
 import {
+  DefaultBookThemeClassName,
   SinglePageBookAnimation,
   listenToClickEvents,
   listenToKeyboardEvents,
@@ -27,7 +28,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         minWidth: 750,
       },
     },
-    { styles: { margin: 'auto' } }
+    {
+      classnames: [DefaultBookThemeClassName],
+      styles: { margin: 'auto' },
+    }
   );
 
   const mobileBook = BookComponent(
@@ -40,7 +44,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       listeners: [listenToClickEvents, listenToSwipeEvents],
       pagesShown: 1,
     },
-    { styles: { margin: 'auto' } }
+    {
+      classnames: [DefaultBookThemeClassName],
+      styles: { margin: 'auto' },
+    }
   );
 
   const books = BooksComponent({

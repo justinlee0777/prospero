@@ -59,6 +59,10 @@ export default class Pages {
     }
   };
 
+  getContainerStyle(): ContainerStyle {
+    return this.containerStyle;
+  }
+
   getAll(): Array<string> {
     return [...this.pageGenerator];
   }

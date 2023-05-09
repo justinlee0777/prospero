@@ -4,8 +4,8 @@ describe('HTMLSanitizer', () => {
   test('sanitizes', () => {
     /*
      * Current spec is:
-     * - Only <span> is allowed.
-     * - Only "style" attribute is allowed, and only the "color" value.
+     * - Only <a>, <code>, <del>, <em>, <pre>, <span>, <strong> is allowed.
+     * - Only "style" and "href" attributes are allowed
      */
     const paragraphElement = '<p>foo</p>';
 
@@ -27,13 +27,32 @@ describe('HTMLSanitizer', () => {
       '<span style="color: red; background-color: blue;">baz</span>';
 
     expect(sanitize(spanElementWithColorAndBackgroundColor)).toBe(
-      '<span style="color:red">baz</span>'
+      '<span style="color: red; background-color: blue;">baz</span>'
     );
 
     const spanElementWithHexColor = '<span style="color: #EFEFEF">baz</span>';
 
     expect(sanitize(spanElementWithHexColor)).toBe(
-      '<span style="color:#EFEFEF">baz</span>'
+      '<span style="color: #EFEFEF">baz</span>'
     );
+
+    const anchorElement =
+      '<a href="https://example.com" rel="noopener">Link</a>';
+
+    expect(sanitize(anchorElement)).toBe(
+      '<a href="https://example.com">Link</a>'
+    );
+
+    const codeElement = '<code>const foo = "foo";</code>';
+
+    expect(sanitize(codeElement)).toBe('<code>const foo = "foo";</code>');
+
+    const strongElement = '<strong>emphasized</strong>';
+
+    expect(sanitize(strongElement)).toBe('<strong>emphasized</strong>');
+
+    const italicizedElement = '<em>bar</em>';
+
+    expect(sanitize(italicizedElement)).toBe('<em>bar</em>');
   });
 });
