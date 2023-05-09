@@ -10,6 +10,7 @@ interface PageConfig {
   get: GetPage;
   pagesShown: number;
   animation: BookAnimation;
+  showPageNumbers: boolean;
 
   styles?: Partial<CSSStyleDeclaration>;
 }
@@ -24,7 +25,7 @@ type UpdatePage = (this: void, currentPage: number) => boolean;
  */
 export default function updateHandler(
   book: BookComponent,
-  { get, pagesShown, animation, styles = {} }: PageConfig
+  { get, pagesShown, animation, styles = {}, showPageNumbers }: PageConfig
 ): UpdatePage {
   return (pageNumber: number) => {
     const leftmostPage = pageNumber - (pageNumber % pagesShown);
@@ -47,17 +48,22 @@ export default function updateHandler(
       ...book.querySelectorAll(pageSelector),
     ] as Array<PageComponent>;
 
-    const pages = pageContent.map(({ number, content }, i) =>
-      PageComponent(
+    const pages = pageContent.map(({ number, content }, i) => {
+      let numbering;
+
+      if (showPageNumbers) {
+        numbering = {
+          alignment:
+            number % 2 === 0
+              ? PageNumberingAlignment.LEFT
+              : PageNumberingAlignment.RIGHT,
+          pageNumber: number + 1,
+        };
+      }
+
+      return PageComponent(
         {
-          //
-          numbering: {
-            alignment:
-              number % 2 === 0
-                ? PageNumberingAlignment.LEFT
-                : PageNumberingAlignment.RIGHT,
-            pageNumber: number + 1,
-          },
+          numbering,
         },
         {
           innerHTML: content,
@@ -66,8 +72,8 @@ export default function updateHandler(
             left: `${offset * i}%`,
           },
         }
-      )
-    );
+      );
+    });
 
     /*
      * The animation handles the actual page changing as it may need to control

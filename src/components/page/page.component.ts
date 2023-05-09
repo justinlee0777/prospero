@@ -8,18 +8,24 @@ import PageComponent from './page-element.interface';
 const PageComponent: CreatePageElement = (pageConfig, config = {}) => {
   const classnames = [pageClassName].concat(config?.classnames ?? []);
 
-  const numbering = div({
-    classnames: [styles.pageNumber],
-    textContent: pageConfig.numbering.pageNumber.toString(),
-    styles: {
-      [pageConfig.numbering.alignment]: '1em',
-    },
-  });
+  const children = [];
+
+  if (pageConfig.numbering) {
+    const numbering = div({
+      classnames: [styles.pageNumber],
+      textContent: pageConfig.numbering.pageNumber.toString(),
+      styles: {
+        [pageConfig.numbering.alignment]: '1em',
+      },
+    });
+
+    children.push(numbering);
+  }
 
   const page = div({
     ...config,
     classnames,
-    children: [numbering],
+    children,
   }) as unknown as PageComponent;
 
   page.destroy = () => page.remove();

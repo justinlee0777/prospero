@@ -19,12 +19,14 @@ const BookComponent: CreateBookElement = (
     media,
     animation = new DefaultPageFlipAnimation(),
     listeners = [listenToKeyboardEvents, listenToSwipeEvents],
+    showPageNumbers = true,
   } = {
     currentPage: 0,
     pageStyles: {},
     pagesShown: 1,
     animation: new DefaultPageFlipAnimation(),
     listeners: [listenToKeyboardEvents, listenToSwipeEvents],
+    showPageNumbers: true,
   },
   config = {}
 ) => {
@@ -100,6 +102,7 @@ const BookComponent: CreateBookElement = (
     pagesShown,
     styles: pageStyles,
     animation,
+    showPageNumbers,
   });
 
   const decrement = () =>

@@ -6,4 +6,5 @@ export default interface BookConfig extends BookAttributes {
   pageStyles?: Partial<CSSStyleDeclaration>;
   pagesShown?: number;
   listeners?: Array<AddListeners>;
+  showPageNumbers?: boolean;
 }
