@@ -9,7 +9,6 @@ import BookIdentifier from './book.symbol';
 import CreateBookElement from './create-book-element.interface';
 import initialize from './initialization/initialize.function';
 import updateHandler from './initialization/update-handler.function';
-import DefaultBookThemeClassName from './theming/default-book.theme';
 
 const BookComponent: CreateBookElement = (
   args,
@@ -27,15 +26,8 @@ const BookComponent: CreateBookElement = (
     animation: new DefaultPageFlipAnimation(),
     listeners: [listenToKeyboardEvents, listenToSwipeEvents],
   },
-  config
+  config = {}
 ) => {
-  config = {
-    ...{
-      classnames: DefaultBookThemeClassName,
-    },
-    ...(config ?? {}),
-  };
-
   const { containerStyles } = args;
   let getPage: GetPage;
 

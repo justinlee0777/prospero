@@ -22,7 +22,7 @@ import normalizeContainerStyle from './normalize-container-style.function';
  */
 const FlexibleBookComponent: CreateFlexibleBookElement = (
   requiredArgs,
-  { fontLocation, createProcessors } = {},
+  { fontLocation, createProcessors, bookClassNames } = {},
   elementConfig = {}
 ) => {
   const { containerStyle, text } = requiredArgs;
@@ -97,7 +97,10 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
         getPage: (pageNumber) => pages.get(pageNumber),
         containerStyles: pages.getContainerStyle(),
       },
-      bookConfig
+      bookConfig,
+      {
+        classnames: bookClassNames,
+      }
     );
 
     flexibleBookElement.appendChild(bookElement);

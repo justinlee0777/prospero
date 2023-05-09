@@ -34,6 +34,8 @@ interface OptionalArgs {
    * This is needed as processors are stateful.
    */
   createProcessors?: () => Array<Processor>;
+
+  bookClassNames?: Array<string>;
 }
 
 export default interface CreateFlexibleBookElement {
