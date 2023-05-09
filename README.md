@@ -134,7 +134,6 @@ However, processors need to leave notes for other processors if they transform t
 
 ### Roadmap
 
-- Book look-and-feel (ex. animations)
 - Support for different font sizes
 - Support for H1..6 from Markdown
 - Angular and React-compatible components
