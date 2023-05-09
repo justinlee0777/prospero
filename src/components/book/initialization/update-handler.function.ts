@@ -50,6 +50,7 @@ export default function updateHandler(
     const pages = pageContent.map(({ number, content }, i) =>
       PageComponent(
         {
+          //
           numbering: {
             alignment:
               number % 2 === 0

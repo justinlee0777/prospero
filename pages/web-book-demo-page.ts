@@ -3,10 +3,10 @@ import './book-demo.css';
 import DoublePageBookPreset from '../src/components/book/presets/double-page-book-preset.const';
 import SinglePageBookPreset from '../src/components/book/presets/single-page-book-preset.const';
 import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
-import { HTMLProcessor } from '../src/shared';
+import { HTMLProcessor, IndentProcessor } from '../src/shared';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/color-example.txt');
+  const response = await fetch('../text-samples/proteus.txt');
   const text = await response.text();
 
   const container = document.body;
@@ -20,9 +20,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         lineHeight: 32,
         padding: {
           top: 36,
-          right: 8,
+          right: 18,
           bottom: 36,
-          left: 8,
+          left: 18,
         },
       },
       mediaQueryList: [
@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       ],
     },
     {
-      createProcessors: () => [new HTMLProcessor()],
+      createProcessors: () => [new HTMLProcessor(), new IndentProcessor(5)],
     },
     {
       styles: {
