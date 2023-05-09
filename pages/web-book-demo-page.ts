@@ -1,11 +1,7 @@
 import './book-demo.css';
 
-import {
-  SinglePageBookAnimation,
-  listenToClickEvents,
-  listenToKeyboardEvents,
-} from '../src/components';
-import DoublePageBookAnimation from '../src/components/book/animations/double-page-book.animation';
+import DoublePageBookPreset from '../src/components/book/presets/double-page-book-preset.const';
+import SinglePageBookPreset from '../src/components/book/presets/single-page-book-preset.const';
 import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
 import { HTMLProcessor } from '../src/shared';
 
@@ -30,20 +26,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         },
       },
       mediaQueryList: [
-        {
-          pagesShown: 1,
-          animation: new SinglePageBookAnimation(),
-          listeners: [listenToClickEvents],
-        },
+        SinglePageBookPreset(),
         {
           pattern: {
             minWidth: 800,
           },
-          config: {
-            pagesShown: 2,
-            animation: new DoublePageBookAnimation(),
-            listeners: [listenToClickEvents, listenToKeyboardEvents],
-          },
+          config: DoublePageBookPreset(),
         },
       ],
     },

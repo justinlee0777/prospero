@@ -15,7 +15,10 @@ import FlexibleBookIdentifier from './flexible-book.symbol';
 import normalizeContainerStyle from './normalize-container-style.function';
 
 /**
- * A magic book that stretches to the edges of the screen.
+ * A magic book that stretches to the edges of the screen. This is perfect for short articles/essays (~2500 words).
+ * This component creates a Book as a child based on the screen width.
+ * The element by default is the height and width of the window. To constrain the size, it is recommended to
+ * use viewport units/pixels for the width/height CSS properties (ex. min-width, max-width).
  */
 const FlexibleBookComponent: CreateFlexibleBookElement = (
   requiredArgs,
