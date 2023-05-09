@@ -49,6 +49,7 @@ describe('BookComponent updateHandler()', () => {
         }
       }),
       pagesShown: 1,
+      showPageNumbers: false,
     });
 
     expect(callback(0)).toBe(true);
@@ -77,6 +78,7 @@ describe('BookComponent updateHandler()', () => {
         }
       }),
       pagesShown: 2,
+      showPageNumbers: false,
     });
 
     expect(callback(0)).toBe(true);
@@ -107,6 +109,7 @@ describe('BookComponent updateHandler()', () => {
         }
       }),
       pagesShown: 3,
+      showPageNumbers: false,
     });
 
     expect(callback(0)).toBe(true);
@@ -119,5 +122,33 @@ describe('BookComponent updateHandler()', () => {
     expect(callback(3)).toBe(false);
 
     expect(book.onpagechange).toHaveBeenCalledTimes(2);
+  });
+
+  test('shows page numbers', async () => {
+    const book = BookComponent(pagesOutput);
+    book.onpagechange = jest.fn();
+
+    const callback = updateHandler(book, {
+      animation: new DefaultPageFlipAnimation(),
+      get: jest.fn().mockImplementation((pageNumber) => {
+        if (pageNumber < 0 || pageNumber >= pages.length) {
+          return null;
+        } else {
+          return pages[pageNumber];
+        }
+      }),
+      pagesShown: 1,
+      showPageNumbers: true,
+    });
+
+    callback(0);
+
+    await new Promise(jest.requireActual('timers').setImmediate);
+
+    const [page] = book.children;
+
+    const pageNumberElement = page.querySelector('.pageNumber');
+    expect(pageNumberElement).toBeTruthy();
+    expect(pageNumberElement.textContent).toBe('1');
   });
 });
