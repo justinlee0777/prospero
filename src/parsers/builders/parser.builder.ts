@@ -4,7 +4,6 @@ import Optional from '../../utils/optional.type';
 import WordWidthCalculator from '../../word-width.calculator';
 import Parser from '../models/parser.interface';
 import ParserFactory from '../parser.factory';
-import getNormalizedPageHeight from './get-normalized-page-height.function';
 
 const fromContainerStyle = 'fromContainerStyle';
 
@@ -78,18 +77,14 @@ export default class ParserBuilder {
       border.left -
       border.right;
 
-    const pageHeight = getNormalizedPageHeight(
+    const containerHeight =
       height -
-        padding.top -
-        padding.bottom -
-        margin.top -
-        margin.bottom -
-        border.top -
-        border.bottom,
-      lineHeight
-    );
-
-    const numLines = pageHeight / lineHeight;
+      padding.top -
+      padding.bottom -
+      margin.top -
+      margin.bottom -
+      border.top -
+      border.bottom;
 
     const calculator = new WordWidthCalculator(
       computedFontSize,
@@ -98,7 +93,8 @@ export default class ParserBuilder {
     );
 
     const parser = ParserFactory.create({
-      pageLines: numLines,
+      lineHeight,
+      pageHeight: containerHeight,
       pageWidth: containerWidth,
     });
 

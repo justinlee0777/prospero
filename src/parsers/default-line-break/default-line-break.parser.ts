@@ -98,16 +98,20 @@ export default class DefaultLineBreakParser implements Parser {
     const tokens = text.matchAll(this.tokenExpression);
     const calculateWordWidth = (word) => this.calculator.calculate(word);
 
+    const bookLineHeight = Big(this.config.lineHeight);
+
     let parserState: ParserState = {
       pages: [],
       textIndex: 0,
       changes: [],
+      bookLineHeight: Big(0),
 
       lines: [],
+      pageHeight: bookLineHeight,
       pageChanges: [],
 
       lineWidth: Big(0),
-      line: 0,
+      lineHeight: bookLineHeight,
       lineText: '',
     };
 
@@ -124,7 +128,7 @@ export default class DefaultLineBreakParser implements Parser {
       const wordWidth = Big(calculateWordWidth(word)).round(2, 0);
 
       const pageBeginning =
-        parserState.line === 0 && parserState.lineWidth.eq(0);
+        parserState.pageHeight.eq(0) && parserState.lineWidth.eq(0);
       const wordOverflows = parserState.lineWidth
         .plus(wordWidth)
         .gte(this.config.pageWidth);

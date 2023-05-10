@@ -2,7 +2,7 @@ import CreateTextParser from '../../models/create-text-parser.interface';
 
 const createWordAtTextOverflowParser: CreateTextParser =
   (config) => (state, word) => {
-    if (state.line + 1 >= config.pageLines) {
+    if (state.pageHeight.add(state.lineHeight).gte(config.pageHeight)) {
       return {
         ...state,
         pages: state.pages.concat(state.lines.join('') + state.lineText),
@@ -13,7 +13,7 @@ const createWordAtTextOverflowParser: CreateTextParser =
         // Cut the current text and begin on a newline.
         lines: [],
         pageChanges: [],
-        line: 0,
+        pageHeight: state.lineHeight,
         lineWidth: word.width,
         lineText: word.text,
       };
@@ -23,7 +23,7 @@ const createWordAtTextOverflowParser: CreateTextParser =
         textIndex: state.textIndex + word.text.length,
         // Cut the current text and begin on a newline.
         lines: state.lines.concat(state.lineText),
-        line: state.line + 1,
+        pageHeight: state.pageHeight.add(state.lineHeight),
         lineWidth: word.width,
         lineText: word.text,
       };
