@@ -80,7 +80,7 @@ module.exports = {
   plugins: [
     new webpack.NormalModuleReplacementPlugin(
       /src\/sanitizers\/html\.sanitizer\.ts/,
-      path.join(__dirname, '../../src/sanitizers/html.sanitizer.web.ts'),
+      path.join(__dirname, '../../src/sanitizers/html.sanitizer.web.ts')
     ),
     ...pageHtml,
     new HtmlWebpackPlugin({

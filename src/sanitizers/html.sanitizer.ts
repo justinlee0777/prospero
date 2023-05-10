@@ -9,7 +9,7 @@ const options: DOMPurify.Config = {
 };
 
 export default class HTMLSanitizer implements Sanitizer {
-  purify: DOMPurify.DOMPurifyI;
+  private purify: DOMPurify.DOMPurifyI;
 
   constructor() {
     const window = new JSDOM('').window;

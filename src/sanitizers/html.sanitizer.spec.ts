@@ -1,58 +1,69 @@
-import sanitize from './html.sanitizer';
+import HTMLSanitizer from './html.sanitizer';
+import WebHTMLSanitizer from './html.sanitizer.web';
 
 describe('HTMLSanitizer', () => {
-  test('sanitizes', () => {
-    /*
-     * Current spec is:
-     * - Only <a>, <code>, <del>, <em>, <pre>, <span>, <strong> is allowed.
-     * - Only "style" and "href" attributes are allowed
-     */
-    const paragraphElement = '<p>foo</p>';
+  [HTMLSanitizer, WebHTMLSanitizer].forEach((Sanitizer) => {
+    test('sanitizes', () => {
+      const sanitizer = new Sanitizer();
 
-    expect(sanitize(paragraphElement)).toBe('foo');
+      /*
+       * Current spec is:
+       * - Only <a>, <code>, <del>, <em>, <pre>, <span>, <strong> is allowed.
+       * - Only "style" and "href" attributes are allowed
+       */
+      const paragraphElement = '<p>foo</p>';
 
-    const imageElement = '<img/>';
+      expect(sanitizer.sanitize(paragraphElement)).toBe('foo');
 
-    expect(sanitize(imageElement)).toBe('');
+      const imageElement = '<img/>';
 
-    const spanElement = '<span>bar</span>';
+      expect(sanitizer.sanitize(imageElement)).toBe('');
 
-    expect(sanitize(spanElement)).toBe('<span>bar</span>');
+      const spanElement = '<span>bar</span>';
 
-    const spanElementWithClassname = '<span class="inline">baz</span>';
+      expect(sanitizer.sanitize(spanElement)).toBe('<span>bar</span>');
 
-    expect(sanitize(spanElementWithClassname)).toBe('<span>baz</span>');
+      const spanElementWithClassname = '<span class="inline">baz</span>';
 
-    const spanElementWithColorAndBackgroundColor =
-      '<span style="color: red; background-color: blue;">baz</span>';
+      expect(sanitizer.sanitize(spanElementWithClassname)).toBe(
+        '<span>baz</span>'
+      );
 
-    expect(sanitize(spanElementWithColorAndBackgroundColor)).toBe(
-      '<span style="color: red; background-color: blue;">baz</span>'
-    );
+      const spanElementWithColorAndBackgroundColor =
+        '<span style="color: red; background-color: blue;">baz</span>';
 
-    const spanElementWithHexColor = '<span style="color: #EFEFEF">baz</span>';
+      expect(sanitizer.sanitize(spanElementWithColorAndBackgroundColor)).toBe(
+        '<span style="color: red; background-color: blue;">baz</span>'
+      );
 
-    expect(sanitize(spanElementWithHexColor)).toBe(
-      '<span style="color: #EFEFEF">baz</span>'
-    );
+      const spanElementWithHexColor = '<span style="color: #EFEFEF">baz</span>';
 
-    const anchorElement =
-      '<a href="https://example.com" rel="noopener">Link</a>';
+      expect(sanitizer.sanitize(spanElementWithHexColor)).toBe(
+        '<span style="color: #EFEFEF">baz</span>'
+      );
 
-    expect(sanitize(anchorElement)).toBe(
-      '<a href="https://example.com">Link</a>'
-    );
+      const anchorElement =
+        '<a href="https://example.com" rel="noopener">Link</a>';
 
-    const codeElement = '<code>const foo = "foo";</code>';
+      expect(sanitizer.sanitize(anchorElement)).toBe(
+        '<a href="https://example.com">Link</a>'
+      );
 
-    expect(sanitize(codeElement)).toBe('<code>const foo = "foo";</code>');
+      const codeElement = '<code>const foo = "foo";</code>';
 
-    const strongElement = '<strong>emphasized</strong>';
+      expect(sanitizer.sanitize(codeElement)).toBe(
+        '<code>const foo = "foo";</code>'
+      );
 
-    expect(sanitize(strongElement)).toBe('<strong>emphasized</strong>');
+      const strongElement = '<strong>emphasized</strong>';
 
-    const italicizedElement = '<em>bar</em>';
+      expect(sanitizer.sanitize(strongElement)).toBe(
+        '<strong>emphasized</strong>'
+      );
 
-    expect(sanitize(italicizedElement)).toBe('<em>bar</em>');
+      const italicizedElement = '<em>bar</em>';
+
+      expect(sanitizer.sanitize(italicizedElement)).toBe('<em>bar</em>');
+    });
   });
 });

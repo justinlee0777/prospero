@@ -1,3 +1,3 @@
 export default interface Sanitizer {
-    sanitize(text: string): string;
+  sanitize(text: string): string;
 }

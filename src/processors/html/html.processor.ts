@@ -6,8 +6,8 @@ import TextChange, {
   AddTextChange,
   DeleteTextChange,
 } from '../../parsers/models/text-change.interface';
-import Processor from '../models/processor.interface';
 import HTMLSanitizer from '../../sanitizers/html.sanitizer';
+import Processor from '../models/processor.interface';
 
 /**
  * Memorized description of HTML tags for (ideally) quick and simple replacements in the text.
