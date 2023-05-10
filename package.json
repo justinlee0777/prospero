@@ -37,7 +37,8 @@
   },
   "dependencies": {
     "big.js": "^6.2.1",
-    "isomorphic-dompurify": "^1.4.0",
+    "dompurify": "^3.0.3",
+    "jsdom": "^22.0.0",
     "lodash-es": "^4.17.21",
     "rehype-stringify": "^9.0.3",
     "remark-gfm": "^3.0.1",

@@ -1,4 +1,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { join } = require('path');
+const webpack = require('webpack')
 
 module.exports = {
   name: 'production-web',
@@ -42,6 +44,12 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  plugins: [new MiniCssExtractPlugin()],
+  plugins: [
+    new webpack.NormalModuleReplacementPlugin(
+      /src\/sanitizers\/html\.sanitizer\.ts/,
+      join(__dirname, '../../src/sanitizers/html.sanitizer.web.ts'),
+    ),
+    new MiniCssExtractPlugin(),
+  ],
   target: 'web',
 };

@@ -9,6 +9,7 @@ import MediaQueryListenerFactory from './media-query/media-query-listener.factor
 export * from './book/animations/public-api';
 export * from './book/theming/public-api';
 export * from './listeners/public-api';
+export * from './book/presets/public-api';
 export {
   BookComponent,
   BooksComponent,

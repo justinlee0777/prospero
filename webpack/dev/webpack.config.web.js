@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { cwd } = require('process');
+const webpack = require('webpack');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -77,6 +78,10 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   plugins: [
+    new webpack.NormalModuleReplacementPlugin(
+      /src\/sanitizers\/html\.sanitizer\.ts/,
+      path.join(__dirname, '../../src/sanitizers/html.sanitizer.web.ts'),
+    ),
     ...pageHtml,
     new HtmlWebpackPlugin({
       filename: 'index.html',

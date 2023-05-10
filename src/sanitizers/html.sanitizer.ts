@@ -1,10 +1,22 @@
-import { Config, sanitize as domPurifySanitize } from 'isomorphic-dompurify';
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
-const options: Config = {
+import Sanitizer from './sanitizer.interface';
+
+const options: DOMPurify.Config = {
   ALLOWED_TAGS: ['a', 'code', 'del', 'em', 'pre', 'span', 'strong'],
   ALLOWED_ATTR: ['style', 'href'],
 };
 
-export default function sanitize(text: string): string {
-  return domPurifySanitize(text, options) as string;
+export default class HTMLSanitizer implements Sanitizer {
+  purify: DOMPurify.DOMPurifyI;
+
+  constructor() {
+    const window = new JSDOM('').window;
+    this.purify = DOMPurify(window);
+  }
+
+  sanitize(text: string): string {
+    return this.purify.sanitize(text, options) as string;
+  }
 }
