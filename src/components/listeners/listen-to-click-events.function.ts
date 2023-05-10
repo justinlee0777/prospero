@@ -2,7 +2,8 @@ import AddListeners from '../model/add-listeners.interface';
 
 const listenToClickEvents: AddListeners = (book, [decrement, increment]) => {
   function flipPage(event: MouseEvent) {
-    const midpoint = book.clientWidth / 2;
+    const { x, width } = book.getBoundingClientRect();
+    const midpoint = x + width / 2;
     if (event.clientX >= midpoint) {
       increment();
     } else {
