@@ -6,6 +6,7 @@ import TextChange, {
   AddTextChange,
   DeleteTextChange,
 } from '../../parsers/models/text-change.interface';
+import HTMLRegex from '../../regexp/html.regexp';
 import HTMLSanitizer from '../../sanitizers/html.sanitizer';
 import Processor from '../models/processor.interface';
 
@@ -31,27 +32,6 @@ interface HTMLTag {
  * Remove and add HTML tags into pages.
  */
 export default class HTMLProcessor implements Processor {
-  /**
-   * Omitting non-closing tags for the time-being as those - afaik - are not allowed.
-   * Capture groups
-   * First: the entire opening tag, plus attributes
-   * Second: the tag name itself
-   * Third: the tag content
-   *
-   * To be unit tested one day:
-   * Allowed:
-   * - <div>foo</div>
-   * - <span>bar</span>
-   * - <span style="color: blue">foo</span>
-   * Disallowed:
-   * - <span>foo</div>
-   * - foo
-   * - <span>bar
-   * - baz</span>
-   * - baz<span>
-   */
-  private static HTMLRegex = /(<([A-Za-z]+).*?>)([^<>]*)<\/\2>/g;
-
   private htmlTags: Array<HTMLTag> = [];
 
   private previousParserState: ParserState | undefined;
@@ -65,7 +45,7 @@ export default class HTMLProcessor implements Processor {
     let normalizedOffset = 0;
 
     return text.replace(
-      HTMLProcessor.HTMLRegex,
+      HTMLRegex,
       (
         _,
         openingTag: string,

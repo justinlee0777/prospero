@@ -8,14 +8,14 @@ import ParseWord from '../models/parse-word.interface';
 import ParserState from '../models/parser-state.interface';
 import Parser from '../models/parser.interface';
 import Word from '../models/word.interface';
-import parseEnd from './end.parser';
-import createNewlineAtPageBeginningParser from './newline/newline-at-page-beginning.parser';
-import createNewlineParser from './newline/newline.parser';
-import parseWhitespaceAtPageBeginning from './whitespace/whitespace-at-page-beginning.parser';
-import createWhitespaceAtTextOverflowParser from './whitespace/whitespace-at-text-overflow.parser';
-import parseWhitespaceInline from './whitespace/whitespace-inline.parser';
-import createWordAtTextOverflowParser from './word/word-at-text-overflow.parser';
-import parseWord from './word/word.parser';
+import parseEnd from '../word-parsers/end.parser';
+import createNewlineAtPageBeginningParser from '../word-parsers/newline/newline-at-page-beginning.parser';
+import createNewlineParser from '../word-parsers/newline/newline.parser';
+import parseWhitespaceAtPageBeginning from '../word-parsers/whitespace/whitespace-at-page-beginning.parser';
+import createWhitespaceAtTextOverflowParser from '../word-parsers/whitespace/whitespace-at-text-overflow.parser';
+import parseWhitespaceInline from '../word-parsers/whitespace/whitespace-inline.parser';
+import createWordAtTextOverflowParser from '../word-parsers/word/word-at-text-overflow.parser';
+import parseWord from '../word-parsers/word/word.parser';
 
 export default class DefaultLineBreakParser implements Parser {
   /**

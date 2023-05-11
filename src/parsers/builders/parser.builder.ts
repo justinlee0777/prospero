@@ -2,6 +2,7 @@ import ContainerStyle from '../../container-style.interface';
 import Processor from '../../processors/models/processor.interface';
 import Optional from '../../utils/optional.type';
 import WordWidthCalculator from '../../word-width.calculator';
+import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import Parser from '../models/parser.interface';
 import ParserFactory from '../parser.factory';
 
@@ -9,6 +10,9 @@ const fromContainerStyle = 'fromContainerStyle';
 
 export default class ParserBuilder {
   static entrypoints = [fromContainerStyle];
+
+  private ParserConstructor: (config: CreateTextParserConfig) => Parser =
+    ParserFactory.create;
 
   private containerStyle: ContainerStyle;
 
@@ -48,6 +52,12 @@ export default class ParserBuilder {
 
   setFontLocation(url: string): ParserBuilder {
     this.fontLocation = url;
+
+    return this;
+  }
+
+  forHTML(): ParserBuilder {
+    this.ParserConstructor = ParserFactory.createForHTML;
 
     return this;
   }
@@ -92,7 +102,7 @@ export default class ParserBuilder {
       this.fontLocation
     );
 
-    const parser = ParserFactory.create({
+    const parser = this.ParserConstructor({
       lineHeight,
       pageHeight: containerHeight,
       pageWidth: containerWidth,

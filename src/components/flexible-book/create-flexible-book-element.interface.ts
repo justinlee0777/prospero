@@ -36,6 +36,8 @@ interface OptionalArgs {
   createProcessors?: () => Array<Processor>;
 
   bookClassNames?: Array<string>;
+
+  forHTML?: boolean;
 }
 
 export default interface CreateFlexibleBookElement {

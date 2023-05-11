@@ -14,16 +14,20 @@ export default class Pages {
     private containerStyle: ContainerStyle,
     text: string,
     processors?: Array<Processor>,
-    { fontLocation }: { fontLocation?: string } = {}
+    { fontLocation, html }: { fontLocation?: string; html?: boolean } = {}
   ) {
     let parserBuilder = new ParserBuilder().fromContainerStyle(containerStyle);
 
     if (processors) {
-      parserBuilder.setProcessors(processors);
+      parserBuilder = parserBuilder.setProcessors(processors);
     }
 
     if (fontLocation) {
-      parserBuilder.setFontLocation(fontLocation);
+      parserBuilder = parserBuilder.setFontLocation(fontLocation);
+    }
+
+    if (html) {
+      parserBuilder = parserBuilder.forHTML();
     }
 
     const parser = parserBuilder.build();

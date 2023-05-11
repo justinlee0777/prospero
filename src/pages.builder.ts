@@ -113,7 +113,7 @@ export default class PagesBuilder {
    * @returns sorted by width ascending.
    * @throws if 'setFont', 'setLineHeight', 'setText', 'addSize' have not been called at least once.
    */
-  build(): Array<Pages> {
+  build({ html }: { html?: boolean } = {}): Array<Pages> {
     if (!this.validate()) {
       throw new Error(
         `The builder requires additional information. Ensure you have called ${PagesBuilder.requiredMethods
@@ -132,7 +132,7 @@ export default class PagesBuilder {
         },
         this.text,
         this.processors,
-        { fontLocation: this.fontLocation }
+        { fontLocation: this.fontLocation, html }
       );
     });
   }
