@@ -6,8 +6,8 @@ import TextChange, {
   AddTextChange,
   DeleteTextChange,
 } from '../../parsers/models/text-change.interface';
-import HTMLRegex from '../../regexp/html.regexp';
-import HTMLSanitizer from '../../sanitizers/html.sanitizer';
+import createHTMLRegex from '../../regexp/html.regexp';
+import HTMLSanitizer from '../../sanitizers/html/html.sanitizer';
 import Processor from '../models/processor.interface';
 
 /**
@@ -45,7 +45,7 @@ export default class HTMLProcessor implements Processor {
     let normalizedOffset = 0;
 
     return text.replace(
-      HTMLRegex,
+      createHTMLRegex(),
       (
         _,
         openingTag: string,

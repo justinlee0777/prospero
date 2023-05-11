@@ -1,3 +1,5 @@
+const anyTag = '[A-Za-z0-9]+';
+
 /**
  * Omitting non-closing tags for the time-being as those - afaik - are not allowed.
  * Capture groups
@@ -17,6 +19,10 @@
  * - baz</span>
  * - baz<span>
  */
-const HTMLRegex = /(<([A-Za-z]+).*?>)([^<>]*)<\/\2>/g;
+export default function createHTMLRegex(tagname = anyTag): RegExp {
+  const openingTag = `<(${tagname}).*?>`;
+  const tagContent = '[^<>]*';
+  const closingTag = '</\\2>';
 
-export default HTMLRegex;
+  return new RegExp(`(${openingTag})(${tagContent})${closingTag}`, 'g');
+}
