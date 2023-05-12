@@ -2,7 +2,8 @@ import Big from 'big.js';
 
 import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
 import Processor from '../../processors/models/processor.interface';
-import HTMLRegex from '../../regexp/html.regexp';
+import createHTMLRegex from '../../regexp/html.regexp';
+import BigUtils from '../../utils/big/index';
 import WordWidthCalculator from '../../word-width.calculator';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import ParseWord from '../models/parse-word.interface';
@@ -14,6 +15,9 @@ import createNewlineAtPageBeginningParser from '../word-parsers/newline/newline-
 import parseWhitespaceAtPageBeginning from '../word-parsers/whitespace/whitespace-at-page-beginning.parser';
 import parseWhitespaceInline from '../word-parsers/whitespace/whitespace-inline.parser';
 import parseWord from '../word-parsers/word/word.parser';
+import extractStyles from './extract-styles.function';
+import { FontStyles } from './font-styles.interface';
+import HTMLTransformer from './html.transformer';
 
 export default class HTMLParser implements Parser {
   /**
@@ -28,6 +32,8 @@ export default class HTMLParser implements Parser {
   private calculator: WordWidthCalculator;
   private processors: Array<Processor> = [];
 
+  private bookLineHeight: Big;
+
   /*
    * The last element will always be the original text content.
    * The first element will be either the original text content or an HTML element.
@@ -39,6 +45,7 @@ export default class HTMLParser implements Parser {
     opening: string;
     name: string;
     remainingTextContentLength: number;
+    lineHeight: Big;
   } | null;
 
   constructor(private config: CreateTextParserConfig) {
@@ -64,7 +71,7 @@ export default class HTMLParser implements Parser {
     const whitespaceExpression = `${whitespace}|${dash}`;
     const newlineExpression = newline;
     const expressions = [
-      HTMLRegex.source,
+      createHTMLRegex().source,
       `(?<word>${characterExpression})`,
       `(?<whitespace>${whitespaceExpression})`,
       `(?<newline>${newlineExpression})`,
@@ -75,6 +82,8 @@ export default class HTMLParser implements Parser {
 
   setCalculator(calculator: WordWidthCalculator): void {
     this.calculator = calculator;
+
+    this.bookLineHeight = Big(this.calculator.getCalculatedLineHeight());
   }
 
   setProcessors(processors: Array<Processor>): void {
@@ -89,10 +98,12 @@ export default class HTMLParser implements Parser {
         );
         */
 
+    text = new HTMLTransformer({
+      fontSize: this.config.fontSize,
+    }).transform(text);
+
     this.iteratorQueue = [text.matchAll(this.tokenExpression)];
     const calculateWordWidth = (word) => this.calculator.calculate(word);
-
-    const bookLineHeight = Big(this.config.lineHeight);
 
     let parserState: ParserState = {
       pages: [],
@@ -101,11 +112,11 @@ export default class HTMLParser implements Parser {
       bookLineHeight: Big(0),
 
       lines: [],
-      pageHeight: bookLineHeight,
+      pageHeight: Big(0),
       pageChanges: [],
 
       lineWidth: Big(0),
-      lineHeight: bookLineHeight,
+      lineHeight: this.bookLineHeight,
       lineText: '',
     };
 
@@ -124,14 +135,42 @@ export default class HTMLParser implements Parser {
         token.filter((group) => Boolean(group)).length === 4;
 
       if (htmlExpression) {
+        const opening = token.at(1);
         const tagContent = token.at(3);
 
         this.iteratorQueue.unshift(tagContent.matchAll(this.tokenExpression));
+
+        let fontStyles: FontStyles;
+        if ((fontStyles = extractStyles(opening))) {
+          this.calculator.apply({
+            size: fontStyles['font-size'],
+            weight: fontStyles['font-weight'],
+          });
+        }
+
         this.tag = {
-          opening: token.at(1),
+          opening,
           name: token.at(2),
           remainingTextContentLength: tagContent.length,
+          lineHeight: BigUtils.max(
+            this.bookLineHeight,
+            Big(this.calculator.getCalculatedLineHeight())
+          ),
         };
+
+        parserState = {
+          ...parserState,
+          /*
+           * This code will essentially break lines that are smaller than the default font size,
+           * meaning it will overestimate and not fill out the page entirely.
+           */
+          lineHeight: BigUtils.max(
+            this.bookLineHeight,
+            Big(this.calculator.getCalculatedLineHeight())
+          ),
+        };
+
+        parserState = this.parsePageOverflowFromLineHeightChange(parserState);
 
         parserState = this.openTag(parserState);
 
@@ -188,9 +227,12 @@ export default class HTMLParser implements Parser {
       };
 
       parserState = parseText(parserState, wordState);
+      parserState = this.parsePageOverflow(parserState);
 
       if (this.shouldCloseTag()) {
         this.tag = null;
+
+        this.calculator.reset();
       }
 
       yield parserState;
@@ -242,37 +284,16 @@ export default class HTMLParser implements Parser {
   private parseNewlineAtPageBeginning: ParseWord =
     createNewlineAtPageBeginningParser(this.config);
   private parseNewline(state: ParserState, word: Word): ParserState {
-    if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
-      return {
-        ...state,
-        pages: state.pages.concat(
-          state.lines.join('') +
-            state.lineText +
-            word.text +
-            this.getClosingTag()
-        ),
-        changes: state.changes.concat({
-          values: state.pageChanges,
-        }),
-        textIndex: state.textIndex + word.text.length,
-        // Cut the current text and begin on a newline.
-        lines: [],
-        pageChanges: [],
-        pageHeight: state.lineHeight,
-        lineWidth: Big(0),
-        lineText: this.getOpeningTag() + '',
-      };
-    } else {
-      return {
-        ...state,
-        textIndex: state.textIndex + word.text.length,
-        // Cut the current text and begin on a newline.
-        lines: state.lines.concat(state.lineText + word.text),
-        pageHeight: state.pageHeight.add(state.lineHeight),
-        lineWidth: Big(0),
-        lineText: '',
-      };
-    }
+    return {
+      ...state,
+      textIndex: state.textIndex + word.text.length,
+      // Cut the current text and begin on a newline.
+      lines: state.lines.concat(state.lineText + word.text),
+      pageHeight: state.pageHeight.add(state.lineHeight),
+      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
+      lineWidth: Big(0),
+      lineText: '',
+    };
   }
 
   private parseWhitespaceAtPageBeginning: ParseWord =
@@ -281,73 +302,74 @@ export default class HTMLParser implements Parser {
     state: ParserState,
     word: Word
   ): ParserState {
-    if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
-      return {
-        ...state,
-        pages: state.pages.concat(
-          state.lines.join('') +
-            state.lineText +
-            word.text +
-            this.getClosingTag()
-        ),
-        changes: state.changes.concat({
-          values: state.pageChanges,
-        }),
-        textIndex: state.textIndex + word.text.length,
-        // Cut the current text and begin on a newline.
-        lines: [],
-        pageChanges: [],
-        pageHeight: state.lineHeight,
-        lineWidth: Big(0),
-        lineText: this.getOpeningTag() + '',
-      };
-    } else {
-      return {
-        ...state,
-        textIndex: state.textIndex + word.text.length,
-        // Cut the current text and begin on a newline.
-        lines: state.lines.concat(state.lineText),
-        pageHeight: state.pageHeight.add(state.lineHeight),
-        lineWidth: Big(0),
-        lineText: word.text,
-      };
-    }
+    return {
+      ...state,
+      textIndex: state.textIndex + word.text.length,
+      // Cut the current text and begin on a newline.
+      lines: state.lines.concat(state.lineText),
+      pageHeight: state.pageHeight.add(state.lineHeight),
+      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
+      lineWidth: Big(0),
+      lineText: word.text,
+    };
   }
   private parseWhitespaceInline: ParseWord = parseWhitespaceInline;
 
   private parseWordAtTextOverflow(state: ParserState, word: Word): ParserState {
-    if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
-      return {
-        ...state,
-        pages: state.pages.concat(
-          state.lines.join('') + state.lineText + this.getClosingTag()
-        ),
-        changes: state.changes.concat({
-          values: state.pageChanges,
-        }),
-        textIndex: state.textIndex + word.text.length,
-        // Cut the current text and begin on a newline.
-        lines: [],
-        pageChanges: [],
-        pageHeight: state.lineHeight,
-        lineWidth: word.width,
-        lineText: this.getOpeningTag() + word.text,
-      };
-    } else {
-      return {
-        ...state,
-        textIndex: state.textIndex + word.text.length,
-        // Cut the current text and begin on a newline.
-        lines: state.lines.concat(state.lineText),
-        pageHeight: state.pageHeight.add(state.lineHeight),
-        lineWidth: word.width,
-        lineText: word.text,
-      };
-    }
+    return {
+      ...state,
+      textIndex: state.textIndex + word.text.length,
+      // Cut the current text and begin on a newline.
+      lines: state.lines.concat(state.lineText),
+      pageHeight: state.pageHeight.add(state.lineHeight),
+      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
+      lineWidth: word.width,
+      lineText: word.text,
+    };
   }
   private parseWord: ParseWord = parseWord;
 
   private parseEnd: ParseWord = parseEnd;
+
+  private parsePageOverflow(state: ParserState): ParserState {
+    if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
+      return {
+        ...state,
+        pages: state.pages.concat(state.lines.join('')),
+        changes: state.changes.concat({
+          values: state.pageChanges,
+        }),
+        // Cut the current text and begin on a newline.
+        lines: [],
+        pageChanges: [],
+        pageHeight: Big(0),
+        lineText: this.getOpeningTag() + state.lineText.trim(),
+      };
+    } else {
+      return state;
+    }
+  }
+
+  private parsePageOverflowFromLineHeightChange(
+    state: ParserState
+  ): ParserState {
+    if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
+      return {
+        ...state,
+        pages: state.pages.concat(state.lines.join('')),
+        changes: state.changes.concat({
+          values: state.pageChanges,
+        }),
+        // Cut the current text and begin on a newline.
+        lines: [],
+        pageChanges: [],
+        pageHeight: Big(0),
+        lineText: state.lineText.trim(),
+      };
+    } else {
+      return state;
+    }
+  }
 
   private getOpeningTag(): string {
     return this.tag?.opening ?? '';

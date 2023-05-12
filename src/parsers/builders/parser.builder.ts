@@ -1,6 +1,7 @@
 import ContainerStyle from '../../container-style.interface';
 import Processor from '../../processors/models/processor.interface';
 import Optional from '../../utils/optional.type';
+import toPixelUnits from '../../utils/to-pixel-units.function';
 import WordWidthCalculator from '../../word-width.calculator';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import Parser from '../models/parser.interface';
@@ -99,11 +100,12 @@ export default class ParserBuilder {
     const calculator = new WordWidthCalculator(
       computedFontSize,
       computedFontFamily,
+      lineHeight,
       this.fontLocation
     );
 
     const parser = this.ParserConstructor({
-      lineHeight,
+      fontSize: toPixelUnits(computedFontSize),
       pageHeight: containerHeight,
       pageWidth: containerWidth,
     });

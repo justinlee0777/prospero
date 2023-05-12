@@ -21,11 +21,11 @@ const pagesBuilder = new PagesBuilder()
 
 const [desktop] = pagesBuilder
   .setFont('16px', containerStyles.computedFontFamily)
-  .build();
+  .build({ html: true });
 
 const [mobile] = pagesBuilder
   .setFont('12px', containerStyles.computedFontFamily)
-  .build();
+  .build({ html: true });
 
 // const pages = new Pages(containerStyles, text, processors);
 

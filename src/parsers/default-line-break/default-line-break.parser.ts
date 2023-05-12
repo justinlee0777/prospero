@@ -11,6 +11,7 @@ import Word from '../models/word.interface';
 import parseEnd from '../word-parsers/end.parser';
 import createNewlineAtPageBeginningParser from '../word-parsers/newline/newline-at-page-beginning.parser';
 import createNewlineParser from '../word-parsers/newline/newline.parser';
+import pageOverflowParser from '../word-parsers/page-overflow.parser';
 import parseWhitespaceAtPageBeginning from '../word-parsers/whitespace/whitespace-at-page-beginning.parser';
 import createWhitespaceAtTextOverflowParser from '../word-parsers/whitespace/whitespace-at-text-overflow.parser';
 import parseWhitespaceInline from '../word-parsers/whitespace/whitespace-inline.parser';
@@ -36,6 +37,8 @@ export default class DefaultLineBreakParser implements Parser {
 
   private readonly parseWordAtTextOverflow: ParseWord;
   private readonly parseWord: ParseWord;
+
+  private readonly parsePageOverflow: (parserState: ParserState) => ParserState;
 
   private calculator: WordWidthCalculator;
   private processors: Array<Processor> = [];
@@ -79,6 +82,8 @@ export default class DefaultLineBreakParser implements Parser {
 
     this.parseWordAtTextOverflow = createWordAtTextOverflowParser(config);
     this.parseWord = parseWord;
+
+    this.parsePageOverflow = pageOverflowParser(config);
   }
 
   setCalculator(calculator: WordWidthCalculator): void {
@@ -98,7 +103,7 @@ export default class DefaultLineBreakParser implements Parser {
     const tokens = text.matchAll(this.tokenExpression);
     const calculateWordWidth = (word) => this.calculator.calculate(word);
 
-    const bookLineHeight = Big(this.config.lineHeight);
+    const bookLineHeight = Big(this.calculator.getCalculatedLineHeight());
 
     let parserState: ParserState = {
       pages: [],
@@ -107,7 +112,7 @@ export default class DefaultLineBreakParser implements Parser {
       bookLineHeight: Big(0),
 
       lines: [],
-      pageHeight: bookLineHeight,
+      pageHeight: Big(0),
       pageChanges: [],
 
       lineWidth: Big(0),
@@ -163,6 +168,9 @@ export default class DefaultLineBreakParser implements Parser {
       };
 
       parserState = parseText(parserState, wordState);
+
+      parserState = this.parsePageOverflow(parserState);
+
       parserState = this.postprocessParserState(parserState);
       yield parserState;
     }
