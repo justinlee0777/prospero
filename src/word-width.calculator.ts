@@ -37,15 +37,17 @@ export default class WordWidthCalculator {
   calculate: CalculateWordWidth = (word) =>
     this.context.measureText(word).width;
 
+  /**
+   * @returns the line height. The calculation is (originalLineHeight / originalFontSize) * newFontSize;
+   * so using the original line height multiplier to calculate.
+   */
   getCalculatedLineHeight(): number {
     return this.calculatedLineHeight;
   }
 
-  reset(): void {
-    this.context.font = this.defaultFont;
-    this.calculatedLineHeight = this.defaultLineHeight;
-  }
-
+  /**
+   * Apply a temporary change in font ex. for a header.
+   */
   apply({ size, weight }: { size?: string; weight?: string }): void {
     let font = `${size ?? this.fontSize} ${this.fontFamily}`;
 
@@ -58,5 +60,13 @@ export default class WordWidthCalculator {
     if (size) {
       this.calculatedLineHeight = this.lineHeight * toPixelUnits(size);
     }
+  }
+
+  /**
+   * Reset to the original font after a temporary change.
+   */
+  reset(): void {
+    this.context.font = this.defaultFont;
+    this.calculatedLineHeight = this.defaultLineHeight;
   }
 }
