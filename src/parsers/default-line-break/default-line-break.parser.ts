@@ -12,7 +12,6 @@ import parseEnd from '../word-parsers/end.parser';
 import createNewlineAtPageBeginningParser from '../word-parsers/newline/newline-at-page-beginning.parser';
 import createNewlineParser from '../word-parsers/newline/newline.parser';
 import pageOverflowParser from '../word-parsers/page-overflow.parser';
-import parseWhitespaceAtPageBeginning from '../word-parsers/whitespace/whitespace-at-page-beginning.parser';
 import createWhitespaceAtTextOverflowParser from '../word-parsers/whitespace/whitespace-at-text-overflow.parser';
 import parseWhitespaceInline from '../word-parsers/whitespace/whitespace-inline.parser';
 import createWordAtTextOverflowParser from '../word-parsers/word/word-at-text-overflow.parser';
@@ -28,17 +27,21 @@ export default class DefaultLineBreakParser implements Parser {
 
   private readonly tokenExpression: RegExp;
 
-  private readonly parseNewlineAtPageBeginning: ParseWord;
-  private readonly parseNewline: ParseWord;
+  private readonly parseNewlineAtPageBeginning =
+    createNewlineAtPageBeginningParser;
+  private readonly parseNewline = createNewlineParser;
 
-  private readonly parseWhitespaceAtPageBeginning: ParseWord;
-  private readonly parseWhitespaceAtTextOverflow: ParseWord;
-  private readonly parseWhitespaceInline: ParseWord;
+  private readonly parseWhitespaceAtPageBeginning =
+    createNewlineAtPageBeginningParser;
+  private readonly parseWhitespaceAtTextOverflow =
+    createWhitespaceAtTextOverflowParser;
+  private readonly parseWhitespaceInline = parseWhitespaceInline;
 
-  private readonly parseWordAtTextOverflow: ParseWord;
-  private readonly parseWord: ParseWord;
+  private readonly parseWordAtTextOverflow = createWordAtTextOverflowParser;
+  private readonly parseWord = parseWord;
 
   private readonly parsePageOverflow: (parserState: ParserState) => ParserState;
+  private readonly parseEnd = parseEnd;
 
   private calculator: WordWidthCalculator;
   private processors: Array<Processor> = [];
@@ -71,19 +74,7 @@ export default class DefaultLineBreakParser implements Parser {
 
     this.tokenExpression = new RegExp(expressions.join('|'), 'g');
 
-    this.parseNewlineAtPageBeginning =
-      createNewlineAtPageBeginningParser(config);
-    this.parseNewline = createNewlineParser(config);
-
-    this.parseWhitespaceAtPageBeginning = parseWhitespaceAtPageBeginning;
-    this.parseWhitespaceAtTextOverflow =
-      createWhitespaceAtTextOverflowParser(config);
-    this.parseWhitespaceInline = parseWhitespaceInline;
-
-    this.parseWordAtTextOverflow = createWordAtTextOverflowParser(config);
-    this.parseWord = parseWord;
-
-    this.parsePageOverflow = pageOverflowParser(config);
+    this.parsePageOverflow = pageOverflowParser(this.config);
   }
 
   setCalculator(calculator: WordWidthCalculator): void {
@@ -175,7 +166,7 @@ export default class DefaultLineBreakParser implements Parser {
       yield parserState;
     }
 
-    parserState = parseEnd(parserState, { text: '', width: Big(0) });
+    parserState = this.parseEnd(parserState);
     parserState = this.postprocessParserState(parserState);
 
     yield parserState;

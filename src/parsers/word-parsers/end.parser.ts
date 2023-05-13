@@ -1,8 +1,8 @@
 import Big from 'big.js';
 
-import ParseWord from '../models/parse-word.interface';
+import ParserState from '../models/parser-state.interface';
 
-const parseEnd: ParseWord = (state) => {
+const parseEnd: (state: ParserState) => ParserState = (state) => {
   return {
     ...state,
     pages: state.pages.concat(state.lines.join('') + state.lineText),

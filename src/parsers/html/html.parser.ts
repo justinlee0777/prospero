@@ -287,7 +287,7 @@ export default class HTMLParser implements Parser {
   }
 
   private parseNewlineAtPageBeginning: ParseWord =
-    createNewlineAtPageBeginningParser(this.config);
+    createNewlineAtPageBeginningParser;
   private parseNewline(state: ParserState, word: Word): ParserState {
     return {
       ...state,

@@ -39,7 +39,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     {
       createProcessors: () => [new IndentProcessor(5)],
       bookClassNames: [DefaultBookThemeClassName],
-      forHTML: true,
+      // forHTML: true,
     },
     {
       styles: {

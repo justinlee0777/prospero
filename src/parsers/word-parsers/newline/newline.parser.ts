@@ -1,8 +1,8 @@
 import Big from 'big.js';
 
-import CreateTextParser from '../../models/create-text-parser.interface';
+import ParseWord from '../../models/parse-word.interface';
 
-const createNewlineParser: CreateTextParser = (config) => (state, word) => {
+const createNewlineParser: ParseWord = (state, word) => {
   return {
     ...state,
     textIndex: state.textIndex + word.text.length,
