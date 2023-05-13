@@ -84,6 +84,92 @@ This component will listen to viewport changes and re-render itself appropriatel
 
 With Next.js, the ideal use case is to use `prospero/server` with `getServerSideProps` or `getStaticProps` and to mount the components from `prospero/web` on the web page.
 
+#### Look and feel
+
+The `BooksComponent` is only styled using the container styles you have passed in ex. `width`, `height`, `margin` _et cetera_. To get a book's look and feel, import the `DefaultBookThemeClassName` class name which will load a stylesheet to make the book look more like a book (background color, border...).
+
+```
+import { BookComponent, DefaultBookThemeClassName } from 'prospero/web';
+
+BookComponent(
+    ...,
+    ...,
+    {
+      classnames: [DefaultBookThemeClassName],
+    }
+  );
+```
+
+You also need to configure animations:
+
+```
+import { BookComponent, SinglePageBookAnimation } from 'prospero/web';
+
+BookComponent(
+    ...,
+    {
+        ...,
+        animation: new SinglePageBookAnimation(),
+    }
+);
+```
+
+or use a preset for animations, pages shown and event listeners:
+
+```
+import { BookComponent, SinglePageBookPreset } from 'prospero/web';
+
+BookComponent(
+    ...,
+    {
+        ...,
+        ...new SinglePageBookPreset(),
+    }
+);
+```
+
+#### Flexible Book
+
+However, for texts with 2500 words or less (essays or blog posts, for example), `prospero/web` also exports `FlexibleBookComponent`, which will dynamically size itself.
+
+```
+FlexibleBookComponent({
+    text: ... // this is the original text.
+    containerStyle: ... // same as is passed to PagesBuilder
+    /**
+     * Choose either 'config' or 'mediaQueryList'. 'mediaQueyList' will change configurations based on screen
+     * width ex. number of pages shown. The FlexibleBook will use 'pagesShown' to calculate the page's width
+     * properly.
+     */
+    config: ...
+    mediaQueryList: ...
+}, {
+    createProcessors: () => [ /* Processors initialized here */ ],
+    forHTML: ...
+}, {
+    {
+        styles: {
+            ... // can use styles to constrain the Book's width/height/max-width ...
+        }
+    }
+})
+```
+
+#### Markdown
+
+`prospero` supports only some of the Markdown specification. All inline elements and headings (without margins) are supported.
+
+Directly, `prospero` supports
+
+- The following tags: a, code, del, em, span, strong, sub, sup
+- The following attributes: style, href
+
+and only a limited set of style values:
+
+- font-size, font-weight
+
+H1 - H6 tags are converted into `<span>` with the proper font sizes.
+
 ### Concept and architecture
 
 This section needs to be greatly expanded.
@@ -122,7 +208,7 @@ In theory, one could sacrifice performance for functionality (for example, block
 
 Pages are a layer over parsers that expose the parser's state at a given time. They provide a convenient way to get the pages of a book.
 
-Parsers return generators. In theory, this makes a pure client-side solution of `prospero` viable as parsing only one page of code is quite fast and therefore a feature worth exploring. However, for best performance, there are more techniques available to the developer for already-paginated content over the entire text.
+Parsers return generators. A pure client-side solution of `prospero` (through the `FlexibleBookComponent`) is viable as parsing only one page of code is quite fast. For best performance, it is better to paginate content on the server and serve it to users as one would an asset.
 
 #### Processors
 
@@ -130,7 +216,7 @@ The processors of `prospero` modify the generated parser state. Though this allo
 
 Processors are excellent for transforming text using simple triggers. They consume only the parser state, which exposes the current page, line, and word being examined at a given moment. This is a lot of data, but usually a processor only needs a subset of this to be effective.
 
-However, processors need to leave notes for other processors if they transform the text. For example, the `HTMLProcessor` remembers where in the text the previous HTML tags were in order to add them in afterwards. There is no design guideline saying processors cannot be stateful, so processors need to leave behind notes if they add/delete/replace phrases, and where. Notes also have the additional benefit of being transparent and debuggable.
+However, processors need to leave notes for other processors if they transform the text. For example, the `HTMLProcessor` (now deprecated) remembers where in the text the previous HTML tags were in order to add them in afterwards. There is no design guideline saying processors cannot be stateful, so processors need to leave behind notes if they add/delete/replace phrases, and where. Notes also have the additional benefit of being transparent and debuggable.
 
 ### Roadmap
 

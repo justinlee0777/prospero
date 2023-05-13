@@ -118,9 +118,13 @@ export default class HTMLParser extends DefaultLineBreakParser {
       );
 
       /*
-       * This is wrong. It is possible to transform only part of a word.
+       * Old note: This is wrong. It is possible to transform only part of a word.
        * This considers the entire word.
        * I don't know what use case that would fulfill, however.
+       *
+       * New note: This actually does work, having observed the ping.txt. I forgot the
+       * HTML regex creates its own context and cuts into words properly.
+       * Who was it that said that good (in this case, decent) code can exhibit surprising behavior?
        */
       this.tag && (this.tag.remainingTextContentLength -= word.length);
 

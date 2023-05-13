@@ -30,7 +30,8 @@ interface HTMLTag {
 
 /**
  * Remove and add HTML tags into pages.
- * @deprecated Use the 'html' option in PagesBuilder or the 'forHTML' option in the FlexibleBookComponent.
+ * @deprecated Use the 'html' option in PagesBuilder or the 'forHTML' option in the FlexibleBookComponent. This will
+ * create a parser that directly interprets HTML and thus allows more options.
  */
 export default class HTMLProcessor implements Processor {
   private htmlTags: Array<HTMLTag> = [];
