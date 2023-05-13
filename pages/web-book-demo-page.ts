@@ -4,10 +4,9 @@ import { DefaultBookThemeClassName } from '../src/components';
 import DoublePageBookPreset from '../src/components/book/presets/double-page-book-preset.const';
 import SinglePageBookPreset from '../src/components/book/presets/single-page-book-preset.const';
 import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
-import { IndentProcessor } from '../src/shared';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/proteus.txt');
+  const response = await fetch('../text-samples/color-example.txt');
   const text = await response.text();
 
   const container = document.body;
@@ -37,9 +36,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       ],
     },
     {
-      createProcessors: () => [new IndentProcessor(5)],
+      createProcessors: () => [
+        /*new IndentProcessor(5)*/
+      ],
       bookClassNames: [DefaultBookThemeClassName],
-      // forHTML: true,
+      forHTML: true,
     },
     {
       styles: {

@@ -1,44 +1,21 @@
 import Big from 'big.js';
 
-import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
-import Processor from '../../processors/models/processor.interface';
 import createHTMLRegex from '../../regexp/html.regexp';
 import HTMLSanitizer from '../../sanitizers/html/html.sanitizer';
-import BigUtils from '../../utils/big/index';
-import WordWidthCalculator from '../../word-width.calculator';
+import BigUtils from '../../utils/big';
+import DefaultLineBreakParser from '../default-line-break/default-line-break.parser';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
-import ParseWord from '../models/parse-word.interface';
 import ParserState from '../models/parser-state.interface';
-import Parser from '../models/parser.interface';
 import Word from '../models/word.interface';
-import parseEnd from '../word-parsers/end.parser';
-import createNewlineAtPageBeginningParser from '../word-parsers/newline/newline-at-page-beginning.parser';
-import parseWhitespaceAtPageBeginning from '../word-parsers/whitespace/whitespace-at-page-beginning.parser';
-import parseWhitespaceInline from '../word-parsers/whitespace/whitespace-inline.parser';
-import parseWord from '../word-parsers/word/word.parser';
 import extractStyles from './extract-styles.function';
 import { FontStyles } from './font-styles.interface';
 import HTMLTransformer from './html.transformer';
 
-export default class HTMLParser implements Parser {
+export default class HTMLParser extends DefaultLineBreakParser {
   /**
-   * This is used to debug the parser. Beware if you use this directly.
-   */
-  public debug: {
-    pageWidth: number;
-  };
-
-  private readonly tokenExpression: RegExp;
-
-  private calculator: WordWidthCalculator;
-  private processors: Array<Processor> = [];
-
-  private bookLineHeight: Big;
-
-  /*
    * The last element will always be the original text content.
    * The first element will be either the original text content or an HTML element.
-   * The parser currently is not expected to handle nested HTML tags - thus elements are only one-level deep.
+   * The parser currently is not expected to handle nested HTML tags - thus elements are only one - level deep.
    * Thus there are always only 0 - 2 elements in the array.
    */
   private iteratorQueue: Array<IterableIterator<RegExpMatchArray>>;
@@ -49,53 +26,17 @@ export default class HTMLParser implements Parser {
     lineHeight: Big;
   } | null;
 
-  constructor(private config: CreateTextParserConfig) {
-    this.debug = {
-      pageWidth: config.pageWidth,
-    };
+  constructor(config: CreateTextParserConfig) {
+    super(config);
 
-    const escapedPunctuation = [...punctuation]
-      .map((glyph) => `\\${glyph}`)
-      .join('');
-
-    /**
-     * <token> = <html> | <content>
-     * <html> = <tag> <content> <tagend>
-     * <content> = <punctuatedWord> | <whitespace> | <newline>
-     * <punctuatedWord> = <punctuation> <word> <punctuation>
-     * <punctuation> = "!" | "?" ... | ""
-     * <word> = alphabetic sequence with at least one character
-     * <whitespace> = " -"
-     * <newline> = "\n"
-     */
-    const characterExpression = `[A-Za-z0-9${escapedPunctuation}]+`;
-    const whitespaceExpression = `${whitespace}|${dash}`;
-    const newlineExpression = newline;
-    const expressions = [
-      createHTMLRegex().source,
-      `(?<word>${characterExpression})`,
-      `(?<whitespace>${whitespaceExpression})`,
-      `(?<newline>${newlineExpression})`,
-    ];
-
-    this.tokenExpression = new RegExp(expressions.join('|'), 'g');
-  }
-
-  setCalculator(calculator: WordWidthCalculator): void {
-    this.calculator = calculator;
-
-    this.bookLineHeight = Big(this.calculator.getCalculatedLineHeight());
-  }
-
-  setProcessors(processors: Array<Processor>): void {
-    this.processors = processors;
+    this.tokenExpression = new RegExp(
+      `${createHTMLRegex().source}|${this.tokenExpression.source}`,
+      this.tokenExpression.flags
+    );
   }
 
   *generateParserStates(text: string): Generator<ParserState> {
-    text = this.processors.reduce(
-      (newText, processor) => processor.preprocess?.(newText) ?? newText,
-      text
-    );
+    text = this.preprocessText(text);
 
     text = new HTMLTransformer({
       fontSize: this.config.fontSize,
@@ -104,24 +45,10 @@ export default class HTMLParser implements Parser {
     text = new HTMLSanitizer().sanitize(text);
 
     this.iteratorQueue = [text.matchAll(this.tokenExpression)];
+
     const calculateWordWidth = (word) => this.calculator.calculate(word);
 
-    let parserState: ParserState = {
-      pages: [],
-      textIndex: 0,
-      changes: [],
-      bookLineHeight: Big(0),
-
-      lines: [],
-      pageHeight: Big(0),
-      pageChanges: [],
-
-      lineWidth: Big(0),
-      lineHeight: this.bookLineHeight,
-      lineText: '',
-    };
-
-    parserState = this.postprocessParserState(parserState);
+    let parserState = this.initializeParserState();
 
     yield parserState;
 
@@ -182,54 +109,27 @@ export default class HTMLParser implements Parser {
 
       const word = token.at(0);
 
-      const newlineExpression = Boolean(groups['newline']);
-      const whitespaceExpression = Boolean(groups['whitespace']);
-
-      const wordWidth = Big(calculateWordWidth(word)).round(2, 0);
-
-      const pageBeginning =
-        parserState.pageHeight.eq(0) && parserState.lineWidth.eq(0);
-      const wordOverflows = parserState.lineWidth
-        .plus(wordWidth)
-        .gte(this.config.pageWidth);
+      const wordDescription = this.getWordDescription(
+        parserState,
+        Boolean(groups['newline']),
+        Boolean(groups['whitespace']),
+        word,
+        calculateWordWidth
+      );
 
       /*
-       * This is wrong. It is possible to only transform part of a word.
+       * This is wrong. It is possible to transform only part of a word.
        * This considers the entire word.
        * I don't know what use case that would fulfill, however.
        */
       this.tag && (this.tag.remainingTextContentLength -= word.length);
 
-      let parseText: ParseWord;
+      wordDescription.word.text += this.getClosingTag();
 
-      if (newlineExpression) {
-        if (pageBeginning) {
-          parseText = this.parseNewlineAtPageBeginning;
-        } else {
-          parseText = this.parseNewline.bind(this);
-        }
-      } else if (whitespaceExpression) {
-        if (wordOverflows) {
-          parseText = this.parseWhitespaceAtTextOverflow.bind(this);
-        } else if (pageBeginning) {
-          parseText = this.parseWhitespaceAtPageBeginning;
-        } else {
-          parseText = this.parseWhitespaceInline;
-        }
-      } else {
-        if (wordOverflows) {
-          parseText = this.parseWordAtTextOverflow.bind(this);
-        } else {
-          parseText = this.parseWord;
-        }
-      }
+      const parseText = this.chooseWordParser(wordDescription);
 
-      const wordState: Word = {
-        text: word + this.getClosingTag(),
-        width: wordWidth,
-      };
+      parserState = parseText(parserState, wordDescription.word);
 
-      parserState = parseText(parserState, wordState);
       parserState = this.parsePageOverflow(parserState);
 
       parserState = this.postprocessParserState(parserState);
@@ -243,26 +143,10 @@ export default class HTMLParser implements Parser {
       yield parserState;
     }
 
-    parserState = this.parseEnd(parserState, { text: '', width: Big(0) });
+    parserState = this.parseEnd(parserState);
+    parserState = this.postprocessParserState(parserState);
 
     yield parserState;
-  }
-
-  *generatePages(text: string): Generator<string> {
-    const parserStates = this.generateParserStates(text);
-
-    let parserState: ParserState;
-
-    for (const newParserState of parserStates) {
-      if (
-        parserState &&
-        newParserState.pages.length > parserState.pages.length
-      ) {
-        yield newParserState.pages.at(-1);
-      }
-
-      parserState = newParserState;
-    }
   }
 
   /**
@@ -286,9 +170,10 @@ export default class HTMLParser implements Parser {
     }
   }
 
-  private parseNewlineAtPageBeginning: ParseWord =
-    createNewlineAtPageBeginningParser;
-  private parseNewline(state: ParserState, word: Word): ParserState {
+  protected parseNewline = function (
+    state: ParserState,
+    word: Word
+  ): ParserState {
     return {
       ...state,
       textIndex: state.textIndex + word.text.length,
@@ -299,11 +184,9 @@ export default class HTMLParser implements Parser {
       lineWidth: Big(0),
       lineText: '',
     };
-  }
+  };
 
-  private parseWhitespaceAtPageBeginning: ParseWord =
-    parseWhitespaceAtPageBeginning;
-  private parseWhitespaceAtTextOverflow(
+  protected parseWhitespaceAtTextOverflow = function (
     state: ParserState,
     word: Word
   ): ParserState {
@@ -317,10 +200,12 @@ export default class HTMLParser implements Parser {
       lineWidth: Big(0),
       lineText: word.text,
     };
-  }
-  private parseWhitespaceInline: ParseWord = parseWhitespaceInline;
+  };
 
-  private parseWordAtTextOverflow(state: ParserState, word: Word): ParserState {
+  protected parseWordAtTextOverflow = function (
+    state: ParserState,
+    word: Word
+  ): ParserState {
     return {
       ...state,
       textIndex: state.textIndex + word.text.length,
@@ -331,12 +216,9 @@ export default class HTMLParser implements Parser {
       lineWidth: word.width,
       lineText: word.text,
     };
-  }
-  private parseWord: ParseWord = parseWord;
+  };
 
-  private parseEnd: ParseWord = parseEnd;
-
-  private parsePageOverflow(state: ParserState): ParserState {
+  protected parsePageOverflow = function (state: ParserState) {
     if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
       return {
         ...state,
@@ -353,7 +235,7 @@ export default class HTMLParser implements Parser {
     } else {
       return state;
     }
-  }
+  };
 
   private parsePageOverflowFromLineHeightChange(
     state: ParserState
@@ -374,14 +256,6 @@ export default class HTMLParser implements Parser {
     } else {
       return state;
     }
-  }
-
-  private postprocessParserState(parserState: ParserState): ParserState {
-    return this.processors.reduce(
-      (newParserState, processor) =>
-        processor.process?.(newParserState) ?? newParserState,
-      parserState
-    );
   }
 
   private getOpeningTag(): string {
