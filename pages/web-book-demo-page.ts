@@ -7,7 +7,7 @@ import FlexibleBookComponent from '../src/components/flexible-book/flexible-book
 import { IndentProcessor } from '../src/shared';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/markdown-test.md');
+  const response = await fetch('../text-samples/proteus.txt');
   const text = await response.text();
 
   const container = document.body;

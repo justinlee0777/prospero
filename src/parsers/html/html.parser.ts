@@ -92,12 +92,10 @@ export default class HTMLParser implements Parser {
   }
 
   *generateParserStates(text: string): Generator<ParserState> {
-    /*
-        text = this.processors.reduce(
-            (newText, processor) => processor.preprocess?.(newText) ?? newText,
-            text
-        );
-        */
+    text = this.processors.reduce(
+      (newText, processor) => processor.preprocess?.(newText) ?? newText,
+      text
+    );
 
     text = new HTMLTransformer({
       fontSize: this.config.fontSize,
@@ -122,6 +120,8 @@ export default class HTMLParser implements Parser {
       lineHeight: this.bookLineHeight,
       lineText: '',
     };
+
+    parserState = this.postprocessParserState(parserState);
 
     yield parserState;
 
@@ -231,6 +231,8 @@ export default class HTMLParser implements Parser {
 
       parserState = parseText(parserState, wordState);
       parserState = this.parsePageOverflow(parserState);
+
+      parserState = this.postprocessParserState(parserState);
 
       if (this.shouldCloseTag()) {
         this.tag = null;
@@ -372,6 +374,14 @@ export default class HTMLParser implements Parser {
     } else {
       return state;
     }
+  }
+
+  private postprocessParserState(parserState: ParserState): ParserState {
+    return this.processors.reduce(
+      (newParserState, processor) =>
+        processor.process?.(newParserState) ?? newParserState,
+      parserState
+    );
   }
 
   private getOpeningTag(): string {
