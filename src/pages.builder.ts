@@ -7,6 +7,11 @@ const setLineHeightMethod = 'setLineHeight';
 const setTextMethod = 'setText';
 const addSizeMethod = 'addSize';
 
+interface PagesBuilderOptions {
+  /** Build the pages interpreting the text content as HTML. */
+  html?: boolean;
+}
+
 /**
  * Build one or more pages. Useful for generating pages across different viewports for responsive design.
  */
@@ -113,7 +118,7 @@ export default class PagesBuilder {
    * @returns sorted by width ascending.
    * @throws if 'setFont', 'setLineHeight', 'setText', 'addSize' have not been called at least once.
    */
-  build({ html }: { html?: boolean } = {}): Array<Pages> {
+  build({ html }: PagesBuilderOptions = {}): Array<Pages> {
     if (!this.validate()) {
       throw new Error(
         `The builder requires additional information. Ensure you have called ${PagesBuilder.requiredMethods

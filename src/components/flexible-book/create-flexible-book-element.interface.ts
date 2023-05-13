@@ -37,6 +37,9 @@ interface OptionalArgs {
 
   bookClassNames?: Array<string>;
 
+  /**
+   * Indicates the book is meant to parse HTML.
+   */
   forHTML?: boolean;
 }
 
