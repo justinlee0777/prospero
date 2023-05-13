@@ -3,6 +3,7 @@ import Big from 'big.js';
 import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
 import Processor from '../../processors/models/processor.interface';
 import createHTMLRegex from '../../regexp/html.regexp';
+import HTMLSanitizer from '../../sanitizers/html/html.sanitizer';
 import BigUtils from '../../utils/big/index';
 import WordWidthCalculator from '../../word-width.calculator';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
@@ -101,6 +102,8 @@ export default class HTMLParser implements Parser {
     text = new HTMLTransformer({
       fontSize: this.config.fontSize,
     }).transform(text);
+
+    text = new HTMLSanitizer().sanitize(text);
 
     this.iteratorQueue = [text.matchAll(this.tokenExpression)];
     const calculateWordWidth = (word) => this.calculator.calculate(word);

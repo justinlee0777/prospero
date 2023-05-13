@@ -3,13 +3,13 @@ import StyleRegex from '../../regexp/style.regexp';
 import { FontStyles, ValidFontStyles } from './font-styles.interface';
 
 export default function extractStyles(htmlString: string): FontStyles | null {
-  const [styleString] = htmlString.match(StyleRegex);
+  const [styleString] = htmlString.match(StyleRegex) ?? [];
 
   if (!styleString) {
     return null;
   }
 
-  const styles = [...styleString.matchAll(StyleValueRegex)];
+  const styles = [...(styleString.matchAll(StyleValueRegex) ?? [])];
 
   const fontStyles: FontStyles = {};
 

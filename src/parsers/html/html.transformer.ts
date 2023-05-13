@@ -17,6 +17,38 @@ export default class HTMLTransformer {
           this.config.fontSize * 2
         }px">${tagContent}</span>`,
     ],
+    [
+      'h2',
+      (tagContent) =>
+        `<span style="font-weight: bold; font-size: ${
+          this.config.fontSize * 1.5
+        }px">${tagContent}</span>`,
+    ],
+    [
+      'h3',
+      (tagContent) =>
+        `<span style="font-weight: bold; font-size: ${
+          this.config.fontSize * 1.17
+        }px">${tagContent}</span>`,
+    ],
+    [
+      'h4',
+      (tagContent) => `<span style="font-weight: bold">${tagContent}</span>`,
+    ],
+    [
+      'h5',
+      (tagContent) =>
+        `<span style="font-weight: bold; font-size: ${
+          this.config.fontSize * 0.83
+        }px">${tagContent}</span>`,
+    ],
+    [
+      'h6',
+      (tagContent) =>
+        `<span style="font-weight: bold; font-size: ${
+          this.config.fontSize * 0.67
+        }px">${tagContent}</span>`,
+    ],
   ]);
 
   constructor(private config: { fontSize: number }) {}
