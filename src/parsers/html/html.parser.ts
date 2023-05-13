@@ -6,7 +6,7 @@ import BigUtils from '../../utils/big';
 import DefaultLineBreakParser from '../default-line-break/default-line-break.parser';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import ParserState from '../models/parser-state.interface';
-import Word from '../models/word.interface';
+import pageOverflowParser from '../word-parsers/page-overflow.parser';
 import extractStyles from './extract-styles.function';
 import { FontStyles } from './font-styles.interface';
 import HTMLTransformer from './html.transformer';
@@ -38,10 +38,12 @@ export default class HTMLParser extends DefaultLineBreakParser {
   *generateParserStates(text: string): Generator<ParserState> {
     text = this.preprocessText(text);
 
+    // transform incompatible HTML tags into compatible ones using styling to match original behavior.
     text = new HTMLTransformer({
       fontSize: this.config.fontSize,
     }).transform(text);
 
+    // remove completely incompatible HTML tags.
     text = new HTMLSanitizer().sanitize(text);
 
     this.iteratorQueue = [text.matchAll(this.tokenExpression)];
@@ -65,6 +67,10 @@ export default class HTMLParser extends DefaultLineBreakParser {
         token.filter((group) => Boolean(group)).length === 4;
 
       if (htmlExpression) {
+        /*
+         * If an HTML expression, set the program to the HTML context:
+         * parse the HTML context and tell the program to add opening and closing tags in certain places.
+         */
         const opening = token.at(1);
         const tagContent = token.at(3);
 
@@ -72,6 +78,7 @@ export default class HTMLParser extends DefaultLineBreakParser {
 
         let fontStyles: FontStyles;
         if ((fontStyles = extractStyles(opening))) {
+          // Adjust the current word-width calculator to take into account font size and weight.
           this.calculator.apply({
             size: fontStyles['font-size'],
             weight: fontStyles['font-weight'],
@@ -81,7 +88,9 @@ export default class HTMLParser extends DefaultLineBreakParser {
         this.tag = {
           opening,
           name: token.at(2),
+          // Use the size of the text content within the HTML to determine when to end the HTML tag.
           remainingTextContentLength: tagContent.length,
+          // Choose the greater line height. Code breaks if the line height is smaller.
           lineHeight: BigUtils.max(
             this.bookLineHeight,
             Big(this.calculator.getCalculatedLineHeight())
@@ -100,10 +109,16 @@ export default class HTMLParser extends DefaultLineBreakParser {
           ),
         };
 
+        // If the change in font size causes the current line to overflow, set a new page.
         parserState = this.parsePageOverflowFromLineHeightChange(parserState);
 
+        // Create an opening tag.
         parserState = this.openTag(parserState);
 
+        /*
+         * There is no content to parse (the tags are not treated directly as content).
+         * Continue the program using the current HTML tag as content.
+         */
         continue;
       }
 
@@ -128,6 +143,7 @@ export default class HTMLParser extends DefaultLineBreakParser {
        */
       this.tag && (this.tag.remainingTextContentLength -= word.length);
 
+      // Add the closing tag if there is no remaining text content left.
       wordDescription.word.text += this.getClosingTag();
 
       const parseText = this.chooseWordParser(wordDescription);
@@ -139,6 +155,7 @@ export default class HTMLParser extends DefaultLineBreakParser {
       parserState = this.postprocessParserState(parserState);
 
       if (this.shouldCloseTag()) {
+        // If there is no remaining text content left, remove the tag context and reset the calculator.
         this.tag = null;
 
         this.calculator.reset();
@@ -174,54 +191,9 @@ export default class HTMLParser extends DefaultLineBreakParser {
     }
   }
 
-  protected parseNewline = function (
-    state: ParserState,
-    word: Word
-  ): ParserState {
-    return {
-      ...state,
-      textIndex: state.textIndex + word.text.length,
-      // Cut the current text and begin on a newline.
-      lines: state.lines.concat(state.lineText + word.text),
-      pageHeight: state.pageHeight.add(state.lineHeight),
-      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
-      lineWidth: Big(0),
-      lineText: '',
-    };
-  };
-
-  protected parseWhitespaceAtTextOverflow = function (
-    state: ParserState,
-    word: Word
-  ): ParserState {
-    return {
-      ...state,
-      textIndex: state.textIndex + word.text.length,
-      // Cut the current text and begin on a newline.
-      lines: state.lines.concat(state.lineText),
-      pageHeight: state.pageHeight.add(state.lineHeight),
-      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
-      lineWidth: Big(0),
-      lineText: word.text,
-    };
-  };
-
-  protected parseWordAtTextOverflow = function (
-    state: ParserState,
-    word: Word
-  ): ParserState {
-    return {
-      ...state,
-      textIndex: state.textIndex + word.text.length,
-      // Cut the current text and begin on a newline.
-      lines: state.lines.concat(state.lineText),
-      pageHeight: state.pageHeight.add(state.lineHeight),
-      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
-      lineWidth: word.width,
-      lineText: word.text,
-    };
-  };
-
+  /**
+   * Overriding original page overflow parser to make sure the opening tag is applied on a new page.
+   */
   protected parsePageOverflow = function (state: ParserState) {
     if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
       return {
@@ -241,26 +213,9 @@ export default class HTMLParser extends DefaultLineBreakParser {
     }
   };
 
-  private parsePageOverflowFromLineHeightChange(
-    state: ParserState
-  ): ParserState {
-    if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
-      return {
-        ...state,
-        pages: state.pages.concat(state.lines.join('')),
-        changes: state.changes.concat({
-          values: state.pageChanges,
-        }),
-        // Cut the current text and begin on a newline.
-        lines: [],
-        pageChanges: [],
-        pageHeight: Big(0),
-        lineText: state.lineText.trim(),
-      };
-    } else {
-      return state;
-    }
-  }
+  private parsePageOverflowFromLineHeightChange = pageOverflowParser(
+    this.config
+  );
 
   private getOpeningTag(): string {
     return this.tag?.opening ?? '';
