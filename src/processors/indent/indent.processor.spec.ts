@@ -10,10 +10,12 @@ describe('IndentProcessor', () => {
     pages: [],
     textIndex: 0,
     changes: [],
+    bookLineHeight: Big(24),
     lines: [],
     pageChanges: [],
     lineWidth: Big(0),
-    line: 0,
+    pageHeight: Big(0),
+    lineHeight: Big(24),
     lineText: '',
   };
 
@@ -21,10 +23,12 @@ describe('IndentProcessor', () => {
     pages: ['Foo\nBar\n'],
     textIndex: 7,
     changes: [{ values: [] }],
+    bookLineHeight: Big(24),
     lines: [],
     pageChanges: [],
     lineWidth: Big(0),
-    line: 0,
+    pageHeight: Big(0),
+    lineHeight: Big(24),
     lineText: '',
   };
 
@@ -32,10 +36,12 @@ describe('IndentProcessor', () => {
     pages: ['Foo\nBar\n'],
     textIndex: 11,
     changes: [{ values: [] }],
+    bookLineHeight: Big(24),
     lines: ['Baz\n'],
     pageChanges: [],
     lineWidth: Big(0),
-    line: 1,
+    pageHeight: Big(24),
+    lineHeight: Big(24),
     lineText: '',
   };
 
@@ -43,14 +49,16 @@ describe('IndentProcessor', () => {
     pages: [],
     textIndex: 3,
     changes: [],
+    bookLineHeight: Big(24),
     lines: [],
     pageChanges: [],
     lineWidth: Big(0),
-    line: 0,
+    pageHeight: Big(0),
+    lineHeight: Big(24),
     lineText: 'Foo',
   };
 
-  const calculator = new WordWidthCalculator('Arial', '16px');
+  const calculator = new WordWidthCalculator('16px', 'Arial', 24);
 
   test('needs to be configured before starting processing', () => {
     const processor = new IndentProcessor(4);
@@ -66,8 +74,10 @@ describe('IndentProcessor', () => {
     processor.configure({ calculator });
 
     expect(processor.process(bookBeginning)).toEqual({
+      bookLineHeight: Big(24),
       pages: [],
       textIndex: 4,
+      lineHeight: Big(24),
       changes: [],
       lines: [],
       pageChanges: [
@@ -77,8 +87,8 @@ describe('IndentProcessor', () => {
           type: TextChangeType.ADD_WORD,
         },
       ],
-      lineWidth: Big(11.11328125),
-      line: 0,
+      pageHeight: Big(0),
+      lineWidth: Big(17.78125),
       lineText: '    ',
     });
   });
@@ -89,8 +99,10 @@ describe('IndentProcessor', () => {
     processor.configure({ calculator });
 
     expect(processor.process(pageBeginning)).toEqual({
+      bookLineHeight: Big(24),
       pages: ['Foo\nBar\n'],
       textIndex: 11,
+      lineHeight: Big(24),
       changes: [{ values: [] }],
       lines: [],
       pageChanges: [
@@ -100,8 +112,8 @@ describe('IndentProcessor', () => {
           type: TextChangeType.ADD_WORD,
         },
       ],
-      lineWidth: Big(11.11328125),
-      line: 0,
+      pageHeight: Big(0),
+      lineWidth: Big(17.78125),
       lineText: '    ',
     });
   });
@@ -112,8 +124,10 @@ describe('IndentProcessor', () => {
     processor.configure({ calculator });
 
     expect(processor.process(paragraphBeginning)).toEqual({
+      bookLineHeight: Big(24),
       pages: ['Foo\nBar\n'],
       textIndex: 15,
+      lineHeight: Big(24),
       changes: [{ values: [] }],
       lines: ['Baz\n'],
       pageChanges: [
@@ -123,8 +137,8 @@ describe('IndentProcessor', () => {
           type: TextChangeType.ADD_WORD,
         },
       ],
-      lineWidth: Big(11.11328125),
-      line: 1,
+      pageHeight: Big(24),
+      lineWidth: Big(17.78125),
       lineText: '    ',
     });
   });

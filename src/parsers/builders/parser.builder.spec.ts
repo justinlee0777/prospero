@@ -84,6 +84,7 @@ describe('ParserBuilder', () => {
     expect(MockWordWidthCalculatorConstructor).toHaveBeenCalledWith(
       '16px',
       'Bookerly',
+      24,
       '/Bookerly.tiff'
     );
 

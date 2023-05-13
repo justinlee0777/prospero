@@ -2,7 +2,7 @@ import WordWidthCalculator from './word-width.calculator';
 
 describe('WordWidthCalculator', () => {
   test('calculates word widths for Arial in 16px size', () => {
-    const calculator = new WordWidthCalculator('16px', 'Arial');
+    const calculator = new WordWidthCalculator('16px', 'Arial', 32);
 
     expect(calculator.calculate(' ')).toBe(4.4453125);
 
@@ -14,7 +14,7 @@ describe('WordWidthCalculator', () => {
   });
 
   test('calculates word widths for Arial in 12px size', () => {
-    const calculator = new WordWidthCalculator('12px', 'Arial');
+    const calculator = new WordWidthCalculator('12px', 'Arial', 18);
 
     expect(calculator.calculate(' ')).toBe(3.333984375);
 
@@ -26,7 +26,7 @@ describe('WordWidthCalculator', () => {
   });
 
   test('calculates word widths for Times New Roman in 16px size', () => {
-    const calculator = new WordWidthCalculator('16px', 'Times New Roman');
+    const calculator = new WordWidthCalculator('16px', 'Times New Roman', 24);
 
     expect(calculator.calculate(' ')).toBe(4);
 
