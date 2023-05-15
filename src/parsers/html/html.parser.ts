@@ -6,6 +6,7 @@ import BigUtils from '../../utils/big';
 import DefaultLineBreakParser from '../default-line-break/default-line-break.parser';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import ParserState from '../models/parser-state.interface';
+import Word from '../models/word.interface';
 import pageOverflowParser from '../word-parsers/page-overflow.parser';
 import extractStyles from './extract-styles.function';
 import { FontStyles } from './font-styles.interface';
@@ -190,6 +191,57 @@ export default class HTMLParser extends DefaultLineBreakParser {
       return next.value;
     }
   }
+
+  protected parseNewline = function (
+    state: ParserState,
+    word: Word
+  ): ParserState {
+    return {
+      ...state,
+      textIndex: state.textIndex + word.text.length,
+      // Cut the current text and begin on a newline.
+      lines: state.lines.concat(state.lineText + word.text),
+      pageHeight: state.pageHeight.add(state.lineHeight),
+      // Choose the current tag's line height over the default line height, if it is continued on the next line
+      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
+      lineWidth: Big(0),
+      lineText: '',
+    };
+  };
+
+  protected parseWhitespaceAtTextOverflow = function (
+    state: ParserState,
+    word: Word
+  ): ParserState {
+    return {
+      ...state,
+      textIndex: state.textIndex + word.text.length,
+      // Cut the current text and begin on a newline.
+      lines: state.lines.concat(state.lineText),
+      pageHeight: state.pageHeight.add(state.lineHeight),
+      // Choose the current tag's line height over the default line height, if it is continued on the next line
+      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
+      lineWidth: Big(0),
+      lineText: word.text,
+    };
+  };
+
+  protected parseWordAtTextOverflow = function (
+    state: ParserState,
+    word: Word
+  ): ParserState {
+    return {
+      ...state,
+      textIndex: state.textIndex + word.text.length,
+      // Cut the current text and begin on a newline.
+      lines: state.lines.concat(state.lineText),
+      pageHeight: state.pageHeight.add(state.lineHeight),
+      // Choose the current tag's line height over the default line height, if it is continued on the next line
+      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
+      lineWidth: word.width,
+      lineText: word.text,
+    };
+  };
 
   /**
    * Overriding original page overflow parser to make sure the opening tag is applied on a new page.
