@@ -10,7 +10,6 @@ describe('IndentProcessor', () => {
     pages: [],
     textIndex: 0,
     changes: [],
-    bookLineHeight: Big(24),
     lines: [],
     pageChanges: [],
     lineWidth: Big(0),
@@ -23,7 +22,6 @@ describe('IndentProcessor', () => {
     pages: ['Foo\nBar\n'],
     textIndex: 7,
     changes: [{ values: [] }],
-    bookLineHeight: Big(24),
     lines: [],
     pageChanges: [],
     lineWidth: Big(0),
@@ -36,7 +34,6 @@ describe('IndentProcessor', () => {
     pages: ['Foo\nBar\n'],
     textIndex: 11,
     changes: [{ values: [] }],
-    bookLineHeight: Big(24),
     lines: ['Baz\n'],
     pageChanges: [],
     lineWidth: Big(0),
@@ -49,7 +46,6 @@ describe('IndentProcessor', () => {
     pages: [],
     textIndex: 3,
     changes: [],
-    bookLineHeight: Big(24),
     lines: [],
     pageChanges: [],
     lineWidth: Big(0),
@@ -74,7 +70,6 @@ describe('IndentProcessor', () => {
     processor.configure({ calculator });
 
     expect(processor.process(bookBeginning)).toEqual({
-      bookLineHeight: Big(24),
       pages: [],
       textIndex: 4,
       lineHeight: Big(24),
@@ -99,7 +94,6 @@ describe('IndentProcessor', () => {
     processor.configure({ calculator });
 
     expect(processor.process(pageBeginning)).toEqual({
-      bookLineHeight: Big(24),
       pages: ['Foo\nBar\n'],
       textIndex: 11,
       lineHeight: Big(24),
@@ -124,7 +118,6 @@ describe('IndentProcessor', () => {
     processor.configure({ calculator });
 
     expect(processor.process(paragraphBeginning)).toEqual({
-      bookLineHeight: Big(24),
       pages: ['Foo\nBar\n'],
       textIndex: 15,
       lineHeight: Big(24),

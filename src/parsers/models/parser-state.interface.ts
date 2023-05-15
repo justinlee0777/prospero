@@ -13,8 +13,6 @@ export default interface ParserState {
   textIndex: number;
   /** Changes made from the passed-in text. */
   changes: Array<TextChanges>;
-  /** Line height for the entire book. I don't see any reason currently for this to change as parsing occurs. */
-  bookLineHeight: Big;
 
   // The below section describes the page to be built.
 

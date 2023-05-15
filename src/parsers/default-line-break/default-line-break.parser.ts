@@ -33,9 +33,7 @@ export default class DefaultLineBreakParser implements Parser {
   /**
    * This is used to debug the parser. Beware if you use this directly. Or don't, I don't really care beyond documentation.
    */
-  public debug: {
-    pageWidth: number;
-  };
+  public debug: CreateTextParserConfig;
 
   protected tokenExpression: RegExp;
 
@@ -62,9 +60,7 @@ export default class DefaultLineBreakParser implements Parser {
   protected bookLineHeight: Big;
 
   constructor(protected config: CreateTextParserConfig) {
-    this.debug = {
-      pageWidth: config.pageWidth,
-    };
+    this.debug = config;
 
     const escapedPunctuation = [...punctuation]
       .map((glyph) => `\\${glyph}`)
@@ -176,7 +172,6 @@ export default class DefaultLineBreakParser implements Parser {
       pages: [],
       textIndex: 0,
       changes: [],
-      bookLineHeight: Big(0),
 
       lines: [],
       pageHeight: Big(0),
