@@ -220,7 +220,6 @@ However, processors need to leave notes for other processors if they transform t
 
 ### Roadmap
 
-- Support for different font sizes
-- Support for H1..6 from Markdown
 - Angular and React-compatible components
 - Bookmarking
+- Pagination on the server
