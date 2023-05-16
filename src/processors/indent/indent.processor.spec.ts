@@ -67,7 +67,7 @@ describe('IndentProcessor', () => {
   test("sets indentation for the book's beginning", () => {
     const processor = new IndentProcessor(4);
 
-    processor.configure({ calculator });
+    processor.configure({ calculator, pageHeight: 600 });
 
     expect(processor.process(bookBeginning)).toEqual({
       pages: [],
@@ -91,7 +91,7 @@ describe('IndentProcessor', () => {
   test("sets indentation for the page's beginning", () => {
     const processor = new IndentProcessor(4);
 
-    processor.configure({ calculator });
+    processor.configure({ calculator, pageHeight: 600 });
 
     expect(processor.process(pageBeginning)).toEqual({
       pages: ['Foo\nBar\n'],
@@ -115,7 +115,7 @@ describe('IndentProcessor', () => {
   test("sets indentation for the paragraph's beginning", () => {
     const processor = new IndentProcessor(4);
 
-    processor.configure({ calculator });
+    processor.configure({ calculator, pageHeight: 600 });
 
     expect(processor.process(paragraphBeginning)).toEqual({
       pages: ['Foo\nBar\n'],
@@ -139,7 +139,7 @@ describe('IndentProcessor', () => {
   test('does not set indentation', () => {
     const processor = new IndentProcessor(4);
 
-    processor.configure({ calculator });
+    processor.configure({ calculator, pageHeight: 600 });
 
     expect(processor.process(inline)).toEqual(inline);
   });

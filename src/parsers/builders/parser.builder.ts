@@ -117,6 +117,7 @@ export default class ParserBuilder {
     processors.forEach((processor) =>
       processor.configure?.({
         calculator,
+        pageHeight: containerHeight,
       })
     );
 
