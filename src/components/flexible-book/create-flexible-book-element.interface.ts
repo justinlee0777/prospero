@@ -36,6 +36,11 @@ interface OptionalArgs {
   createProcessors?: () => Array<Processor>;
 
   bookClassNames?: Array<string>;
+
+  /**
+   * Indicates the book is meant to parse HTML.
+   */
+  forHTML?: boolean;
 }
 
 export default interface CreateFlexibleBookElement {

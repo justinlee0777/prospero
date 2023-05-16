@@ -1,6 +1,8 @@
 export default interface CreateTextParserConfig {
-  /** The number of lines in a page. */
-  pageLines: number;
+  /** In pixels. */
+  fontSize: number;
+  /** The height of a page. */
+  pageHeight: number;
   /** The width of the page, in pixels. */
   pageWidth: number;
 }

@@ -1,10 +1,18 @@
 let mockParser: Parser;
+let mockHTMLParser: Parser;
 
 jest.mock('../parser.factory', () => {
   return {
     create: jest.fn().mockImplementation(
       () =>
         (mockParser = {
+          setCalculator: jest.fn(),
+          setProcessors: jest.fn(),
+        } as any)
+    ),
+    createForHTML: jest.fn().mockImplementation(
+      () =>
+        (mockHTMLParser = {
           setCalculator: jest.fn(),
           setProcessors: jest.fn(),
         } as any)
@@ -84,11 +92,18 @@ describe('ParserBuilder', () => {
     expect(MockWordWidthCalculatorConstructor).toHaveBeenCalledWith(
       '16px',
       'Bookerly',
+      24,
       '/Bookerly.tiff'
     );
 
     expect(new ParserBuilder().fromContainerStyle(containerStyle).build()).toBe(
       mockParser
     );
+  });
+
+  test('should build a parser for HTML', () => {
+    expect(
+      new ParserBuilder().fromContainerStyle(containerStyle).forHTML().build()
+    ).toBe(mockHTMLParser);
   });
 });

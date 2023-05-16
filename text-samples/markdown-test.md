@@ -54,6 +54,6 @@ That is so funny! :joy:
 
 I need to highlight these ==very important words==.
 
-H~2~O
+H<sub>2</sub>O
 
-X^2^
+X<sup>2</sup>

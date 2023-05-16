@@ -2,7 +2,7 @@ import WordWidthCalculator from './word-width.calculator';
 
 describe('WordWidthCalculator', () => {
   test('calculates word widths for Arial in 16px size', () => {
-    const calculator = new WordWidthCalculator('16px', 'Arial');
+    const calculator = new WordWidthCalculator('16px', 'Arial', 32);
 
     expect(calculator.calculate(' ')).toBe(4.4453125);
 
@@ -14,7 +14,7 @@ describe('WordWidthCalculator', () => {
   });
 
   test('calculates word widths for Arial in 12px size', () => {
-    const calculator = new WordWidthCalculator('12px', 'Arial');
+    const calculator = new WordWidthCalculator('12px', 'Arial', 18);
 
     expect(calculator.calculate(' ')).toBe(3.333984375);
 
@@ -26,7 +26,7 @@ describe('WordWidthCalculator', () => {
   });
 
   test('calculates word widths for Times New Roman in 16px size', () => {
-    const calculator = new WordWidthCalculator('16px', 'Times New Roman');
+    const calculator = new WordWidthCalculator('16px', 'Times New Roman', 24);
 
     expect(calculator.calculate(' ')).toBe(4);
 
@@ -35,5 +35,32 @@ describe('WordWidthCalculator', () => {
     expect(calculator.calculate('bar')).toBe(20.4296875);
 
     expect(calculator.calculate('baz')).toBe(22.203125);
+  });
+
+  test('changes font size and weight and resets back to the original setting', () => {
+    const calculator = new WordWidthCalculator('16px', 'Arial', 32);
+
+    calculator.apply({
+      size: '24px',
+      weight: 'bold',
+    });
+
+    expect(calculator.calculate(' ')).toBe(6.66796875);
+
+    expect(calculator.calculate('foo')).toBe(37.3125);
+
+    expect(calculator.calculate('bar')).toBe(37.34765625);
+
+    expect(calculator.calculate('baz')).toBe(40.0078125);
+
+    calculator.reset();
+
+    expect(calculator.calculate(' ')).toBe(4.4453125);
+
+    expect(calculator.calculate('foo')).toBe(22.2421875);
+
+    expect(calculator.calculate('bar')).toBe(23.125);
+
+    expect(calculator.calculate('baz')).toBe(25.796875);
   });
 });

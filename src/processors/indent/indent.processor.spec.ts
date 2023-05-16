@@ -13,7 +13,8 @@ describe('IndentProcessor', () => {
     lines: [],
     pageChanges: [],
     lineWidth: Big(0),
-    line: 0,
+    pageHeight: Big(0),
+    lineHeight: Big(24),
     lineText: '',
   };
 
@@ -24,7 +25,8 @@ describe('IndentProcessor', () => {
     lines: [],
     pageChanges: [],
     lineWidth: Big(0),
-    line: 0,
+    pageHeight: Big(0),
+    lineHeight: Big(24),
     lineText: '',
   };
 
@@ -35,7 +37,8 @@ describe('IndentProcessor', () => {
     lines: ['Baz\n'],
     pageChanges: [],
     lineWidth: Big(0),
-    line: 1,
+    pageHeight: Big(24),
+    lineHeight: Big(24),
     lineText: '',
   };
 
@@ -46,11 +49,12 @@ describe('IndentProcessor', () => {
     lines: [],
     pageChanges: [],
     lineWidth: Big(0),
-    line: 0,
+    pageHeight: Big(0),
+    lineHeight: Big(24),
     lineText: 'Foo',
   };
 
-  const calculator = new WordWidthCalculator('Arial', '16px');
+  const calculator = new WordWidthCalculator('16px', 'Arial', 24);
 
   test('needs to be configured before starting processing', () => {
     const processor = new IndentProcessor(4);
@@ -63,11 +67,12 @@ describe('IndentProcessor', () => {
   test("sets indentation for the book's beginning", () => {
     const processor = new IndentProcessor(4);
 
-    processor.configure({ calculator });
+    processor.configure({ calculator, pageHeight: 600 });
 
     expect(processor.process(bookBeginning)).toEqual({
       pages: [],
       textIndex: 4,
+      lineHeight: Big(24),
       changes: [],
       lines: [],
       pageChanges: [
@@ -77,8 +82,8 @@ describe('IndentProcessor', () => {
           type: TextChangeType.ADD_WORD,
         },
       ],
-      lineWidth: Big(11.11328125),
-      line: 0,
+      pageHeight: Big(0),
+      lineWidth: Big(17.78125),
       lineText: '    ',
     });
   });
@@ -86,11 +91,12 @@ describe('IndentProcessor', () => {
   test("sets indentation for the page's beginning", () => {
     const processor = new IndentProcessor(4);
 
-    processor.configure({ calculator });
+    processor.configure({ calculator, pageHeight: 600 });
 
     expect(processor.process(pageBeginning)).toEqual({
       pages: ['Foo\nBar\n'],
       textIndex: 11,
+      lineHeight: Big(24),
       changes: [{ values: [] }],
       lines: [],
       pageChanges: [
@@ -100,8 +106,8 @@ describe('IndentProcessor', () => {
           type: TextChangeType.ADD_WORD,
         },
       ],
-      lineWidth: Big(11.11328125),
-      line: 0,
+      pageHeight: Big(0),
+      lineWidth: Big(17.78125),
       lineText: '    ',
     });
   });
@@ -109,11 +115,12 @@ describe('IndentProcessor', () => {
   test("sets indentation for the paragraph's beginning", () => {
     const processor = new IndentProcessor(4);
 
-    processor.configure({ calculator });
+    processor.configure({ calculator, pageHeight: 600 });
 
     expect(processor.process(paragraphBeginning)).toEqual({
       pages: ['Foo\nBar\n'],
       textIndex: 15,
+      lineHeight: Big(24),
       changes: [{ values: [] }],
       lines: ['Baz\n'],
       pageChanges: [
@@ -123,8 +130,8 @@ describe('IndentProcessor', () => {
           type: TextChangeType.ADD_WORD,
         },
       ],
-      lineWidth: Big(11.11328125),
-      line: 1,
+      pageHeight: Big(24),
+      lineWidth: Big(17.78125),
       lineText: '    ',
     });
   });
@@ -132,7 +139,7 @@ describe('IndentProcessor', () => {
   test('does not set indentation', () => {
     const processor = new IndentProcessor(4);
 
-    processor.configure({ calculator });
+    processor.configure({ calculator, pageHeight: 600 });
 
     expect(processor.process(inline)).toEqual(inline);
   });

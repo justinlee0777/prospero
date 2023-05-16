@@ -3,47 +3,64 @@ import Big from 'big.js';
 import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
 import Processor from '../../processors/models/processor.interface';
 import WordWidthCalculator from '../../word-width.calculator';
+import CalculateWordWidth from '../builders/calculate-word-width.interface';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import ParseWord from '../models/parse-word.interface';
 import ParserState from '../models/parser-state.interface';
 import Parser from '../models/parser.interface';
 import Word from '../models/word.interface';
-import parseEnd from './end.parser';
-import createNewlineAtPageBeginningParser from './newline/newline-at-page-beginning.parser';
-import createNewlineParser from './newline/newline.parser';
-import parseWhitespaceAtPageBeginning from './whitespace/whitespace-at-page-beginning.parser';
-import createWhitespaceAtTextOverflowParser from './whitespace/whitespace-at-text-overflow.parser';
-import parseWhitespaceInline from './whitespace/whitespace-inline.parser';
-import createWordAtTextOverflowParser from './word/word-at-text-overflow.parser';
-import parseWord from './word/word.parser';
+import parseEnd from '../word-parsers/end.parser';
+import createNewlineAtPageBeginningParser from '../word-parsers/newline/newline-at-page-beginning.parser';
+import createNewlineParser from '../word-parsers/newline/newline.parser';
+import pageOverflowParser from '../word-parsers/page-overflow.parser';
+import createWhitespaceAtTextOverflowParser from '../word-parsers/whitespace/whitespace-at-text-overflow.parser';
+import parseWhitespaceInline from '../word-parsers/whitespace/whitespace-inline.parser';
+import createWordAtTextOverflowParser from '../word-parsers/word/word-at-text-overflow.parser';
+import parseWord from '../word-parsers/word/word.parser';
+
+/**
+ * Describes the effect a word has on a page.
+ */
+interface WordDescription {
+  isNewline: boolean;
+  isWhitespace: boolean;
+  isBeginningOfPage: boolean;
+  causesWordOverflow: boolean;
+  word: Word;
+}
 
 export default class DefaultLineBreakParser implements Parser {
   /**
    * This is used to debug the parser. Beware if you use this directly. Or don't, I don't really care beyond documentation.
    */
-  public debug: {
-    pageWidth: number;
-  };
+  public debug: CreateTextParserConfig;
 
-  private readonly tokenExpression: RegExp;
+  protected tokenExpression: RegExp;
 
-  private readonly parseNewlineAtPageBeginning: ParseWord;
-  private readonly parseNewline: ParseWord;
+  protected parseNewlineAtPageBeginning = createNewlineAtPageBeginningParser;
+  protected parseNewline = createNewlineParser;
 
-  private readonly parseWhitespaceAtPageBeginning: ParseWord;
-  private readonly parseWhitespaceAtTextOverflow: ParseWord;
-  private readonly parseWhitespaceInline: ParseWord;
+  protected parseWhitespaceAtPageBeginning = createNewlineAtPageBeginningParser;
+  protected parseWhitespaceAtTextOverflow =
+    createWhitespaceAtTextOverflowParser;
+  protected parseWhitespaceInline = parseWhitespaceInline;
 
-  private readonly parseWordAtTextOverflow: ParseWord;
-  private readonly parseWord: ParseWord;
+  protected parseWordAtTextOverflow = createWordAtTextOverflowParser;
+  protected parseWord = parseWord;
 
-  private calculator: WordWidthCalculator;
-  private processors: Array<Processor> = [];
+  protected parsePageOverflow: (parserState: ParserState) => ParserState;
+  protected parseEnd = parseEnd;
 
-  constructor(private config: CreateTextParserConfig) {
-    this.debug = {
-      pageWidth: config.pageWidth,
-    };
+  protected calculator: WordWidthCalculator;
+  protected processors: Array<Processor> = [];
+
+  /**
+   * Line height for the whole book, given the font size configured.
+   */
+  protected bookLineHeight: Big;
+
+  constructor(protected config: CreateTextParserConfig) {
+    this.debug = config;
 
     const escapedPunctuation = [...punctuation]
       .map((glyph) => `\\${glyph}`)
@@ -68,21 +85,13 @@ export default class DefaultLineBreakParser implements Parser {
 
     this.tokenExpression = new RegExp(expressions.join('|'), 'g');
 
-    this.parseNewlineAtPageBeginning =
-      createNewlineAtPageBeginningParser(config);
-    this.parseNewline = createNewlineParser(config);
-
-    this.parseWhitespaceAtPageBeginning = parseWhitespaceAtPageBeginning;
-    this.parseWhitespaceAtTextOverflow =
-      createWhitespaceAtTextOverflowParser(config);
-    this.parseWhitespaceInline = parseWhitespaceInline;
-
-    this.parseWordAtTextOverflow = createWordAtTextOverflowParser(config);
-    this.parseWord = parseWord;
+    this.parsePageOverflow = pageOverflowParser(this.config);
   }
 
   setCalculator(calculator: WordWidthCalculator): void {
     this.calculator = calculator;
+
+    this.bookLineHeight = Big(this.calculator.getCalculatedLineHeight());
   }
 
   setProcessors(processors: Processor[]): void {
@@ -90,80 +99,37 @@ export default class DefaultLineBreakParser implements Parser {
   }
 
   *generateParserStates(text: string): Generator<ParserState> {
-    text = this.processors.reduce(
-      (newText, processor) => processor.preprocess?.(newText) ?? newText,
-      text
-    );
+    text = this.preprocessText(text);
 
     const tokens = text.matchAll(this.tokenExpression);
     const calculateWordWidth = (word) => this.calculator.calculate(word);
 
-    let parserState: ParserState = {
-      pages: [],
-      textIndex: 0,
-      changes: [],
-
-      lines: [],
-      pageChanges: [],
-
-      lineWidth: Big(0),
-      line: 0,
-      lineText: '',
-    };
-
-    parserState = this.postprocessParserState(parserState);
+    let parserState = this.initializeParserState();
 
     yield parserState;
 
     for (const token of tokens) {
       const { 0: word, groups } = token;
 
-      const newlineExpression = Boolean(groups['newline']);
-      const whitespaceExpression = Boolean(groups['whitespace']);
+      const wordDescription = this.getWordDescription(
+        parserState,
+        Boolean(groups['newline']),
+        Boolean(groups['whitespace']),
+        word,
+        calculateWordWidth
+      );
 
-      const wordWidth = Big(calculateWordWidth(word)).round(2, 0);
+      const parseText = this.chooseWordParser(wordDescription);
 
-      const pageBeginning =
-        parserState.line === 0 && parserState.lineWidth.eq(0);
-      const wordOverflows = parserState.lineWidth
-        .plus(wordWidth)
-        .gte(this.config.pageWidth);
+      parserState = parseText(parserState, wordDescription.word);
 
-      let parseText: ParseWord;
+      parserState = this.parsePageOverflow(parserState);
 
-      if (newlineExpression) {
-        if (pageBeginning) {
-          parseText = this.parseNewlineAtPageBeginning;
-        } else {
-          parseText = this.parseNewline;
-        }
-      } else if (whitespaceExpression) {
-        if (wordOverflows) {
-          parseText = this.parseWhitespaceAtTextOverflow;
-        } else if (pageBeginning) {
-          parseText = this.parseWhitespaceAtPageBeginning;
-        } else {
-          parseText = this.parseWhitespaceInline;
-        }
-      } else {
-        if (wordOverflows) {
-          parseText = this.parseWordAtTextOverflow;
-        } else {
-          parseText = this.parseWord;
-        }
-      }
-
-      const wordState: Word = {
-        text: word,
-        width: wordWidth,
-      };
-
-      parserState = parseText(parserState, wordState);
       parserState = this.postprocessParserState(parserState);
       yield parserState;
     }
 
-    parserState = parseEnd(parserState, { text: '', width: Big(0) });
+    parserState = this.parseEnd(parserState);
     parserState = this.postprocessParserState(parserState);
 
     yield parserState;
@@ -186,11 +152,93 @@ export default class DefaultLineBreakParser implements Parser {
     }
   }
 
-  private postprocessParserState(parserState: ParserState): ParserState {
+  protected preprocessText(text: string): string {
+    return this.processors.reduce(
+      (newText, processor) => processor.preprocess?.(newText) ?? newText,
+      text
+    );
+  }
+
+  protected postprocessParserState(parserState: ParserState): ParserState {
     return this.processors.reduce(
       (newParserState, processor) =>
         processor.process?.(newParserState) ?? newParserState,
       parserState
     );
+  }
+
+  protected initializeParserState(): ParserState {
+    const parserState: ParserState = {
+      pages: [],
+      textIndex: 0,
+      changes: [],
+
+      lines: [],
+      pageHeight: Big(0),
+      pageChanges: [],
+
+      lineWidth: Big(0),
+      lineHeight: this.bookLineHeight,
+      lineText: '',
+    };
+
+    return this.postprocessParserState(parserState);
+  }
+
+  protected getWordDescription(
+    parserState: ParserState,
+    isNewline: boolean,
+    isWhitespace: boolean,
+    text: string,
+    calculateWordWidth: CalculateWordWidth
+  ): WordDescription {
+    const wordWidth = Big(calculateWordWidth(text)).round(2, 0);
+
+    return {
+      isNewline,
+      isWhitespace,
+      isBeginningOfPage:
+        parserState.pageHeight.eq(0) && parserState.lineWidth.eq(0),
+      causesWordOverflow: parserState.lineWidth
+        .plus(wordWidth)
+        .gte(this.config.pageWidth),
+      word: {
+        text,
+        width: wordWidth,
+      },
+    };
+  }
+
+  protected chooseWordParser({
+    isNewline,
+    isWhitespace,
+    isBeginningOfPage,
+    causesWordOverflow,
+  }: WordDescription): ParseWord {
+    let parseWord: ParseWord;
+
+    if (isNewline) {
+      if (isBeginningOfPage) {
+        parseWord = this.parseNewlineAtPageBeginning;
+      } else {
+        parseWord = this.parseNewline;
+      }
+    } else if (isWhitespace) {
+      if (causesWordOverflow) {
+        parseWord = this.parseWhitespaceAtTextOverflow;
+      } else if (isBeginningOfPage) {
+        parseWord = this.parseWhitespaceAtPageBeginning;
+      } else {
+        parseWord = this.parseWhitespaceInline;
+      }
+    } else {
+      if (causesWordOverflow) {
+        parseWord = this.parseWordAtTextOverflow;
+      } else {
+        parseWord = this.parseWord;
+      }
+    }
+
+    return parseWord.bind(this);
   }
 }

@@ -46,8 +46,8 @@ module.exports = {
   },
   plugins: [
     new webpack.NormalModuleReplacementPlugin(
-      /src\/sanitizers\/html\.sanitizer\.ts/,
-      join(__dirname, '../../src/sanitizers/html.sanitizer.web.ts')
+      /src\/sanitizers\/html\/html\.sanitizer\.ts/,
+      join(__dirname, '../../src/sanitizers/html/html.sanitizer.web.ts')
     ),
     new MiniCssExtractPlugin(),
   ],

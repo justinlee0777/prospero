@@ -1,15 +1,19 @@
 import ContainerStyle from '../../container-style.interface';
 import Processor from '../../processors/models/processor.interface';
 import Optional from '../../utils/optional.type';
+import toPixelUnits from '../../utils/to-pixel-units.function';
 import WordWidthCalculator from '../../word-width.calculator';
+import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import Parser from '../models/parser.interface';
 import ParserFactory from '../parser.factory';
-import getNormalizedPageHeight from './get-normalized-page-height.function';
 
 const fromContainerStyle = 'fromContainerStyle';
 
 export default class ParserBuilder {
   static entrypoints = [fromContainerStyle];
+
+  private ParserConstructor: (config: CreateTextParserConfig) => Parser =
+    ParserFactory.create;
 
   private containerStyle: ContainerStyle;
 
@@ -53,6 +57,12 @@ export default class ParserBuilder {
     return this;
   }
 
+  forHTML(): ParserBuilder {
+    this.ParserConstructor = ParserFactory.createForHTML;
+
+    return this;
+  }
+
   /**
    * Get the built parser.
    * @throws if there is no internal parser yet.
@@ -78,27 +88,25 @@ export default class ParserBuilder {
       border.left -
       border.right;
 
-    const pageHeight = getNormalizedPageHeight(
+    const containerHeight =
       height -
-        padding.top -
-        padding.bottom -
-        margin.top -
-        margin.bottom -
-        border.top -
-        border.bottom,
-      lineHeight
-    );
-
-    const numLines = pageHeight / lineHeight;
+      padding.top -
+      padding.bottom -
+      margin.top -
+      margin.bottom -
+      border.top -
+      border.bottom;
 
     const calculator = new WordWidthCalculator(
       computedFontSize,
       computedFontFamily,
+      lineHeight,
       this.fontLocation
     );
 
-    const parser = ParserFactory.create({
-      pageLines: numLines,
+    const parser = this.ParserConstructor({
+      fontSize: toPixelUnits(computedFontSize),
+      pageHeight: containerHeight,
       pageWidth: containerWidth,
     });
 
@@ -109,6 +117,7 @@ export default class ParserBuilder {
     processors.forEach((processor) =>
       processor.configure?.({
         calculator,
+        pageHeight: containerHeight,
       })
     );
 

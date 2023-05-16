@@ -18,14 +18,15 @@ export default interface ParserState {
 
   /** The lines of the page. */
   lines: Array<string>;
+  /** The current height of the page. */
+  pageHeight: Big;
   pageChanges: Array<TextChange>;
 
   // The below section describes the line to be built.
 
   /** The width of the current line in pixels. */
   lineWidth: Big;
-  /** The line number. */
-  line: number;
+  lineHeight: Big;
   /** The text of the current line. */
   lineText: string;
 }

@@ -1,12 +1,8 @@
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 
-import Sanitizer from './sanitizer.interface';
-
-const options: DOMPurify.Config = {
-  ALLOWED_TAGS: ['a', 'code', 'del', 'em', 'pre', 'span', 'strong'],
-  ALLOWED_ATTR: ['style', 'href'],
-};
+import Sanitizer from '../sanitizer.interface';
+import options from './dompurify.config';
 
 export default class HTMLSanitizer implements Sanitizer {
   private purify: DOMPurify.DOMPurifyI;
