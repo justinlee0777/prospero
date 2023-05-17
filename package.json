@@ -1,6 +1,6 @@
 {
   "name": "prospero",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "scripts": {
     "build": "rm -rf dist && webpack",
     "start": "./scripts/start-dev-server.sh",
