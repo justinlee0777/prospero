@@ -53,6 +53,8 @@ const BooksComponent: CreateBooksElement = (config) => {
   booksElement.elementTagIdentifier = BooksIdentifier;
 
   booksElement.destroy = () => {
+    booksElement.remove();
+
     destroyMediaQueryListener();
 
     /** Destroy books for client. */

@@ -1,11 +1,11 @@
 let mediaQueryBookList;
-let destroyMediaQueryListener;
+let mockDestroyMediaQueryListener;
 
 jest.mock('../media-query/media-query-listener.factory', () => ({
   create(...args) {
     mediaQueryBookList = args;
-    destroyMediaQueryListener = jest.fn();
-    return destroyMediaQueryListener;
+    mockDestroyMediaQueryListener = jest.fn();
+    return mockDestroyMediaQueryListener;
   },
 }));
 
@@ -60,7 +60,7 @@ describe('BooksComponent', () => {
 
     books.destroy();
 
-    expect(destroyMediaQueryListener).toHaveBeenCalledTimes(1);
+    expect(mockDestroyMediaQueryListener).toHaveBeenCalledTimes(1);
   });
 
   test('creates Books with multiple Books', () => {
@@ -86,7 +86,7 @@ describe('BooksComponent', () => {
 
     books.destroy();
 
-    expect(destroyMediaQueryListener).toHaveBeenCalledTimes(1);
+    expect(mockDestroyMediaQueryListener).toHaveBeenCalledTimes(1);
   });
 
   test('creates Books with multiple Books for screen widths', () => {
@@ -135,7 +135,7 @@ describe('BooksComponent', () => {
 
     books.destroy();
 
-    expect(destroyMediaQueryListener).toHaveBeenCalledTimes(1);
+    expect(mockDestroyMediaQueryListener).toHaveBeenCalledTimes(1);
   });
 
   test('throws an error for Books with no Book', () => {

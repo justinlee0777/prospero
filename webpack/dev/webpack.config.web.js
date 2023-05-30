@@ -8,17 +8,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // Loading pages for development environment
-const extensionlessFilenames = fs
-  .readdirSync('./pages')
-  .filter((filename) => filename.includes('-page.ts'))
-  .map((filename) => filename.slice(0, filename.length - 3));
+const extensionlessFilenames = [];
+const pageEntry = {};
 
-const pageEntry = extensionlessFilenames.reduce((entry, filename) => {
-  return {
-    ...entry,
-    [filename]: `./pages/${filename}.ts`,
-  };
-}, {});
+fs.readdirSync('./pages')
+  .filter((filename) => filename.includes('-page.ts'))
+  .forEach((filename) => {
+    const extensionlessFilename = filename.split('.').at(0);
+
+    extensionlessFilenames.push(extensionlessFilename);
+    pageEntry[extensionlessFilename] = `./pages/${filename}`;
+  });
 
 const pageHtml = extensionlessFilenames.map((filename) => {
   return new HtmlWebpackPlugin({
@@ -48,7 +48,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         exclude: /node_modules/,
         use: {
           loader: 'ts-loader',
@@ -75,7 +75,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.tsx', '.js'],
   },
   plugins: [
     new webpack.NormalModuleReplacementPlugin(

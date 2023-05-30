@@ -69,7 +69,6 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
 
   const size: MediaQuerySizerConfig['size'] = (width, height) => {
     bookElement?.destroy();
-    bookElement?.remove();
 
     const bookConfig =
       mediaQueryList.find((mediaQuery) => mediaQuery.matches)?.config ??
@@ -114,6 +113,8 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
   );
 
   flexibleBookElement.destroy = () => {
+    flexibleBookElement.remove();
+
     bookElement?.destroy();
     destroySizer();
   };

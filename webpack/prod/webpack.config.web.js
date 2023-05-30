@@ -7,6 +7,7 @@ module.exports = {
   mode: 'production',
   entry: {
     web: ['./src/web.ts'],
+    'web/react': ['./src/react/index.ts'],
   },
   output: {
     filename: '[name].js',
@@ -17,7 +18,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.ts$/,
+        test: /\.tsx?$/,
         exclude: /node_modules/,
         use: {
           loader: 'ts-loader',
@@ -42,7 +43,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.tsx', '.js'],
   },
   plugins: [
     new webpack.NormalModuleReplacementPlugin(
@@ -52,4 +53,7 @@ module.exports = {
     new MiniCssExtractPlugin(),
   ],
   target: 'web',
+  externals: {
+    react: 'react',
+  },
 };
