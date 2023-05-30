@@ -220,6 +220,10 @@ However, processors need to leave notes for other processors if they transform t
 
 ### Roadmap
 
-- Angular and React-compatible components
+- Angular ~~and React-compatible~~ components
 - Bookmarking
 - Pagination on the server
+
+Possible:
+
+- Idiomatic React component

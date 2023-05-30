@@ -14,13 +14,17 @@ describe('useBook', () => {
   function UseBookTest(props): JSX.Element {
     props ||= {};
 
-    const { classname } = props;
+    const { classname, noBook } = props;
 
     const ref = useRef<HTMLDivElement>();
 
     useBook(
       ref,
       () => {
+        if (noBook) {
+          return null;
+        }
+
         const component = FlexibleBookComponent({
           containerStyle: {
             lineHeight: 32,
@@ -34,7 +38,7 @@ describe('useBook', () => {
 
         return component;
       },
-      [classname]
+      [classname, noBook]
     );
 
     return <div ref={ref}></div>;
@@ -91,5 +95,16 @@ describe('useBook', () => {
     expect(book instanceof HTMLElement).toBe(true);
 
     expect(book.className).toBe('bar');
+  });
+
+  test('does not add a book', async () => {
+    let component;
+    await renderer.act(() => {
+      component = renderer.create(<UseBookTest noBook={true} />, {
+        createNodeMock: createMockContainer,
+      });
+    });
+
+    expect(appendChildSpy).not.toHaveBeenCalled();
   });
 });
