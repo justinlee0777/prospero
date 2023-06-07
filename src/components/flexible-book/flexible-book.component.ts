@@ -91,16 +91,9 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
       .addSize(width / (bookConfig.pagesShown ?? 1), height)
       .build({ html: forHTML });
 
-    bookElement = BookComponent(
-      {
-        getPage: (pageNumber) => pages.get(pageNumber),
-        containerStyles: pages.getContainerStyle(),
-      },
-      bookConfig,
-      {
-        classnames: bookClassNames,
-      }
-    );
+    bookElement = BookComponent(pages.getData(), bookConfig, {
+      classnames: bookClassNames,
+    });
 
     flexibleBookElement.appendChild(bookElement);
   };

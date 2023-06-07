@@ -13,7 +13,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   container.style.maxHeight = '100vh';
   container.style.padding = '18px';
 
-  function updateTextContent() {
+  async function updateTextContent() {
     const style = window.getComputedStyle(container);
 
     const containerStyle: ContainerStyle = {
@@ -44,7 +44,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const pages = new Pages(containerStyle, text);
 
-    container.textContent = pages.get(0);
+    container.textContent = await pages.get(0);
   }
 
   window.addEventListener('resize', debounce(updateTextContent), {

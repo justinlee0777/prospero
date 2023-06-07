@@ -1,10 +1,12 @@
 import ContainerStyle from './container-style.interface';
 import GetPage from './get-page.interface';
+import PagesAsIndicesOutput from './pages-as-indices-output.interface';
 import PagesOutput from './pages-output.interface';
+import IPages from './pages.interface';
 import ParserBuilder from './parsers/builders/parser.builder';
 import Processor from './processors/models/processor.interface';
 
-export default class Pages {
+export default class Pages implements IPages {
   private pageGenerator: Generator<string>;
 
   private cachedPages: Array<string> = [];
@@ -78,6 +80,31 @@ export default class Pages {
   getData(): PagesOutput {
     return {
       pages: this.getAll(),
+      containerStyles: this.containerStyle,
+    };
+  }
+
+  getDataAsIndices(): PagesAsIndicesOutput {
+    const stringPages = this.getAll();
+
+    let text = '';
+    let pages: PagesAsIndicesOutput['pages'] = [];
+
+    let index = 0;
+
+    stringPages.forEach((page) => {
+      text += page;
+      console.log(page);
+      console.log('\n===================ENDING\n');
+      pages.push({
+        beginIndex: index,
+        endIndex: (index += page.length),
+      });
+    });
+
+    return {
+      text,
+      pages,
       containerStyles: this.containerStyle,
     };
   }

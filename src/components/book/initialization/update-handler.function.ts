@@ -5,6 +5,7 @@ import PageComponent from '../../page/page.component';
 import BookAnimation from '../book-animation.interface';
 import BookComponent from '../book.component';
 import PageChangeEvent from '../page-change-event.interface';
+import UpdatePage from '../update-page.interface';
 
 interface PageConfig {
   get: GetPage;
@@ -16,18 +17,13 @@ interface PageConfig {
 }
 
 /**
- * @returns whether the operation completed or halted early.
- */
-type UpdatePage = (this: void, currentPage: number) => boolean;
-
-/**
  * @returns a handler to update the page.
  */
 export default function updateHandler(
   book: BookComponent,
   { get, pagesShown, animation, styles = {}, showPageNumbers }: PageConfig
 ): UpdatePage {
-  return (pageNumber: number) => {
+  return async (pageNumber: number) => {
     const leftmostPage = pageNumber - (pageNumber % pagesShown);
     const pageNumbers = Array(pagesShown)
       .fill(undefined)
@@ -35,10 +31,11 @@ export default function updateHandler(
 
     const offset = 100 / pagesShown;
 
-    const pageContent = pageNumbers.map((number) => ({
-      number,
-      content: get(number),
-    }));
+    const pageContent = await Promise.all(
+      pageNumbers.map((number) =>
+        Promise.resolve(get(number)).then((content) => ({ number, content }))
+      )
+    );
 
     if (pageContent.every(({ content }) => !Boolean(content))) {
       return false;

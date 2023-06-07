@@ -77,10 +77,10 @@ const BookComponent: CreateBookElement = (
     showPageNumbers,
   });
 
-  const decrement = () =>
-    goToPage(currentPage - pagesShown) && (currentPage -= pagesShown);
-  const increment = () =>
-    goToPage(currentPage + pagesShown) && (currentPage += pagesShown);
+  const decrement = async () =>
+    (await goToPage(currentPage - pagesShown)) && (currentPage -= pagesShown);
+  const increment = async () =>
+    (await goToPage(currentPage + pagesShown)) && (currentPage += pagesShown);
 
   destroyCallbacks.push(
     ...listeners.map((listener) => listener(book, [decrement, increment]))
