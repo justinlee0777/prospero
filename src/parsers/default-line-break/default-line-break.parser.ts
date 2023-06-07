@@ -10,7 +10,6 @@ import ParserState from '../models/parser-state.interface';
 import Parser from '../models/parser.interface';
 import Word from '../models/word.interface';
 import parseEnd from '../word-parsers/end.parser';
-import createNewlineAtPageBeginningParser from '../word-parsers/newline/newline-at-page-beginning.parser';
 import createNewlineParser from '../word-parsers/newline/newline.parser';
 import pageOverflowParser from '../word-parsers/page-overflow.parser';
 import createWhitespaceAtTextOverflowParser from '../word-parsers/whitespace/whitespace-at-text-overflow.parser';
@@ -37,10 +36,8 @@ export default class DefaultLineBreakParser implements Parser {
 
   protected tokenExpression: RegExp;
 
-  protected parseNewlineAtPageBeginning = createNewlineAtPageBeginningParser;
   protected parseNewline = createNewlineParser;
 
-  protected parseWhitespaceAtPageBeginning = createNewlineAtPageBeginningParser;
   protected parseWhitespaceAtTextOverflow =
     createWhitespaceAtTextOverflowParser;
   protected parseWhitespaceInline = parseWhitespaceInline;
@@ -171,11 +168,9 @@ export default class DefaultLineBreakParser implements Parser {
     const parserState: ParserState = {
       pages: [],
       textIndex: 0,
-      changes: [],
 
       lines: [],
       pageHeight: Big(0),
-      pageChanges: [],
 
       lineWidth: Big(0),
       lineHeight: this.bookLineHeight,
@@ -212,22 +207,15 @@ export default class DefaultLineBreakParser implements Parser {
   protected chooseWordParser({
     isNewline,
     isWhitespace,
-    isBeginningOfPage,
     causesWordOverflow,
   }: WordDescription): ParseWord {
     let parseWord: ParseWord;
 
     if (isNewline) {
-      if (isBeginningOfPage) {
-        parseWord = this.parseNewlineAtPageBeginning;
-      } else {
-        parseWord = this.parseNewline;
-      }
+      parseWord = this.parseNewline;
     } else if (isWhitespace) {
       if (causesWordOverflow) {
         parseWord = this.parseWhitespaceAtTextOverflow;
-      } else if (isBeginningOfPage) {
-        parseWord = this.parseWhitespaceAtPageBeginning;
       } else {
         parseWord = this.parseWhitespaceInline;
       }

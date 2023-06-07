@@ -94,14 +94,12 @@ export default class Pages implements IPages {
 
     stringPages.forEach((page) => {
       text += page;
-      console.log(page);
-      console.log('\n===================ENDING\n');
       pages.push({
         beginIndex: index,
         endIndex: (index += page.length),
       });
     });
-
+    console.log(text);
     return {
       text,
       pages,

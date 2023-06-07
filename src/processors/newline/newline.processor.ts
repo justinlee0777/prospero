@@ -1,7 +1,6 @@
 import Big from 'big.js';
 
 import ParserState from '../../parsers/models/parser-state.interface';
-import TextChangeType from '../../parsers/models/text-change-type.enum';
 import ProcessorConfig from '../models/processor.config';
 import Processor from '../models/processor.interface';
 
@@ -48,22 +47,12 @@ export default class NewlineProcessor implements Processor {
           pages: parserState.pages.concat(parserState.lines.join('') + '\n'),
           lines: [],
           pageHeight: Big(0),
-          pageChanges: parserState.pageChanges.concat({
-            textIndex: parserState.textIndex - parserState.lineText.length,
-            text: '\n',
-            type: TextChangeType.ADD_WORD,
-          }),
         };
       } else {
         return {
           ...parserState,
           lines: parserState.lines.concat('\n'),
           pageHeight: parserState.pageHeight.add(parserState.lineHeight),
-          pageChanges: parserState.pageChanges.concat({
-            textIndex: parserState.textIndex - parserState.lineText.length,
-            text: '\n',
-            type: TextChangeType.ADD_WORD,
-          }),
         };
       }
     } else {

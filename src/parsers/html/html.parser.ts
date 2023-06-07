@@ -251,14 +251,11 @@ export default class HTMLParser extends DefaultLineBreakParser {
       return {
         ...state,
         pages: state.pages.concat(state.lines.join('')),
-        changes: state.changes.concat({
-          values: state.pageChanges,
-        }),
         // Cut the current text and begin on a newline.
         lines: [],
         pageChanges: [],
         pageHeight: Big(0),
-        lineText: this.getOpeningTag() + state.lineText.trim(),
+        lineText: this.getOpeningTag() + state.lineText,
       };
     } else {
       return state;

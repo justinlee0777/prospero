@@ -1,7 +1,6 @@
 import Big from 'big.js';
 
 import ParserState from '../../parsers/models/parser-state.interface';
-import TextChangeType from '../../parsers/models/text-change-type.enum';
 import Word from '../../parsers/models/word.interface';
 import ProcessorConfig from '../models/processor.config';
 import Processor from '../models/processor.interface';
@@ -67,12 +66,6 @@ export default class IndentProcessor implements Processor {
     if (addIndentation) {
       return {
         ...parserState,
-        // Tell the parser the indentation was added.
-        pageChanges: parserState.pageChanges.concat({
-          textIndex: parserState.textIndex,
-          text: this.indent.text,
-          type: TextChangeType.ADD_WORD,
-        }),
         textIndex: parserState.textIndex + this.indent.text.length,
         lineWidth: this.indent.width,
         // Set the indentation. No concat'ing here as this should be the start of the line.
