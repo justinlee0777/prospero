@@ -1,7 +1,12 @@
+import styles from './book.module.css';
+
 import { merge } from 'lodash-es';
+
 import CreateElementConfig from '../../elements/create-element.config';
 import GetPage from '../../get-page.interface';
+import NullaryFn from '../../utils/nullary-fn.type';
 import LaminaComponent from '../lamina/lamina.component';
+import LoadingIconComponent from '../loading-icon/loading-icon.component';
 import BookComponent from './book-element.interface';
 import BookIdentifier from './book.symbol';
 import CreateBookElement from './create-book-element.interface';
@@ -55,6 +60,8 @@ const BookComponent: CreateBookElement = (
 
   const destroyCallbacks = [];
 
+  const lamina = LaminaComponent();
+
   const book = initialize(
     {
       elementTagIdentifier: BookIdentifier,
@@ -71,7 +78,7 @@ const BookComponent: CreateBookElement = (
         ...(config.styles ?? {}),
         ...bookStyles,
       },
-      children: [LaminaComponent()],
+      children: [lamina],
     }
   );
 
@@ -92,14 +99,8 @@ const BookComponent: CreateBookElement = (
     showPageNumbers,
   });
 
-  const decrement = async () => {
-    await goToPage(currentPage - pagesShown);
-    currentPage -= pagesShown;
-  };
-  const increment = async () => {
-    await goToPage(currentPage + pagesShown);
-    currentPage += pagesShown;
-  };
+  const decrement = () => updatePage(-pagesShown);
+  const increment = () => updatePage(pagesShown);
 
   destroyCallbacks.push(
     ...listeners.map((listener) => listener(book, [decrement, increment]))
@@ -108,6 +109,38 @@ const BookComponent: CreateBookElement = (
   goToPage(currentPage);
 
   return book;
+
+  async function updatePage(increment: number) {
+    const oldPage = currentPage;
+
+    const destroyLoadingIcon = addLoadingIcon(lamina);
+
+    let pageChanged = false;
+
+    try {
+      pageChanged = await goToPage((currentPage += increment));
+    } finally {
+      destroyLoadingIcon();
+    }
+
+    if (!pageChanged) {
+      currentPage = oldPage;
+    }
+  }
 };
+
+/**
+ *
+ * @returns destruction of loading icon.
+ */
+function addLoadingIcon(parent: HTMLElement): NullaryFn {
+  const loadingIcon = LoadingIconComponent({
+    classnames: [styles.bookLoadingIcon],
+  });
+
+  parent.appendChild(loadingIcon);
+
+  return () => loadingIcon.destroy();
+}
 
 export default BookComponent;

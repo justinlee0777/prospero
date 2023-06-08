@@ -24,6 +24,14 @@ import PaginatedResponse from './paginated-response.interface';
 export default class PagesUsingEndpoint implements IPages {
   private readonly pageSize = 10;
 
+  /**
+   * Cache of requests made to the backend so there are no duplicates.
+   * The key is a string: "${beginning page number}-{ending page number"} ex. 11-20 for pages 11 to 20.
+   * The value is a Promise for the HTTP response.
+   */
+  private readonly requests: Map<string, Promise<PaginatedResponse>> =
+    new Map();
+
   private pages: Array<string> | undefined;
 
   private cachedContainerStyle: ContainerStyle | undefined;
@@ -134,10 +142,19 @@ export default class PagesUsingEndpoint implements IPages {
     pageNumber: number,
     pageSize: number
   ): Promise<PaginatedResponse> {
-    const response = await fetch(
-      `${this.endpoint}?pageNumber=${pageNumber}&pageSize=${pageSize}`
-    );
-    return await response.json();
+    const requestId = `${pageNumber}-${pageNumber + pageSize}`;
+
+    if (this.requests.has(requestId)) {
+      return await this.requests.get(requestId);
+    } else {
+      const request = fetch(
+        `${this.endpoint}?pageNumber=${pageNumber}&pageSize=${pageSize}`
+      ).then((response) => response.json());
+
+      this.requests.set(requestId, request);
+
+      return request;
+    }
   }
 
   /**

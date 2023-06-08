@@ -2,3 +2,11 @@
   overflow: hidden;
   position: relative;
 }
+
+.bookLoadingIcon {
+  height: 24px;
+  position: absolute;
+  right: 1%;
+  top: 1%;
+  width: 24px;
+}

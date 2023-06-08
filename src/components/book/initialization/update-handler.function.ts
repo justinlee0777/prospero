@@ -1,6 +1,6 @@
-import { merge } from 'lodash-es';
 import CreateElementConfig from '../../../elements/create-element.config';
 import GetPage from '../../../get-page.interface';
+import merge from '../../../utils/merge.function';
 import PageNumberingAlignment from '../../page/page-numbering-alignment.enum';
 import pageSelector from '../../page/page-selector.const';
 import PageComponent from '../../page/page.component';
@@ -70,7 +70,7 @@ export default function updateHandler(
         {
           numbering,
         },
-        merge<CreateElementConfig, CreateElementConfig>(
+        merge<CreateElementConfig>(
           {
             innerHTML: content,
             styles: {

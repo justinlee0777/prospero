@@ -1,13 +1,12 @@
 import styles from './page.module.css';
 
 import div from '../../elements/div.function';
+import merge from '../../utils/merge.function';
 import CreatePageElement from './create-page-element.interface';
 import pageClassName from './page-class-name.const';
 import PageComponent from './page-element.interface';
 
 const PageComponent: CreatePageElement = (pageConfig, config = {}) => {
-  const classnames = [pageClassName].concat(config?.classnames ?? []);
-
   const children = [];
 
   if (pageConfig.numbering) {
@@ -22,11 +21,15 @@ const PageComponent: CreatePageElement = (pageConfig, config = {}) => {
     children.push(numbering);
   }
 
-  const page = div({
-    ...config,
-    classnames,
-    children,
-  }) as unknown as PageComponent;
+  const page = div(
+    merge(
+      {
+        classnames: [pageClassName],
+        children,
+      },
+      config
+    )
+  ) as unknown as PageComponent;
 
   page.destroy = () => page.remove();
 
