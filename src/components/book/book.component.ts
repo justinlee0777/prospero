@@ -1,9 +1,8 @@
 import styles from './book.module.css';
 
-import { merge } from 'lodash-es';
-
 import CreateElementConfig from '../../elements/create-element.config';
 import GetPage from '../../get-page.interface';
+import merge from '../../utils/merge.function';
 import NullaryFn from '../../utils/nullary-fn.type';
 import LaminaComponent from '../lamina/lamina.component';
 import LoadingIconComponent from '../loading-icon/loading-icon.component';
@@ -85,7 +84,7 @@ const BookComponent: CreateBookElement = (
   const goToPage = updateHandler(book, {
     get: getPage,
     pagesShown,
-    elementConfig: merge<CreateElementConfig, CreateElementConfig>(
+    elementConfig: merge<CreateElementConfig>(
       {
         styles: {
           ...pageStyles,

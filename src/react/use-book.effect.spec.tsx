@@ -1,6 +1,4 @@
-jest.mock('lodash-es', () => ({
-  merge: jest.fn().mockImplementation((arg) => arg),
-}));
+jest.mock('../utils/merge.function', () => (arg) => arg);
 
 import renderer from 'react-test-renderer';
 

@@ -9,6 +9,8 @@ jest.mock('../media-query/media-query-listener.factory', () => ({
   },
 }));
 
+jest.mock('../../utils/merge.function', () => (arg) => arg);
+
 import PagesOutput from '../../pages-output.interface';
 import BookElement from '../book/book-element.interface';
 import BookComponent from '../book/book.component';

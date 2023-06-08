@@ -1,8 +1,7 @@
-import { merge } from 'lodash-es';
-
 import CreateElementConfig from '../../elements/create-element.config';
 import div from '../../elements/div.function';
 import PagesBuilder from '../../pages.builder';
+import merge from '../../utils/merge.function';
 import BookConfig from '../book/book-config.interface';
 import BookElement from '../book/book-element.interface';
 import BookComponent from '../book/book.component';

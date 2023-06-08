@@ -20,12 +20,7 @@ jest.mock('lodash-es', () => ({
 
 import path from 'path';
 import { cwd } from 'process';
-import {
-  HTMLProcessor,
-  IndentProcessor,
-  LoaderBuilder,
-  PagesBuilder,
-} from './server';
+import { IndentProcessor, LoaderBuilder, PagesBuilder } from './server';
 
 /*
  * Contract testing.
@@ -43,7 +38,7 @@ describe('server entrypoint', () => {
       .setFont('16px', 'Arial')
       .setLineHeight(24)
       .setText(text)
-      .setProcessors([new IndentProcessor(5), new HTMLProcessor()])
+      .setProcessors([new IndentProcessor(5)])
       .addSize(375, 667)
       .build();
 

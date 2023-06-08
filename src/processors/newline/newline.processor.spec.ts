@@ -1,7 +1,6 @@
 import Big from 'big.js';
 
 import ParserState from '../../parsers/models/parser-state.interface';
-import TextChangeType from '../../parsers/models/text-change-type.enum';
 import NewlineProcessor from './newline.processor';
 
 describe('NewlineProcessor', () => {
@@ -17,10 +16,8 @@ describe('NewlineProcessor', () => {
     let parserState: ParserState = {
       pages: [],
       textIndex: 0,
-      changes: [],
       lines: [],
       pageHeight: Big(0),
-      pageChanges: [],
       lineWidth: Big(0),
       lineHeight: Big(18),
       lineText: '',
@@ -77,11 +74,6 @@ describe('NewlineProcessor', () => {
       pages: ['Foo\n\n'],
       lines: [],
       pageHeight: Big(0),
-      pageChanges: parserState.pageChanges.concat({
-        textIndex: 4,
-        text: '\n',
-        type: TextChangeType.ADD_WORD,
-      }),
     });
 
     // And the proposed change will not cause an overflow nor the next line
@@ -94,11 +86,6 @@ describe('NewlineProcessor', () => {
       ...parserState,
       lines: ['Foo\n', '\n'],
       pageHeight: Big(24),
-      pageChanges: parserState.pageChanges.concat({
-        textIndex: 4,
-        text: '\n',
-        type: TextChangeType.ADD_WORD,
-      }),
     });
   });
 });
