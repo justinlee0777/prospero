@@ -1,3 +1,5 @@
+import { merge } from 'lodash-es';
+import CreateElementConfig from '../../../elements/create-element.config';
 import GetPage from '../../../get-page.interface';
 import PageNumberingAlignment from '../../page/page-numbering-alignment.enum';
 import pageSelector from '../../page/page-selector.const';
@@ -13,7 +15,7 @@ interface PageConfig {
   animation: BookAnimation;
   showPageNumbers: boolean;
 
-  styles?: Partial<CSSStyleDeclaration>;
+  elementConfig?: CreateElementConfig;
 }
 
 /**
@@ -21,7 +23,13 @@ interface PageConfig {
  */
 export default function updateHandler(
   book: BookComponent,
-  { get, pagesShown, animation, styles = {}, showPageNumbers }: PageConfig
+  {
+    get,
+    pagesShown,
+    animation,
+    elementConfig = {},
+    showPageNumbers,
+  }: PageConfig
 ): UpdatePage {
   return async (pageNumber: number) => {
     const leftmostPage = pageNumber - (pageNumber % pagesShown);
@@ -62,13 +70,15 @@ export default function updateHandler(
         {
           numbering,
         },
-        {
-          innerHTML: content,
-          styles: {
-            ...styles,
-            left: `${offset * i}%`,
+        merge<CreateElementConfig, CreateElementConfig>(
+          {
+            innerHTML: content,
+            styles: {
+              left: `${offset * i}%`,
+            },
           },
-        }
+          elementConfig
+        )
       );
     });
 

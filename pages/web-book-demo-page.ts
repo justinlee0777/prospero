@@ -1,6 +1,5 @@
 import './book-demo.css';
 
-import { DefaultBookThemeClassName } from '../src/components';
 import DoublePageBookPreset from '../src/components/book/presets/double-page-book-preset.const';
 import SinglePageBookPreset from '../src/components/book/presets/single-page-book-preset.const';
 import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
@@ -38,7 +37,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     },
     {
       createProcessors: () => [new IndentProcessor(5)],
-      bookClassNames: [DefaultBookThemeClassName],
       forHTML: true,
     },
     {

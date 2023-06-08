@@ -1,3 +1,3 @@
-import DefaultBookThemeClassName from './default-book.theme';
+import DefaultBookTheme from './default/default-book.theme';
 
-export { DefaultBookThemeClassName };
+export { DefaultBookTheme };

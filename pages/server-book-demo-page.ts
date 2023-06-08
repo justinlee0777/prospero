@@ -1,7 +1,6 @@
 import './book-demo.css';
 
 import {
-  DefaultBookThemeClassName,
   SinglePageBookAnimation,
   listenToClickEvents,
   listenToKeyboardEvents,
@@ -24,7 +23,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       },
     },
     {
-      classnames: [DefaultBookThemeClassName],
       styles: { margin: 'auto' },
     },
   ]);
@@ -36,7 +34,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       pagesShown: 1,
     },
     {
-      classnames: [DefaultBookThemeClassName],
       styles: { margin: 'auto' },
     },
   ]);

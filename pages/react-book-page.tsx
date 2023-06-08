@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client';
 import {
   BookComponent,
   BooksComponent,
-  DefaultBookThemeClassName,
   SinglePageBookAnimation,
   listenToClickEvents,
   listenToKeyboardEvents,
@@ -33,7 +32,6 @@ function ReactTest(): JSX.Element {
             },
           },
           {
-            classnames: [DefaultBookThemeClassName],
             styles: { margin: 'auto' },
           }
         ),
@@ -45,7 +43,6 @@ function ReactTest(): JSX.Element {
             pagesShown: 1,
           },
           {
-            classnames: [DefaultBookThemeClassName],
             styles: { margin: 'auto' },
           }
         ),

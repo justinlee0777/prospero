@@ -1,4 +1,7 @@
+import { merge } from 'lodash-es';
+import CreateElementConfig from '../../elements/create-element.config';
 import GetPage from '../../get-page.interface';
+import LaminaComponent from '../lamina/lamina.component';
 import BookComponent from './book-element.interface';
 import BookIdentifier from './book.symbol';
 import CreateBookElement from './create-book-element.interface';
@@ -24,6 +27,7 @@ const BookComponent: CreateBookElement = (
     animation,
     listeners,
     showPageNumbers,
+    theme,
   } = bookConfig;
 
   let { currentPage } = bookConfig;
@@ -62,25 +66,40 @@ const BookComponent: CreateBookElement = (
     },
     {
       ...config,
+      classnames: [theme?.className],
       styles: {
         ...(config.styles ?? {}),
         ...bookStyles,
       },
+      children: [LaminaComponent()],
     }
   );
 
   const goToPage = updateHandler(book, {
     get: getPage,
     pagesShown,
-    styles: pageStyles,
+    elementConfig: merge<CreateElementConfig, CreateElementConfig>(
+      {
+        styles: {
+          ...pageStyles,
+        },
+      },
+      {
+        classnames: [theme?.pageClassName],
+      }
+    ),
     animation,
     showPageNumbers,
   });
 
-  const decrement = async () =>
-    (await goToPage(currentPage - pagesShown)) && (currentPage -= pagesShown);
-  const increment = async () =>
-    (await goToPage(currentPage + pagesShown)) && (currentPage += pagesShown);
+  const decrement = async () => {
+    await goToPage(currentPage - pagesShown);
+    currentPage -= pagesShown;
+  };
+  const increment = async () => {
+    await goToPage(currentPage + pagesShown);
+    currentPage += pagesShown;
+  };
 
   destroyCallbacks.push(
     ...listeners.map((listener) => listener(book, [decrement, increment]))

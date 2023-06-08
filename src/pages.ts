@@ -99,7 +99,7 @@ export default class Pages implements IPages {
         endIndex: (index += page.length),
       });
     });
-    console.log(text);
+
     return {
       text,
       pages,
