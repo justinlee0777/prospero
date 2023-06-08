@@ -16,12 +16,12 @@ import PaginatedResponse from './paginated-response.interface';
  *
  * Expected usage:
  * ```
- * const pages = new PagesUsingEndpoint('http://localhost:9292/book-text');
+ * const pages = new ServerPages('http://localhost:9292/book-text');
  * ```
  *
  * TODO: Queue up requests reasonably (ex. load up to 50 pages before and after the current page).
  */
-export default class PagesUsingEndpoint implements IPages {
+export default class ServerPages implements IPages {
   private readonly pageSize = 10;
 
   /**

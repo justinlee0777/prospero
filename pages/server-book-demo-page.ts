@@ -6,14 +6,15 @@ import {
   listenToKeyboardEvents,
   listenToSwipeEvents,
 } from '../src/components';
+import Ariel from '../src/components/ariel/ariel.function';
 import DoublePageBookAnimation from '../src/components/book/animations/double-page-book.animation';
-import connectBook from '../src/components/book/connect-book.function';
 import BooksComponent from '../src/components/books/books.component';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const endpointBase = 'http://127.0.0.1:9292/prospero/texts';
 
-  const desktopBook = await connectBook(`${endpointBase}/ulysses/desktop`, [
+  const desktopBook = await Ariel(
+    `${endpointBase}/ulysses/desktop`,
     {
       animation: new DoublePageBookAnimation(),
       listeners: [listenToClickEvents, listenToKeyboardEvents],
@@ -24,10 +25,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     },
     {
       styles: { margin: 'auto' },
-    },
-  ]);
+    }
+  );
 
-  const mobileBook = await connectBook(`${endpointBase}/ulysses/mobile`, [
+  const mobileBook = await Ariel(
+    `${endpointBase}/ulysses/mobile`,
     {
       animation: new SinglePageBookAnimation(),
       listeners: [listenToClickEvents, listenToSwipeEvents],
@@ -35,8 +37,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     },
     {
       styles: { margin: 'auto' },
-    },
-  ]);
+    }
+  );
 
   const books = BooksComponent({
     children: [mobileBook, desktopBook],

@@ -2,7 +2,7 @@ import PagesBuilder from './pages.builder';
 
 import Pages from './pages';
 
-import PagesUsingEndpoint from './pages-using-endpoint';
+import ServerPages from './server-pages';
 
 export { IndentProcessor, NewlineProcessor } from './processors/public-api';
-export { PagesBuilder, Pages, PagesUsingEndpoint };
+export { PagesBuilder, Pages, ServerPages };
