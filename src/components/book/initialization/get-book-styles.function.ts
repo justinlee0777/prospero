@@ -2,6 +2,10 @@ import ContainerStyle from '../../../container-style.interface';
 import containerStyleToStyleDeclaration from '../../../utils/container-style-to-style-declaration.function';
 import toPixelUnits from '../../../utils/to-pixel-units.function';
 
+/**
+ * @params pagesShown is used to double the book width (so as to fit the pages)
+ * @returns tuple. First element is the book styling, the second is the page styling
+ */
 export default function getBookStyles(
   containerStyles: ContainerStyle,
   userDefinedPageStyles: Partial<CSSStyleDeclaration>,
