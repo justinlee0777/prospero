@@ -16,6 +16,7 @@ module.exports = {
   entry: {
     buildPages: path.resolve(cwd(), './pages/build-pages.ts'),
     uploadPages: path.resolve(cwd(), './pages/upload-pages.ts'),
+    'upload-ulysses': path.resolve(cwd(), './pages/ulysses/upload.ts'),
   },
   output: {
     path: path.resolve(cwd(), './dist'),

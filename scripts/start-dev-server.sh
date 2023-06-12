@@ -9,4 +9,6 @@ chmod +x ./dist/uploadPages.js
 
 # ./dist/uploadPages.js
 
+chmod +x ./dist/upload-ulysses.js
+
 http-server -c-1 ./dist
