@@ -31,11 +31,16 @@
     "prettier-plugin-organize-imports": "^3.2.2",
     "react-dom": "^18.2.0",
     "react-test-renderer": "^18.2.0",
+    "rehype-stringify": "^9.0.3",
+    "remark-gfm": "^3.0.1",
+    "remark-parse": "^10.0.2",
+    "remark-rehype": "^10.1.0",
     "style-loader": "^3.3.2",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.2",
     "typescript": "^5.0.3",
     "typescript-plugin-css-modules": "^5.0.0",
+    "unified": "^10.1.2",
     "webpack": "^5.77.0",
     "webpack-cli": "^5.0.1"
   },
@@ -43,12 +48,7 @@
     "big.js": "^6.2.1",
     "dompurify": "^3.0.3",
     "jsdom": "^22.0.0",
-    "lodash-es": "^4.17.21",
-    "rehype-stringify": "^9.0.3",
-    "remark-gfm": "^3.0.1",
-    "remark-parse": "^10.0.1",
-    "remark-rehype": "^10.1.0",
-    "unified": "^10.1.2"
+    "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
     "canvas": "^2.11.2",
