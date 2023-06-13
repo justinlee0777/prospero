@@ -1,5 +1,3 @@
-import Ariel from './ariel/ariel.function';
-
 import BookComponent from './book/book.component';
 
 import BooksComponent from './books/books.component';
@@ -13,7 +11,6 @@ export * from './book/presets/public-api';
 export * from './book/theming/public-api';
 export * from './listeners/public-api';
 export {
-  Ariel,
   BookComponent,
   BooksComponent,
   FlexibleBookComponent,
