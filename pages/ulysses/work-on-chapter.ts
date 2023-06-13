@@ -1,4 +1,6 @@
 import { readFile } from 'node:fs';
+import { join } from 'node:path';
+import { cwd } from 'node:process';
 
 import { IndentProcessor, Pages } from '../../src/shared';
 import ChapterWorkerData from './chapter-worker-data.interface';
@@ -16,12 +18,20 @@ export default async function workOnChapter({
 
   const processors = [new IndentProcessor(5)];
 
-  const desktop = new Pages(desktopStyles, text, processors, { html: true });
+  const fontLocation = join(cwd(), 'pages/Bookerly-Regular.ttf');
 
-  const mobile = new Pages(mobileStyles, text, processors, { html: true });
+  const desktop = new Pages(desktopStyles, text, processors, {
+    html: true,
+    fontLocation,
+  }).getDataAsIndices();
+
+  const mobile = new Pages(mobileStyles, text, processors, {
+    html: true,
+    fontLocation,
+  }).getDataAsIndices();
 
   return {
-    mobile: mobile.getDataAsIndices(),
-    desktop: desktop.getDataAsIndices(),
+    mobile,
+    desktop,
   };
 }

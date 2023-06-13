@@ -11,6 +11,11 @@ import DoublePageBookAnimation from '../src/components/book/animations/double-pa
 import BooksComponent from '../src/components/books/books.component';
 
 window.addEventListener('DOMContentLoaded', async () => {
+  const fontUrl = 'http://127.0.0.1:8080/Bookerly-Regular.ttf';
+  const fontFace = new FontFace('Bookerly', `url(${fontUrl})`);
+
+  document.fonts.add(fontFace);
+
   const endpointBase = 'http://127.0.0.1:9292/prospero/texts';
 
   const desktopBook = await Ariel(

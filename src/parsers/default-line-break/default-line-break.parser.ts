@@ -1,6 +1,6 @@
 import Big from 'big.js';
 
-import { dash, newline, punctuation, whitespace } from '../../glyphs.const';
+import { dash, newline, whitespace } from '../../glyphs.const';
 import Processor from '../../processors/models/processor.interface';
 import WordWidthCalculator from '../../word-width.calculator';
 import CalculateWordWidth from '../builders/calculate-word-width.interface';
@@ -59,10 +59,6 @@ export default class DefaultLineBreakParser implements Parser {
   constructor(protected config: CreateTextParserConfig) {
     this.debug = config;
 
-    const escapedPunctuation = [...punctuation]
-      .map((glyph) => `\\${glyph}`)
-      .join('');
-
     /**
      * <token> = <punctuatedWord> | <whitespace> | <newline>
      * <punctuatedWord> = <punctuation> <word> <punctuation>
@@ -71,9 +67,9 @@ export default class DefaultLineBreakParser implements Parser {
      * <whitespace> = " -"
      * <newline> = "\n"
      */
-    const characterExpression = `[A-Za-z0-9${escapedPunctuation}]+`;
     const whitespaceExpression = `${whitespace}|${dash}`;
     const newlineExpression = newline;
+    const characterExpression = `[^${whitespace}\\${dash}${newline}]+`;
     const expressions = [
       `(?<word>${characterExpression})`,
       `(?<whitespace>${whitespaceExpression})`,
@@ -187,7 +183,7 @@ export default class DefaultLineBreakParser implements Parser {
     text: string,
     calculateWordWidth: CalculateWordWidth
   ): WordDescription {
-    const wordWidth = Big(calculateWordWidth(text)).round(2, 0);
+    const wordWidth = Big(calculateWordWidth(text)).round(2, 3);
 
     return {
       isNewline,

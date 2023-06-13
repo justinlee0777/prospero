@@ -9,7 +9,6 @@ const parseEnd: (state: ParserState) => ParserState = (state) => {
     page: '',
     // Cut the current text and begin on a newline.
     lines: [],
-    pageChanges: [],
     line: 0,
     lineWidth: Big(0),
     lineText: '',

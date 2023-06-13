@@ -106,6 +106,7 @@ module.exports = {
           from: './text-samples',
           to: 'text-samples',
         },
+        'pages/Bookerly-Regular.ttf',
         'README.md',
       ],
     }),

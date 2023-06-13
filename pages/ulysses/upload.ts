@@ -29,11 +29,13 @@ const chapters = [
 const mobileStyles: ContainerStyle = {
   ...containerStyles,
   computedFontSize: '12px',
+  computedFontFamily: 'Bookerly',
 };
 
 const desktopStyles: ContainerStyle = {
   ...containerStyles,
   computedFontSize: '16px',
+  computedFontFamily: 'Bookerly',
 };
 
 const responses = await Promise.all(
