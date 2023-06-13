@@ -31,13 +31,13 @@ jest.mock('../../word-width.calculator', () => {
   };
 });
 
-import Processor from '../../processors/models/processor.interface';
+import Transformer from '../../transformers/models/transformer.interface';
 import Parser from '../models/parser.interface';
 import ParserBuilder from './parser.builder';
 
 describe('ParserBuilder', () => {
-  class MockProcessor implements Processor {
-    configure = jest.fn();
+  class MockTransformer implements Transformer {
+    transform = jest.fn();
   }
 
   let containerStyle;
@@ -59,7 +59,7 @@ describe('ParserBuilder', () => {
   });
 
   test('should build a parser with processors', () => {
-    const processor = new MockProcessor();
+    const processor = new MockTransformer();
 
     expect(
       new ParserBuilder()
@@ -67,8 +67,6 @@ describe('ParserBuilder', () => {
         .setProcessors([processor])
         .build()
     ).toBe(mockParser);
-
-    expect(processor.configure).toHaveBeenCalledTimes(1);
 
     expect(new ParserBuilder().fromContainerStyle(containerStyle).build()).toBe(
       mockParser

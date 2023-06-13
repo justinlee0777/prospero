@@ -5,5 +5,5 @@ import IPages from './pages.interface';
 import PaginatedResponse from './paginated-response.interface';
 
 export * from './components/types';
-export * from './processors/types';
+export * from './transformers/types';
 export { ContainerStyle, GetPage, PagesOutput, IPages, PaginatedResponse };

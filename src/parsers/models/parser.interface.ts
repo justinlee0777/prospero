@@ -1,4 +1,4 @@
-import Processor from '../../processors/models/processor.interface';
+import Processor from '../../transformers/models/transformer.interface';
 import WordWidthCalculator from '../../word-width.calculator';
 import ParserState from './parser-state.interface';
 

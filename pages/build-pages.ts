@@ -16,7 +16,7 @@ const pagesBuilder = new PagesBuilder()
   .setPadding(containerStyles.padding)
   .setBorder(containerStyles.border)
   .setText(text)
-  .setProcessors(processors)
+  .setTransformers(processors)
   .addSize(375, 667);
 
 const [desktop] = pagesBuilder

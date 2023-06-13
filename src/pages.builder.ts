@@ -1,6 +1,6 @@
 import ContainerStyle from './container-style.interface';
 import Pages from './pages';
-import Processor from './processors/models/processor.interface';
+import Transformer from './transformers/models/transformer.interface';
 
 const setFontMethod = 'setFont';
 const setLineHeightMethod = 'setLineHeight';
@@ -51,7 +51,7 @@ export default class PagesBuilder {
 
   private text: string;
 
-  private processors: Array<Processor> = [];
+  private transformers: Array<Transformer> = [];
 
   private sizes: Array<Pick<ContainerStyle, 'width' | 'height'>> = [];
 
@@ -99,8 +99,8 @@ export default class PagesBuilder {
     return this;
   }
 
-  setProcessors(processors: Array<Processor>): PagesBuilder {
-    this.processors = processors;
+  setTransformers(transformers: Array<Transformer>): PagesBuilder {
+    this.transformers = transformers;
 
     return this;
   }
@@ -136,7 +136,7 @@ export default class PagesBuilder {
           ...this.box,
         },
         this.text,
-        this.processors,
+        this.transformers,
         { fontLocation: this.fontLocation, html }
       );
     });

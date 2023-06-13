@@ -1,7 +1,7 @@
 import Big from 'big.js';
 
 import { dash, newline, whitespace } from '../../glyphs.const';
-import Processor from '../../processors/models/processor.interface';
+import Transformer from '../../transformers/models/transformer.interface';
 import WordWidthCalculator from '../../word-width.calculator';
 import CalculateWordWidth from '../builders/calculate-word-width.interface';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
@@ -49,7 +49,7 @@ export default class DefaultLineBreakParser implements Parser {
   protected parseEnd = parseEnd;
 
   protected calculator: WordWidthCalculator;
-  protected processors: Array<Processor> = [];
+  protected transformers: Array<Transformer> = [];
 
   /**
    * Line height for the whole book, given the font size configured.
@@ -87,12 +87,12 @@ export default class DefaultLineBreakParser implements Parser {
     this.bookLineHeight = Big(this.calculator.getCalculatedLineHeight());
   }
 
-  setProcessors(processors: Processor[]): void {
-    this.processors = processors;
+  setProcessors(transformers: Array<Transformer>): void {
+    this.transformers = transformers;
   }
 
   *generateParserStates(text: string): Generator<ParserState> {
-    text = this.preprocessText(text);
+    text = this.transformText(text);
 
     const tokens = text.matchAll(this.tokenExpression);
     const calculateWordWidth = (word) => this.calculator.calculate(word);
@@ -118,12 +118,10 @@ export default class DefaultLineBreakParser implements Parser {
 
       parserState = this.parsePageOverflow(parserState);
 
-      parserState = this.postprocessParserState(parserState);
       yield parserState;
     }
 
     parserState = this.parseEnd(parserState);
-    parserState = this.postprocessParserState(parserState);
 
     yield parserState;
   }
@@ -145,23 +143,15 @@ export default class DefaultLineBreakParser implements Parser {
     }
   }
 
-  protected preprocessText(text: string): string {
-    return this.processors.reduce(
-      (newText, processor) => processor.preprocess?.(newText) ?? newText,
+  protected transformText(text: string): string {
+    return this.transformers.reduce(
+      (newText, transformer) => transformer.transform(newText),
       text
     );
   }
 
-  protected postprocessParserState(parserState: ParserState): ParserState {
-    return this.processors.reduce(
-      (newParserState, processor) =>
-        processor.process?.(newParserState) ?? newParserState,
-      parserState
-    );
-  }
-
   protected initializeParserState(): ParserState {
-    const parserState: ParserState = {
+    return {
       pages: [],
       textIndex: 0,
 
@@ -172,8 +162,6 @@ export default class DefaultLineBreakParser implements Parser {
       lineHeight: this.bookLineHeight,
       lineText: '',
     };
-
-    return this.postprocessParserState(parserState);
   }
 
   protected getWordDescription(

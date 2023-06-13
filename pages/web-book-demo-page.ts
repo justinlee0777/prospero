@@ -3,10 +3,10 @@ import './book-demo.css';
 import DoublePageBookPreset from '../src/components/book/presets/double-page-book-preset.const';
 import SinglePageBookPreset from '../src/components/book/presets/single-page-book-preset.const';
 import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
-import { IndentProcessor } from '../src/processors/public-api';
+import { NewlineTransformer } from '../src/transformers/public-api';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/proteus.txt');
+  const response = await fetch('../text-samples/ulysses/proteus.txt');
   const text = await response.text();
 
   const container = document.body;
@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       ],
     },
     {
-      createProcessors: () => [new IndentProcessor(5)],
+      transformers: [new NewlineTransformer()],
       forHTML: true,
     },
     {

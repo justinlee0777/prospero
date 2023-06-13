@@ -7,7 +7,7 @@ jest.mock(
 );
 
 import PagesBuilder from './pages.builder';
-import Processor from './processors/models/processor.interface';
+import Transformer from './transformers/models/transformer.interface';
 
 describe('PagesBuilder', () => {
   test('builds pages for various screen sizes', () => {
@@ -188,14 +188,18 @@ describe('PagesBuilder', () => {
   });
 
   test('sets processors', () => {
-    const mockProcessor1: Processor = {};
-    const mockProcessor2: Processor = {};
+    const mockTransformer1: Transformer = {
+      transform: (foo) => foo,
+    };
+    const mockTransformer2: Transformer = {
+      transform: (bar) => bar,
+    };
 
     const pages = new PagesBuilder()
       .setText('Foo\nBar\nBaz\n')
       .setFont('16px', 'Arial')
       .setLineHeight(24)
-      .setProcessors([mockProcessor1, mockProcessor2])
+      .setTransformers([mockTransformer1, mockTransformer2])
       .addSize(393, 851)
       .build();
 
@@ -234,7 +238,7 @@ describe('PagesBuilder', () => {
         },
       },
       text: 'Foo\nBar\nBaz\n',
-      processors: [mockProcessor1, mockProcessor2],
+      processors: [mockTransformer1, mockTransformer2],
     });
   });
 

@@ -21,7 +21,7 @@ import normalizeContainerStyle from './normalize-container-style.function';
  */
 const FlexibleBookComponent: CreateFlexibleBookElement = (
   requiredArgs,
-  { fontLocation, createProcessors, bookClassNames, forHTML } = {},
+  { fontLocation, transformers, bookClassNames, forHTML } = {},
   elementConfig = {}
 ) => {
   const { containerStyle, text } = requiredArgs;
@@ -73,8 +73,6 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
       mediaQueryList.find((mediaQuery) => mediaQuery.matches)?.config ??
       fallback;
 
-    const processors = createProcessors?.() ?? [];
-
     const [pages] = new PagesBuilder()
       .setFont(
         normalizedContainerStyle.computedFontSize,
@@ -85,7 +83,7 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
       .setMargin(normalizedContainerStyle.margin)
       .setPadding(normalizedContainerStyle.padding)
       .setBorder(normalizedContainerStyle.border)
-      .setProcessors(processors)
+      .setTransformers(transformers)
       .setText(text)
       .addSize(width / (bookConfig.pagesShown ?? 1), height)
       .build({ html: forHTML });

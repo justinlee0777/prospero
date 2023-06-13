@@ -4,7 +4,7 @@ import PagesAsIndicesOutput from './pages-as-indices-output.interface';
 import PagesOutput from './pages-output.interface';
 import IPages from './pages.interface';
 import ParserBuilder from './parsers/builders/parser.builder';
-import Processor from './processors/models/processor.interface';
+import Processor from './transformers/models/transformer.interface';
 
 export default class Pages implements IPages {
   private pageGenerator: Generator<string>;

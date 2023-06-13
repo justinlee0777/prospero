@@ -2,6 +2,7 @@ import Big from 'big.js';
 
 import createHTMLRegex from '../../regexp/html.regexp';
 import HTMLSanitizer from '../../sanitizers/html/html.sanitizer';
+import HTMLTransformer from '../../transformers/html/html.transformer';
 import BigUtils from '../../utils/big';
 import DefaultLineBreakParser from '../default-line-break/default-line-break.parser';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
@@ -10,7 +11,6 @@ import Word from '../models/word.interface';
 import pageOverflowParser from '../word-parsers/page-overflow.parser';
 import extractStyles from './extract-styles.function';
 import { FontStyles } from './font-styles.interface';
-import HTMLTransformer from './html.transformer';
 
 export default class HTMLParser extends DefaultLineBreakParser {
   /**
@@ -37,7 +37,7 @@ export default class HTMLParser extends DefaultLineBreakParser {
   }
 
   *generateParserStates(text: string): Generator<ParserState> {
-    text = this.preprocessText(text);
+    text = this.transformText(text);
 
     // transform incompatible HTML tags into compatible ones using styling to match original behavior.
     text = new HTMLTransformer({
@@ -153,8 +153,6 @@ export default class HTMLParser extends DefaultLineBreakParser {
 
       parserState = this.parsePageOverflow(parserState);
 
-      parserState = this.postprocessParserState(parserState);
-
       if (this.shouldCloseTag()) {
         // If there is no remaining text content left, remove the tag context and reset the calculator.
         this.tag = null;
@@ -166,7 +164,6 @@ export default class HTMLParser extends DefaultLineBreakParser {
     }
 
     parserState = this.parseEnd(parserState);
-    parserState = this.postprocessParserState(parserState);
 
     yield parserState;
   }

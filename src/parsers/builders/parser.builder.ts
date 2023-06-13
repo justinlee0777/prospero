@@ -1,5 +1,5 @@
 import ContainerStyle from '../../container-style.interface';
-import Processor from '../../processors/models/processor.interface';
+import Transformer from '../../transformers/models/transformer.interface';
 import Optional from '../../utils/optional.type';
 import toPixelUnits from '../../utils/to-pixel-units.function';
 import WordWidthCalculator from '../../word-width.calculator';
@@ -17,7 +17,7 @@ export default class ParserBuilder {
 
   private containerStyle: ContainerStyle;
 
-  private processors: Array<Processor> = [];
+  private transformers: Array<Transformer> = [];
 
   private fontLocation: string;
 
@@ -45,8 +45,8 @@ export default class ParserBuilder {
   /**
    * Set processors on the building parser.
    */
-  setProcessors(processors: Array<Processor>): ParserBuilder {
-    this.processors = processors;
+  setProcessors(transformers: Array<Transformer>): ParserBuilder {
+    this.transformers = transformers;
 
     return this;
   }
@@ -112,16 +112,7 @@ export default class ParserBuilder {
 
     parser.setCalculator(calculator);
 
-    const { processors } = this;
-
-    processors.forEach((processor) =>
-      processor.configure?.({
-        calculator,
-        pageHeight: containerHeight,
-      })
-    );
-
-    parser.setProcessors(processors);
+    parser.setProcessors(this.transformers);
 
     return parser;
   }
