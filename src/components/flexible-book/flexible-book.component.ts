@@ -1,7 +1,7 @@
 import CreateElementConfig from '../../elements/create-element.config';
 import div from '../../elements/div.function';
 import PageStyles from '../../page-styles.interface';
-import PagesBuilder from '../../pages.builder';
+import Pages from '../../pages';
 import merge from '../../utils/merge.function';
 import normalizePageStyles from '../../utils/normalize-page-styles.function';
 import BookConfig from '../book/book-config.interface';
@@ -74,20 +74,16 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
       mediaQueryList.find((mediaQuery) => mediaQuery.matches)?.config ??
       fallback;
 
-    const [pages] = new PagesBuilder()
-      .setFont(
-        normalizedPageStyles.computedFontSize,
-        normalizedPageStyles.computedFontFamily,
-        fontLocation
-      )
-      .setLineHeight(normalizedPageStyles.lineHeight)
-      .setMargin(normalizedPageStyles.margin)
-      .setPadding(normalizedPageStyles.padding)
-      .setBorder(normalizedPageStyles.border)
-      .setTransformers(transformers)
-      .setText(text)
-      .addSize(width / (bookConfig.pagesShown ?? 1), height)
-      .build({ html: forHTML });
+    const pages = new Pages(
+      {
+        ...normalizedPageStyles,
+        width: width / (bookConfig.pagesShown ?? 1),
+        height,
+      },
+      text,
+      transformers,
+      { fontLocation, html: forHTML }
+    );
 
     bookElement = BookComponent(pages.getData(), bookConfig, {
       classnames: bookClassNames,

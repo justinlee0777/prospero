@@ -22,7 +22,7 @@ import { readFile } from 'fs';
 import path from 'path';
 import { cwd } from 'process';
 
-import { IndentTransformer, PagesBuilder } from './server';
+import { IndentTransformer, Pages } from './server';
 
 /*
  * Contract testing.
@@ -37,13 +37,17 @@ describe('server entrypoint', () => {
       )
     );
 
-    const [pages] = new PagesBuilder()
-      .setFont('16px', 'Arial')
-      .setLineHeight(24)
-      .setText(text)
-      .setTransformers([new IndentTransformer(5)])
-      .addSize(375, 667)
-      .build();
+    const pages = new Pages(
+      {
+        computedFontFamily: 'Arial',
+        computedFontSize: '16px',
+        lineHeight: 24,
+        width: 375,
+        height: 667,
+      },
+      text,
+      [new IndentTransformer(5)]
+    );
 
     expect(pages).toBeTruthy();
     expect('get' in pages).toBe(true);
