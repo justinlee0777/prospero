@@ -20,11 +20,11 @@ export default async function Ariel(
 ): Promise<BookElement> {
   const pages = new ServerPages(endpoint);
 
-  const containerStyles = await pages.getContainerStyle();
+  const pageStyles = await pages.getPageStyles();
 
   return BookComponent(
     {
-      containerStyles,
+      pageStyles,
       getPage: (pageNumber) => pages.get(pageNumber),
     },
     ...(bookArgs ?? [])

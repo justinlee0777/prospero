@@ -1,5 +1,5 @@
-import ContainerStyle from './container-style.interface';
 import GetPage from './get-page.interface';
+import PageStyles from './page-styles.interface';
 import PagesAsIndicesOutput from './pages-as-indices-output.interface';
 import PagesOutput from './pages-output.interface';
 import IPages from './pages.interface';
@@ -13,12 +13,12 @@ export default class Pages implements IPages {
   private lastGeneratorResult: IteratorResult<string> | undefined;
 
   constructor(
-    private containerStyle: ContainerStyle,
+    private pageStyles: PageStyles,
     text: string,
     processors?: Array<Processor>,
     { fontLocation, html }: { fontLocation?: string; html?: boolean } = {}
   ) {
-    let parserBuilder = new ParserBuilder().fromContainerStyle(containerStyle);
+    let parserBuilder = new ParserBuilder().fromPageStyles(pageStyles);
 
     if (processors) {
       parserBuilder = parserBuilder.setProcessors(processors);
@@ -65,8 +65,8 @@ export default class Pages implements IPages {
     }
   };
 
-  getContainerStyle(): ContainerStyle {
-    return this.containerStyle;
+  getPageStyles(): PageStyles {
+    return this.pageStyles;
   }
 
   getAll(): Array<string> {
@@ -80,7 +80,7 @@ export default class Pages implements IPages {
   getData(): PagesOutput {
     return {
       pages: this.getAll(),
-      containerStyles: this.containerStyle,
+      pageStyles: this.pageStyles,
     };
   }
 
@@ -103,7 +103,7 @@ export default class Pages implements IPages {
     return {
       text,
       pages,
-      containerStyles: this.containerStyle,
+      pageStyles: this.pageStyles,
     };
   }
 }

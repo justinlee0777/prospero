@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const text = await response.text();
 
   const parser = new ParserBuilder()
-    .fromContainerStyle(containerStyles)
+    .fromPageStyles(containerStyles)
     .setProcessors(processors)
     .build();
 

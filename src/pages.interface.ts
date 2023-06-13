@@ -1,5 +1,5 @@
-import ContainerStyle from './container-style.interface';
 import GetPage from './get-page.interface';
+import PageStyles from './page-styles.interface';
 import PagesAsIndicesOutput from './pages-as-indices-output.interface';
 import PagesOutput from './pages-output.interface';
 
@@ -9,7 +9,7 @@ import PagesOutput from './pages-output.interface';
 export default interface IPages {
   get: GetPage;
 
-  getContainerStyle(): ContainerStyle | Promise<ContainerStyle>;
+  getPageStyles(): PageStyles | Promise<PageStyles>;
 
   getAll(): Array<string> | Promise<Array<string>>;
 

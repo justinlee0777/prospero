@@ -24,7 +24,7 @@ describe('useBook', () => {
         }
 
         const component = FlexibleBookComponent({
-          containerStyle: {
+          pageStyles: {
             lineHeight: 32,
             computedFontSize: '16px',
             computedFontFamily: 'Arial',

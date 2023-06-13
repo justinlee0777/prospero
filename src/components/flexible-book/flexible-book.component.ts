@@ -1,7 +1,9 @@
 import CreateElementConfig from '../../elements/create-element.config';
 import div from '../../elements/div.function';
+import PageStyles from '../../page-styles.interface';
 import PagesBuilder from '../../pages.builder';
 import merge from '../../utils/merge.function';
+import normalizePageStyles from '../../utils/normalize-page-styles.function';
 import BookConfig from '../book/book-config.interface';
 import BookElement from '../book/book-element.interface';
 import BookComponent from '../book/book.component';
@@ -11,7 +13,6 @@ import CreateFlexibleBookElement from './create-flexible-book-element.interface'
 import FlexibleBookElement from './flexible-book-element.interface';
 import FlexibleBookMediaQuery from './flexible-book-media-query.interface';
 import FlexibleBookIdentifier from './flexible-book.symbol';
-import normalizeContainerStyle from './normalize-container-style.function';
 
 /**
  * A magic book that stretches to the edges of the screen. This is perfect for short articles/essays (~2500 words).
@@ -24,9 +25,9 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
   { fontLocation, transformers, bookClassNames, forHTML } = {},
   elementConfig = {}
 ) => {
-  const { containerStyle, text } = requiredArgs;
+  const { pageStyles, text } = requiredArgs;
 
-  const normalizedContainerStyle = normalizeContainerStyle(containerStyle);
+  const normalizedPageStyles = normalizePageStyles(pageStyles as PageStyles);
 
   let fallback: BookConfig;
   let mediaQueryList: Array<FlexibleBookMediaQuery & { matches: boolean }> = [];
@@ -75,14 +76,14 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
 
     const [pages] = new PagesBuilder()
       .setFont(
-        normalizedContainerStyle.computedFontSize,
-        normalizedContainerStyle.computedFontFamily,
+        normalizedPageStyles.computedFontSize,
+        normalizedPageStyles.computedFontFamily,
         fontLocation
       )
-      .setLineHeight(normalizedContainerStyle.lineHeight)
-      .setMargin(normalizedContainerStyle.margin)
-      .setPadding(normalizedContainerStyle.padding)
-      .setBorder(normalizedContainerStyle.border)
+      .setLineHeight(normalizedPageStyles.lineHeight)
+      .setMargin(normalizedPageStyles.margin)
+      .setPadding(normalizedPageStyles.padding)
+      .setBorder(normalizedPageStyles.border)
       .setTransformers(transformers)
       .setText(text)
       .addSize(width / (bookConfig.pagesShown ?? 1), height)

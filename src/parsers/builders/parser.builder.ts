@@ -1,4 +1,4 @@
-import ContainerStyle from '../../container-style.interface';
+import PageStyles from '../../page-styles.interface';
 import Transformer from '../../transformers/models/transformer.interface';
 import Optional from '../../utils/optional.type';
 import toPixelUnits from '../../utils/to-pixel-units.function';
@@ -7,15 +7,15 @@ import CreateTextParserConfig from '../models/create-text-parser-config.interfac
 import Parser from '../models/parser.interface';
 import ParserFactory from '../parser.factory';
 
-const fromContainerStyle = 'fromContainerStyle';
+const fromPageStyles = 'fromPageStyles';
 
 export default class ParserBuilder {
-  static entrypoints = [fromContainerStyle];
+  static entrypoints = [fromPageStyles];
 
   private ParserConstructor: (config: CreateTextParserConfig) => Parser =
     ParserFactory.create;
 
-  private containerStyle: ContainerStyle;
+  private containerStyle: PageStyles;
 
   private transformers: Array<Transformer> = [];
 
@@ -24,8 +24,8 @@ export default class ParserBuilder {
   /**
    * Use ContainerStyle to initialize much of what you need for a parser.
    */
-  [fromContainerStyle](
-    containerStyle: Optional<ContainerStyle, 'padding' | 'margin' | 'border'>
+  [fromPageStyles](
+    containerStyle: Optional<PageStyles, 'padding' | 'margin' | 'border'>
   ): ParserBuilder {
     this.containerStyle = {
       ...containerStyle,

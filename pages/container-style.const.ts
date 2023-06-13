@@ -1,6 +1,6 @@
-import ContainerStyle from '../src/container-style.interface';
+import PageStyles from '../src/page-styles.interface';
 
-const containerStyles: ContainerStyle = {
+const containerStyles: PageStyles = {
   width: 375,
   height: 667,
   computedFontFamily: 'Arial',

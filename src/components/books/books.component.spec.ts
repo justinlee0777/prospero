@@ -19,7 +19,7 @@ import BooksComponent from './books.component';
 describe('BooksComponent', () => {
   const pagesOutput: PagesOutput = {
     pages: ['Foo', 'Bar', 'Baz'],
-    containerStyles: {
+    pageStyles: {
       width: 375,
       height: 667,
       computedFontFamily: 'Arial',

@@ -3,6 +3,7 @@ import styles from './book.module.css';
 import CreateElementConfig from '../../elements/create-element.config';
 import GetPage from '../../get-page.interface';
 import merge from '../../utils/merge.function';
+import normalizePageStyles from '../../utils/normalize-page-styles.function';
 import NullaryFn from '../../utils/nullary-fn.type';
 import LaminaComponent from '../lamina/lamina.component';
 import LoadingIconComponent from '../loading-icon/loading-icon.component';
@@ -36,7 +37,8 @@ const BookComponent: CreateBookElement = (
 
   let { currentPage } = bookConfig;
 
-  const { containerStyles } = args;
+  let { pageStyles } = args;
+  pageStyles = normalizePageStyles(pageStyles);
   let getPage: GetPage;
 
   if ('pages' in args) {
@@ -51,8 +53,8 @@ const BookComponent: CreateBookElement = (
     getPage = args.getPage;
   }
 
-  const [bookStyles, pageStyles] = getBookStyles(
-    containerStyles,
+  const [bookStyles, calculatedPageStyles] = getBookStyles(
+    pageStyles,
     userDefinedPageStyles,
     pagesShown
   );
@@ -87,7 +89,7 @@ const BookComponent: CreateBookElement = (
     elementConfig: merge<CreateElementConfig>(
       {
         styles: {
-          ...pageStyles,
+          ...calculatedPageStyles,
         },
       },
       {

@@ -10,7 +10,7 @@ describe('BookComponent updateHandler()', () => {
 
   const pagesOutput: PagesOutput = {
     pages,
-    containerStyles: {
+    pageStyles: {
       width: 400,
       height: 600,
       computedFontFamily: 'Arial',

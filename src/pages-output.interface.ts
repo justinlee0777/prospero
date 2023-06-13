@@ -1,6 +1,6 @@
-import ContainerStyle from './container-style.interface';
+import PageStyles from './page-styles.interface';
 
 export default interface PagesOutput {
   pages: Array<string>;
-  containerStyles: ContainerStyle;
+  pageStyles: PageStyles;
 }

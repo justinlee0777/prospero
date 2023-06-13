@@ -1,7 +1,7 @@
-import ContainerStyle from '../../src/container-style.interface';
+import PageStyles from '../../src/page-styles.interface';
 
 export default interface ChapterWorkerData {
-  mobileStyles: ContainerStyle;
-  desktopStyles: ContainerStyle;
+  mobileStyles: PageStyles;
+  desktopStyles: PageStyles;
   filename: string;
 }

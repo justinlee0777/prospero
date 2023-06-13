@@ -1,6 +1,6 @@
 import { resolve } from 'path';
 
-import ContainerStyle from '../../src/container-style.interface';
+import PageStyles from '../../src/page-styles.interface';
 import PagesAsIndicesOutput from '../../src/pages-as-indices-output.interface';
 import containerStyles from '../container-style.const';
 import workOnChapter from './work-on-chapter';
@@ -26,13 +26,13 @@ const chapters = [
   'penelope',
 ];
 
-const mobileStyles: ContainerStyle = {
+const mobileStyles: PageStyles = {
   ...containerStyles,
   computedFontSize: '12px',
   computedFontFamily: 'Bookerly',
 };
 
-const desktopStyles: ContainerStyle = {
+const desktopStyles: PageStyles = {
   ...containerStyles,
   computedFontSize: '16px',
   computedFontFamily: 'Bookerly',
@@ -92,13 +92,13 @@ responses.forEach((response) => {
 
 const mobilePages: PagesAsIndicesOutput = {
   pages: mobile,
-  containerStyles: mobileStyles,
+  pageStyles: mobileStyles,
   text: compiledText,
 };
 
 const desktopPages: PagesAsIndicesOutput = {
   pages: desktop,
-  containerStyles: desktopStyles,
+  pageStyles: desktopStyles,
   text: compiledText,
 };
 

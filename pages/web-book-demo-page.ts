@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const flexibleBook = FlexibleBookComponent(
     {
       text,
-      containerStyle: {
+      pageStyles: {
         computedFontFamily: 'Arial',
         computedFontSize: '16px',
         lineHeight: 32,

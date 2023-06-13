@@ -1,8 +1,8 @@
-import ContainerStyle from './container-style.interface';
+import PageStyles from './page-styles.interface';
 
 export default interface PaginatedResponse {
   value: {
-    containerStyles: ContainerStyle;
+    pageStyles: PageStyles;
     content: Array<string>;
   };
   page: {

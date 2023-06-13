@@ -1,11 +1,11 @@
-import ContainerStyle from './container-style.interface';
+import PageStyles from './page-styles.interface';
 
 export default interface PagesAsIndicesOutput {
   /**
    * This is the transformed text, not the the original.
    */
   text: string;
-  containerStyles: ContainerStyle;
+  pageStyles: PageStyles;
   pages: Array<{
     beginIndex: number;
     /** Exclusive. */

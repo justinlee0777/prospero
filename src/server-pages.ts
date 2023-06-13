@@ -1,5 +1,5 @@
-import ContainerStyle from './container-style.interface';
 import GetPage from './get-page.interface';
+import PageStyles from './page-styles.interface';
 import PagesAsIndicesOutput from './pages-as-indices-output.interface';
 import PagesOutput from './pages-output.interface';
 import IPages from './pages.interface';
@@ -34,7 +34,7 @@ export default class ServerPages implements IPages {
 
   private pages: Array<string> | undefined;
 
-  private cachedContainerStyle: ContainerStyle | undefined;
+  private cachedPageStyles: PageStyles | undefined;
 
   private initialization: Promise<void>;
 
@@ -73,9 +73,9 @@ export default class ServerPages implements IPages {
     return pages[pageNumber];
   };
 
-  async getContainerStyle(): Promise<ContainerStyle> {
+  async getPageStyles(): Promise<PageStyles> {
     await this.initialization;
-    return this.cachedContainerStyle;
+    return this.cachedPageStyles;
   }
 
   /**
@@ -111,7 +111,7 @@ export default class ServerPages implements IPages {
   async getData(): Promise<PagesOutput> {
     const pages = await this.getAll();
 
-    return { pages, containerStyles: this.cachedContainerStyle };
+    return { pages, pageStyles: this.cachedPageStyles };
   }
 
   async getDataAsIndices(): Promise<PagesAsIndicesOutput> {
@@ -134,7 +134,7 @@ export default class ServerPages implements IPages {
     return {
       text,
       pages,
-      containerStyles: await this.getContainerStyle(),
+      pageStyles: await this.getPageStyles(),
     };
   }
 
@@ -164,6 +164,6 @@ export default class ServerPages implements IPages {
     const { value, page } = await this.fetch(1, 1);
 
     this.pages = Array(page.totalSize);
-    this.cachedContainerStyle = value.containerStyles;
+    this.cachedPageStyles = value.pageStyles;
   }
 }

@@ -1,5 +1,5 @@
-import ContainerStyle from '../../../container-style.interface';
-import containerStyleToStyleDeclaration from '../../../utils/container-style-to-style-declaration.function';
+import PageStyles from '../../../page-styles.interface';
+import pageStylesToStyleDeclaration from '../../../utils/container-style-to-style-declaration.function';
 import toPixelUnits from '../../../utils/to-pixel-units.function';
 
 /**
@@ -7,15 +7,15 @@ import toPixelUnits from '../../../utils/to-pixel-units.function';
  * @returns tuple. First element is the book styling, the second is the page styling
  */
 export default function getBookStyles(
-  containerStyles: ContainerStyle,
+  pageStyles: PageStyles,
   userDefinedPageStyles: Partial<CSSStyleDeclaration>,
   pagesShown: number
 ): [Partial<CSSStyleDeclaration>, Partial<CSSStyleDeclaration>] {
   let bookStyles: Partial<CSSStyleDeclaration>;
-  let pageStyles: Partial<CSSStyleDeclaration>;
+  let calculatedPageStyles: Partial<CSSStyleDeclaration>;
 
-  if (containerStyles) {
-    const styles = containerStyleToStyleDeclaration(containerStyles);
+  if (pageStyles) {
+    const styles = pageStylesToStyleDeclaration(pageStyles);
 
     const bookWidth = `${toPixelUnits(styles.width) * pagesShown}px`;
     const pageWidth = styles.width;
@@ -32,7 +32,7 @@ export default function getBookStyles(
       borderLeftWidth: styles.borderLeftWidth,
     };
 
-    pageStyles = {
+    calculatedPageStyles = {
       ...userDefinedPageStyles,
       width: pageWidth,
       paddingTop: styles.paddingTop,
@@ -46,5 +46,5 @@ export default function getBookStyles(
     };
   }
 
-  return [bookStyles, pageStyles];
+  return [bookStyles, calculatedPageStyles];
 }

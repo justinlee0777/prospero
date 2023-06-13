@@ -53,7 +53,7 @@ describe('ParserBuilder', () => {
   });
 
   test('should build a parser', () => {
-    expect(new ParserBuilder().fromContainerStyle(containerStyle).build()).toBe(
+    expect(new ParserBuilder().fromPageStyles(containerStyle).build()).toBe(
       mockParser
     );
   });
@@ -63,12 +63,12 @@ describe('ParserBuilder', () => {
 
     expect(
       new ParserBuilder()
-        .fromContainerStyle(containerStyle)
+        .fromPageStyles(containerStyle)
         .setProcessors([processor])
         .build()
     ).toBe(mockParser);
 
-    expect(new ParserBuilder().fromContainerStyle(containerStyle).build()).toBe(
+    expect(new ParserBuilder().fromPageStyles(containerStyle).build()).toBe(
       mockParser
     );
   });
@@ -81,7 +81,7 @@ describe('ParserBuilder', () => {
 
     expect(
       new ParserBuilder()
-        .fromContainerStyle(containerStyle)
+        .fromPageStyles(containerStyle)
         .setFontLocation('/Bookerly.tiff')
         .build()
     ).toBe(mockParser);
@@ -94,14 +94,14 @@ describe('ParserBuilder', () => {
       '/Bookerly.tiff'
     );
 
-    expect(new ParserBuilder().fromContainerStyle(containerStyle).build()).toBe(
+    expect(new ParserBuilder().fromPageStyles(containerStyle).build()).toBe(
       mockParser
     );
   });
 
   test('should build a parser for HTML', () => {
     expect(
-      new ParserBuilder().fromContainerStyle(containerStyle).forHTML().build()
+      new ParserBuilder().fromPageStyles(containerStyle).forHTML().build()
     ).toBe(mockHTMLParser);
   });
 });

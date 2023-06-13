@@ -1,4 +1,4 @@
-import ContainerStyle from './container-style.interface';
+import PageStyles from './page-styles.interface';
 import Pages from './pages';
 import Transformer from './transformers/models/transformer.interface';
 
@@ -23,12 +23,12 @@ export default class PagesBuilder {
     addSizeMethod,
   ];
 
-  private font: Pick<ContainerStyle, 'computedFontSize' | 'computedFontFamily'>;
+  private font: Pick<PageStyles, 'computedFontSize' | 'computedFontFamily'>;
   private fontLocation: string;
 
   private lineHeight: number;
 
-  private box: Pick<ContainerStyle, 'margin' | 'padding' | 'border'> = {
+  private box: Pick<PageStyles, 'margin' | 'padding' | 'border'> = {
     margin: {
       top: 0,
       right: 0,
@@ -53,7 +53,7 @@ export default class PagesBuilder {
 
   private transformers: Array<Transformer> = [];
 
-  private sizes: Array<Pick<ContainerStyle, 'width' | 'height'>> = [];
+  private sizes: Array<Pick<PageStyles, 'width' | 'height'>> = [];
 
   [setFontMethod](
     computedFontSize: string,
@@ -75,19 +75,19 @@ export default class PagesBuilder {
     return this;
   }
 
-  setMargin(margin: ContainerStyle['margin']): PagesBuilder {
+  setMargin(margin: PageStyles['margin']): PagesBuilder {
     this.box.margin = margin;
 
     return this;
   }
 
-  setPadding(padding: ContainerStyle['padding']): PagesBuilder {
+  setPadding(padding: PageStyles['padding']): PagesBuilder {
     this.box.padding = padding;
 
     return this;
   }
 
-  setBorder(border: ContainerStyle['border']): PagesBuilder {
+  setBorder(border: PageStyles['border']): PagesBuilder {
     this.box.border = border;
 
     return this;

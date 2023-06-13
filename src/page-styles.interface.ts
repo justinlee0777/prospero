@@ -1,4 +1,7 @@
-export default interface ContainerStyle {
+/**
+ * Describes the dimensions and font of the page, as needed to calculate pages ahead of time.
+ */
+export default interface PageStyles {
   /** In pixels. */
   width: number;
   /** In pixels. */
@@ -7,34 +10,34 @@ export default interface ContainerStyle {
   computedFontFamily: string;
   /** In pixels. */
   lineHeight: number;
-  padding: {
+  padding?: {
     /** In pixels. */
-    top: number;
+    top?: number;
     /** In pixels. */
-    right: number;
+    right?: number;
     /** In pixels. */
-    bottom: number;
+    bottom?: number;
     /** In pixels. */
-    left: number;
+    left?: number;
   };
-  margin: {
+  margin?: {
     /** In pixels. */
-    top: number;
+    top?: number;
     /** In pixels. */
-    right: number;
+    right?: number;
     /** In pixels. */
-    bottom: number;
+    bottom?: number;
     /** In pixels. */
-    left: number;
+    left?: number;
   };
-  border: {
+  border?: {
     /** In pixels. */
-    top: number;
+    top?: number;
     /** In pixels. */
-    right: number;
+    right?: number;
     /** In pixels. */
-    bottom: number;
+    bottom?: number;
     /** In pixels. */
-    left: number;
+    left?: number;
   };
 }
