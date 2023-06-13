@@ -7,6 +7,7 @@ import normalizePageStyles from '../../utils/normalize-page-styles.function';
 import NullaryFn from '../../utils/nullary-fn.type';
 import LaminaComponent from '../lamina/lamina.component';
 import LoadingIconComponent from '../loading-icon/loading-icon.component';
+import PagePickerComponent from '../page-picker/page-picker.component';
 import BookComponent from './book-element.interface';
 import BookIdentifier from './book.symbol';
 import CreateBookElement from './create-book-element.interface';
@@ -83,7 +84,7 @@ const BookComponent: CreateBookElement = (
     }
   );
 
-  const goToPage = updateHandler(book, {
+  let goToPage = updateHandler(book, {
     get: getPage,
     pagesShown,
     elementConfig: merge<CreateElementConfig>(
@@ -100,18 +101,35 @@ const BookComponent: CreateBookElement = (
     showPageNumbers,
   });
 
-  const decrement = () => updatePage(-pagesShown);
-  const increment = () => updatePage(pagesShown);
+  const decrement = () => updatePage(currentPage - pagesShown);
+  const increment = () => updatePage(currentPage + pagesShown);
 
   destroyCallbacks.push(
     ...listeners.map((listener) => listener(book, [decrement, increment]))
   );
 
+  // Add page picker if configured
+  if (bookConfig.showPagePicker) {
+    const pagePicker = PagePickerComponent({
+      classnames: [styles.bookPagePicker],
+    });
+
+    lamina.appendChild(pagePicker);
+
+    // 'goToPage' is based off 0 while the client goes by 1. Therefore, offset by 1.
+    pagePicker.onpagechange = (pageNumber) => {
+      const newPage = pageNumber - 1;
+      if (newPage !== currentPage) {
+        updatePage(newPage);
+      }
+    };
+  }
+
   goToPage(currentPage);
 
   return book;
 
-  async function updatePage(increment: number) {
+  async function updatePage(pageNumber: number) {
     const oldPage = currentPage;
 
     const destroyLoadingIcon = addLoadingIcon(lamina);
@@ -119,13 +137,15 @@ const BookComponent: CreateBookElement = (
     let pageChanged = false;
 
     try {
-      pageChanged = await goToPage((currentPage += increment));
+      pageChanged = await goToPage(pageNumber);
     } finally {
       destroyLoadingIcon();
     }
 
     if (!pageChanged) {
       currentPage = oldPage;
+    } else {
+      currentPage = pageNumber;
     }
   }
 };

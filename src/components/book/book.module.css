@@ -10,3 +10,10 @@
   top: 1%;
   width: 24px;
 }
+
+.bookPagePicker {
+  position: absolute;
+  right: 50%;
+  top: 8px;
+  transform: translateX(50%);
+}

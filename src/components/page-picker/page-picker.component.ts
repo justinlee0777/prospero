@@ -1,0 +1,56 @@
+import styles from './page-picker.module.css';
+
+import createKeydownListener from '../../elements/create-keydown-listener.function';
+import input from '../../elements/input.function';
+import merge from '../../utils/merge.function';
+import CreatePagePickerElement from './create-page-picker-element.interface';
+import PagePickerElement from './page-picker-element.interface';
+import PagePickerIdentifier from './page-picker.symbol';
+
+const PagePickerComponent: CreatePagePickerElement = (elementConfig = {}) => {
+  const pagePicker = input(
+    'number',
+    {
+      minlength: 1,
+    },
+    merge(
+      {
+        classnames: [styles.pagePicker],
+      },
+      elementConfig
+    )
+  ) as unknown as PagePickerElement;
+
+  function stopPropagation(event: Event) {
+    event.stopPropagation();
+  }
+
+  pagePicker.addEventListener('click', stopPropagation);
+
+  function update() {
+    if (pagePicker.value.match(/^\d+$/)) {
+      pagePicker.onpagechange?.(Number(pagePicker.value));
+    }
+  }
+
+  pagePicker.addEventListener('blur', update);
+
+  const keydownListener = createKeydownListener({
+    Enter: update,
+  });
+  pagePicker.addEventListener('keydown', keydownListener);
+
+  pagePicker.elementTagIdentifier = PagePickerIdentifier;
+  pagePicker.destroy = () => {
+    pagePicker.removeEventListener('click', stopPropagation);
+
+    pagePicker.removeEventListener('blur', update);
+    pagePicker.removeEventListener('keydown', keydownListener);
+
+    pagePicker.remove();
+  };
+
+  return pagePicker;
+};
+
+export default PagePickerComponent;

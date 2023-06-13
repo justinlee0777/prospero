@@ -39,6 +39,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       animation: new SinglePageBookAnimation(),
       listeners: [listenToClickEvents, listenToSwipeEvents],
       pagesShown: 1,
+      showPagePicker: true,
     },
     {
       styles: { margin: 'auto' },

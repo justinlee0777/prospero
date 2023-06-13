@@ -3,7 +3,7 @@ import './book-demo.css';
 import DoublePageBookPreset from '../src/components/book/presets/double-page-book-preset.const';
 import SinglePageBookPreset from '../src/components/book/presets/single-page-book-preset.const';
 import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
-import { NewlineTransformer } from '../src/transformers/public-api';
+import { IndentTransformer } from '../src/transformers/public-api';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch('../text-samples/ulysses/proteus.txt');
@@ -31,12 +31,15 @@ window.addEventListener('DOMContentLoaded', async () => {
           pattern: {
             minWidth: 800,
           },
-          config: DoublePageBookPreset(),
+          config: {
+            ...DoublePageBookPreset(),
+            showPagePicker: true,
+          },
         },
       ],
     },
     {
-      transformers: [new NewlineTransformer()],
+      transformers: [new IndentTransformer(5)],
       forHTML: true,
     },
     {
