@@ -67,12 +67,6 @@ responses.forEach((response) => {
     });
   });
 
-  // Add an empty page.
-  mobile.push({
-    beginIndex: mobile.at(-1).endIndex,
-    endIndex: mobile.at(-1).endIndex,
-  });
-
   response.desktop.pages.forEach((desktopPage) => {
     desktop.push({
       beginIndex: desktopIndex + desktopPage.beginIndex,

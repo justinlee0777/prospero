@@ -17,3 +17,7 @@
   top: 8px;
   transform: translateX(50%);
 }
+
+.bookPagePickerInvalid {
+  border-color: red;
+}

@@ -117,10 +117,18 @@ const BookComponent: CreateBookElement = (
     lamina.appendChild(pagePicker);
 
     // 'goToPage' is based off 0 while the client goes by 1. Therefore, offset by 1.
-    pagePicker.onpagechange = (pageNumber) => {
+    pagePicker.onpagechange = async (pageNumber) => {
       const newPage = pageNumber - 1;
       if (newPage !== currentPage) {
-        updatePage(newPage);
+        const pageChanged = await updatePage(newPage);
+
+        const invalidClass = styles.bookPagePickerInvalid;
+
+        if (!pageChanged) {
+          pagePicker.classList.add(invalidClass);
+        } else {
+          pagePicker.classList.remove(invalidClass);
+        }
       }
     };
   }
@@ -147,6 +155,8 @@ const BookComponent: CreateBookElement = (
     } else {
       currentPage = pageNumber;
     }
+
+    return pageChanged;
   }
 };
 

@@ -2,7 +2,7 @@ import { readFile } from 'node:fs';
 import { join } from 'node:path';
 import { cwd } from 'node:process';
 
-import { IndentTransformer, Pages } from '../../src/shared';
+import { IndentTransformer, NewlineTransformer, Pages } from '../../src/shared';
 import ChapterWorkerData from './chapter-worker-data.interface';
 
 export default async function workOnChapter({
@@ -16,7 +16,10 @@ export default async function workOnChapter({
     )
   );
 
-  const processors = [new IndentTransformer(5)];
+  const processors = [
+    new IndentTransformer(5),
+    new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
+  ];
 
   const fontLocation = join(cwd(), 'pages/Bookerly-Regular.ttf');
 

@@ -126,6 +126,34 @@ describe('BookComponent updateHandler()', () => {
     expect(book.onpagechange).toHaveBeenCalledTimes(3);
   });
 
+  test('takes null pages to mean the end of the book', async () => {
+    const book = BookComponent(pagesOutput);
+
+    let getRetVal: any;
+
+    const callback = updateHandler(book, {
+      animation: new DefaultPageFlipAnimation(),
+      get: jest.fn().mockImplementation((pageNumber) => getRetVal),
+      pagesShown: 3,
+      showPageNumbers: false,
+    });
+
+    // Valid
+    getRetVal = false;
+
+    expect(await callback(0)).toBe(true);
+
+    // Valid
+    getRetVal = undefined;
+
+    expect(await callback(0)).toBe(true);
+
+    // Invalid
+    getRetVal = null;
+
+    expect(await callback(0)).toBe(false);
+  });
+
   test('shows page numbers', async () => {
     const book = BookComponent(pagesOutput);
     book.onpagechange = jest.fn();

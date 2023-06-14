@@ -1,9 +1,12 @@
 import Transformer from '../models/transformer.interface';
+import NewlineTransformerOptions from './newline-transformer-options.interface';
 
 /**
  * Add newlines between paragraphs if there are none.
  */
 export default class NewlineTransformer implements Transformer {
+  constructor(private options: NewlineTransformerOptions = {}) {}
+
   transform(text: string): string {
     /**
      * Match lines that end with a newline but also have at least one non-newline character succeeding them, so as not to
@@ -13,6 +16,17 @@ export default class NewlineTransformer implements Transformer {
      */
     const pattern = /(\n)([^\n])/g;
 
-    return text.replace(pattern, `$1\n$2`);
+    const sectionBeginning = this.createNewlines(
+      this.options?.beginningSections ?? 0
+    );
+    const betweenParagraphs = this.createNewlines(
+      this.options?.betweenParagraphs ?? 1
+    );
+
+    return sectionBeginning + text.replace(pattern, `$1${betweenParagraphs}$2`);
+  }
+
+  private createNewlines(number: number): string {
+    return Array(number).fill('\n').join('');
   }
 }

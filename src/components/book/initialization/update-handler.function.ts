@@ -45,7 +45,7 @@ export default function updateHandler(
       )
     );
 
-    if (pageContent.every(({ content }) => !Boolean(content))) {
+    if (pageContent.every(({ content }) => content === null)) {
       return false;
     }
 
