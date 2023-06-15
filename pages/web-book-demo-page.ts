@@ -37,6 +37,16 @@ window.addEventListener('DOMContentLoaded', async () => {
           config: {
             ...DoublePageBookPreset(),
             showPagePicker: true,
+            showBookmark: {
+              storage: {
+                get: () => JSON.parse(localStorage.getItem('proteus-bookmark')),
+                save: (bookmark) =>
+                  localStorage.setItem(
+                    'proteus-bookmark',
+                    JSON.stringify(bookmark)
+                  ),
+              },
+            },
           },
         },
       ],

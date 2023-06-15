@@ -1,3 +1,4 @@
+import BookmarkStorage from '../bookmark/bookmark-storage.interface';
 import AddListeners from '../model/add-listeners.interface';
 import BookAttributes from './book-attributes.interface';
 import Theme from './theming/theme.interface';
@@ -17,4 +18,8 @@ export default interface BookConfig extends BookAttributes {
   theme?: Theme;
   /** Show an input that the user can use to change the page directly. */
   showPagePicker?: boolean;
+  /** Use a bookmark by hooking it to a bookmark storage. */
+  showBookmark?: {
+    storage: BookmarkStorage;
+  };
 }

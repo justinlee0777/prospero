@@ -5,6 +5,7 @@ import GetPage from '../../get-page.interface';
 import merge from '../../utils/merge.function';
 import normalizePageStyles from '../../utils/normalize-page-styles.function';
 import NullaryFn from '../../utils/nullary-fn.type';
+import BookmarkComponent from '../bookmark/bookmark.component';
 import LaminaComponent from '../lamina/lamina.component';
 import LoadingIconComponent from '../loading-icon/loading-icon.component';
 import PagePickerComponent from '../page-picker/page-picker.component';
@@ -33,6 +34,7 @@ const BookComponent: CreateBookElement = (
     animation,
     listeners,
     showPageNumbers,
+    showBookmark,
     theme,
   } = bookConfig;
 
@@ -108,6 +110,8 @@ const BookComponent: CreateBookElement = (
     ...listeners.map((listener) => listener(book, [decrement, increment]))
   );
 
+  const pageNumberUpdates: Array<(pageNumber: number) => void> = [];
+
   // Add page picker if configured
   if (bookConfig.showPagePicker) {
     const pagePicker = PagePickerComponent({
@@ -133,7 +137,27 @@ const BookComponent: CreateBookElement = (
     };
   }
 
-  goToPage(currentPage);
+  // Add bookmark if configured
+  if (bookConfig.showBookmark) {
+    const bookmarkStorage = bookConfig.showBookmark.storage;
+
+    const bookmark = BookmarkComponent(bookmarkStorage, {
+      classnames: [styles.bookBookmark],
+    });
+
+    goToPage(currentPage).then(() => {
+      bookmark.onbookmarkretrieval = ({ pageNumber }) =>
+        goToPage((currentPage = pageNumber));
+    });
+
+    bookmark.pagenumber = currentPage;
+
+    lamina.appendChild(bookmark);
+
+    pageNumberUpdates.push((pageNumber) => (bookmark.pagenumber = pageNumber));
+  } else {
+    goToPage(currentPage);
+  }
 
   return book;
 
@@ -154,6 +178,7 @@ const BookComponent: CreateBookElement = (
       currentPage = oldPage;
     } else {
       currentPage = pageNumber;
+      pageNumberUpdates.forEach((update) => update(currentPage));
     }
 
     return pageChanged;

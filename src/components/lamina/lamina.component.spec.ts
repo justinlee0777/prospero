@@ -8,5 +8,43 @@ describe('LaminaComponent', () => {
 
     expect(component).toBeTruthy();
     expect(component.className.toString()).toBe('lamina');
+
+    component.destroy();
+  });
+
+  test("creates a perpetual focus-blur loop that is destroyed at the end of the component's lifetime", async () => {
+    jest.useFakeTimers();
+
+    const component = LaminaComponent();
+
+    component.dispatchEvent(new Event('focusin'));
+
+    await Promise.resolve();
+
+    expect(component.classList.toString()).toBe('lamina laminaActive');
+
+    component.dispatchEvent(new Event('focusout'));
+
+    await Promise.resolve();
+
+    jest.advanceTimersByTime(1000);
+
+    await Promise.resolve();
+
+    expect(component.classList.toString()).toBe('lamina');
+
+    component.dispatchEvent(new Event('focusin'));
+
+    await Promise.resolve();
+
+    expect(component.classList.toString()).toBe('lamina laminaActive');
+
+    component.destroy();
+
+    component.dispatchEvent(new Event('focusin'));
+
+    await Promise.resolve();
+
+    expect(component.classList.toString()).toBe('lamina laminaActive');
   });
 });

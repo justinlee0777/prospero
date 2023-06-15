@@ -20,8 +20,49 @@ const LaminaComponent: CreateLaminaElement = (elementConfig = {}) => {
     )
   ) as unknown as LaminaElement;
 
+  let killFocusLoop: (sign: Symbol) => void;
+
+  const KillFocusLoopSwitch = Symbol(
+    'Unique sign that denotes the focus event loop was destroyed deliberately.'
+  );
+
+  (async function focusEventLoop() {
+    try {
+      while (true) {
+        await new Promise((resolve, reject) => {
+          laminaElement.addEventListener('focusin', resolve, { once: true });
+
+          killFocusLoop = reject;
+        });
+
+        laminaElement.classList.add(styles.laminaActive);
+
+        await new Promise((resolve, reject) => {
+          laminaElement.addEventListener('focusout', resolve, { once: true });
+
+          killFocusLoop = reject;
+        });
+
+        await new Promise((resolve, reject) => {
+          setTimeout(resolve, 1000);
+
+          killFocusLoop = reject;
+        });
+
+        laminaElement.classList.remove(styles.laminaActive);
+      }
+    } catch (error) {
+      if (error !== KillFocusLoopSwitch) {
+        // Re-throw the error if it is not deliberate.
+        throw error;
+      }
+    }
+  })();
+
   laminaElement.elementTagIdentifier = LaminaIdentifier;
   laminaElement.destroy = () => {
+    killFocusLoop(KillFocusLoopSwitch);
+
     laminaElement.remove();
   };
 

@@ -3,13 +3,8 @@
   appearance: textfield;
   font-size: 16px;
   max-width: 64px;
-  opacity: 0.1;
   text-align: right;
   z-index: 100;
-}
-
-.pagePicker:focus {
-  opacity: 1;
 }
 
 .pagePicker::-webkit-inner-spin-button,

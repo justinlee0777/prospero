@@ -34,6 +34,18 @@ window.addEventListener('DOMContentLoaded', async () => {
       media: {
         minWidth: 750,
       },
+      showPagePicker: true,
+      showBookmark: {
+        storage: {
+          get: () =>
+            JSON.parse(localStorage.getItem('desktop-ulysses-bookmark')),
+          save: (bookmark) =>
+            localStorage.setItem(
+              'desktop-ulysses-bookmark',
+              JSON.stringify(bookmark)
+            ),
+        },
+      },
     },
     {
       styles: { margin: 'auto' },
