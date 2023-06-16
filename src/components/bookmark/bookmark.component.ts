@@ -66,6 +66,8 @@ const BookmarkComponent: CreateBookmarkElement = (
 
   bookmark.destroy = () => {
     bookmark.removeEventListener('click', saveBookmark);
+
+    bookmark.remove();
   };
 
   Promise.resolve(storage.get()).then((bookmarkData) => {

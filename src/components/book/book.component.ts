@@ -107,7 +107,8 @@ const BookComponent: CreateBookElement = (
   const increment = () => updatePage(currentPage + pagesShown);
 
   destroyCallbacks.push(
-    ...listeners.map((listener) => listener(book, [decrement, increment]))
+    ...listeners.map((listener) => listener(book, [decrement, increment])),
+    () => lamina.destroy()
   );
 
   const pageNumberUpdates: Array<(pageNumber: number) => void> = [];
@@ -135,6 +136,8 @@ const BookComponent: CreateBookElement = (
         }
       }
     };
+
+    destroyCallbacks.push(() => pagePicker.destroy());
   }
 
   // Add bookmark if configured
@@ -155,6 +158,8 @@ const BookComponent: CreateBookElement = (
     lamina.appendChild(bookmark);
 
     pageNumberUpdates.push((pageNumber) => (bookmark.pagenumber = pageNumber));
+
+    destroyCallbacks.push(() => bookmark.destroy());
   } else {
     goToPage(currentPage);
   }
@@ -183,20 +188,20 @@ const BookComponent: CreateBookElement = (
 
     return pageChanged;
   }
+
+  /**
+   *
+   * @returns destruction of loading icon.
+   */
+  function addLoadingIcon(parent: HTMLElement): NullaryFn {
+    const loadingIcon = LoadingIconComponent({
+      classnames: [styles.bookLoadingIcon],
+    });
+
+    parent.appendChild(loadingIcon);
+
+    return () => loadingIcon.destroy();
+  }
 };
-
-/**
- *
- * @returns destruction of loading icon.
- */
-function addLoadingIcon(parent: HTMLElement): NullaryFn {
-  const loadingIcon = LoadingIconComponent({
-    classnames: [styles.bookLoadingIcon],
-  });
-
-  parent.appendChild(loadingIcon);
-
-  return () => loadingIcon.destroy();
-}
 
 export default BookComponent;
