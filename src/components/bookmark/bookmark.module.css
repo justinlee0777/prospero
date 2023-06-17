@@ -1,45 +1,23 @@
 .bookmark {
-  border-color: black;
+  border-color: black black transparent black;
   border-style: solid;
-  border-width: 1px 1px 0 1px;
+  border-width: 18px;
   font-size: 12px;
-  height: 24px;
-  overflow: hidden;
+  height: 6px;
   text-align: center;
-  max-width: 36px;
-}
-
-.bookmark::before,
-.bookmark::after {
-  border-color: black;
-  border-style: solid;
-  border-width: 0 0 1px 0;
-  bottom: 3px;
-  content: '';
-  position: absolute;
-  width: 17px;
-}
-
-.bookmark::before {
-  left: -1px;
-  transform: rotate(-21.5deg);
-}
-
-.bookmark::after {
-  right: -1px;
-  transform: rotate(21.5deg);
-}
-
-.bookmark,
-.bookmark::before,
-.bookmark::after {
   transition-duration: 0.3s;
   transition-property: border-color, color;
+  width: 0;
 }
 
-.bookmarkActivated,
-.bookmarkActivated::before,
-.bookmarkActivated::after {
-  border-color: gold;
-  color: gold;
+.bookmarkContent {
+  color: white;
+  left: 50%;
+  position: absolute;
+  top: -1em;
+  transform: translateX(-50%);
+}
+
+.bookmarkActivated {
+  border-color: gold gold transparent gold;
 }

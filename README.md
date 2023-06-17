@@ -112,8 +112,11 @@ To assist the user, the `Pages` API exposes a method `getDataAsIndices` that sto
  * }
  */
 new Pages(..., ...).getDataAsIndices();
-
 ```
+
+#### Component destruction
+
+All components exported by `prospero` should be destroyed with the `destroy` API, which will get rid of event listeners.
 
 #### Look and feel
 

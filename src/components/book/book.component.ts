@@ -75,15 +75,17 @@ const BookComponent: CreateBookElement = (
         destroyCallbacks.forEach((callback) => callback());
       },
     },
-    {
-      ...config,
-      classnames: [theme?.className],
-      styles: {
-        ...(config.styles ?? {}),
-        ...bookStyles,
+    merge(
+      {
+        classnames: [theme?.className],
+        styles: {
+          ...(config.styles ?? {}),
+          ...bookStyles,
+        },
+        children: [lamina],
       },
-      children: [lamina],
-    }
+      config
+    )
   );
 
   let goToPage = updateHandler(book, {
@@ -141,8 +143,8 @@ const BookComponent: CreateBookElement = (
   }
 
   // Add bookmark if configured
-  if (bookConfig.showBookmark) {
-    const bookmarkStorage = bookConfig.showBookmark.storage;
+  if (showBookmark) {
+    const bookmarkStorage = showBookmark.storage;
 
     const bookmark = BookmarkComponent(bookmarkStorage, {
       classnames: [styles.bookBookmark],

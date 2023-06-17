@@ -10,10 +10,15 @@ const BookmarkComponent: CreateBookmarkElement = (
   storage,
   elementConfig = {}
 ) => {
+  const bookmarkContent = div({
+    classnames: [styles.bookmarkContent],
+  });
+
   const bookmark = div(
     merge(
       {
         classnames: [styles.bookmark],
+        children: [bookmarkContent],
       },
       elementConfig
     )
@@ -46,7 +51,7 @@ const BookmarkComponent: CreateBookmarkElement = (
 
   function updatePageNumber(): void {
     // Page number is 0th based but the client is 1-based. Therefore offset by 1.
-    bookmark.textContent = (bookmark.pagenumber + 1).toString();
+    bookmarkContent.textContent = (bookmark.pagenumber + 1).toString();
   }
 
   let onbookmarkretrieval: BookmarkElement['onbookmarkretrieval'];
