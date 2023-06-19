@@ -12,7 +12,6 @@ import MediaQuerySizerConfig from '../media-query/media-query-sizer-config.inter
 import CreateFlexibleBookElement from './create-flexible-book-element.interface';
 import FlexibleBookElement from './flexible-book-element.interface';
 import FlexibleBookMediaQuery from './flexible-book-media-query.interface';
-import FlexibleBookIdentifier from './flexible-book.symbol';
 
 /**
  * A magic book that stretches to the edges of the screen. This is perfect for short articles/essays (~2500 words).
@@ -68,7 +67,7 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
   let bookElement: BookElement | undefined;
 
   const size: MediaQuerySizerConfig['size'] = (width, height) => {
-    bookElement?.destroy();
+    bookElement?.prospero.destroy();
 
     const bookConfig =
       mediaQueryList.find((mediaQuery) => mediaQuery.matches)?.config ??
@@ -99,13 +98,15 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
     flexibleBookElement
   );
 
-  flexibleBookElement.destroy = () => {
-    flexibleBookElement.remove();
+  flexibleBookElement.prospero = {
+    destroy: () => {
+      flexibleBookElement.remove();
 
-    bookElement?.destroy();
-    destroySizer();
+      bookElement?.prospero.destroy();
+      destroySizer();
+    },
+    type: 'flexible-book',
   };
-  flexibleBookElement.elementTagIdentifier = FlexibleBookIdentifier;
 
   return flexibleBookElement;
 };

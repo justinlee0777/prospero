@@ -2,7 +2,11 @@ import { readFile } from 'node:fs';
 import { join } from 'node:path';
 import { cwd } from 'node:process';
 
-import { IndentTransformer, NewlineTransformer, Pages } from '../../src/shared';
+import Pages from '../../src/pages';
+import {
+  IndentTransformer,
+  NewlineTransformer,
+} from '../../src/transformers/public-api';
 import ChapterWorkerData from './chapter-worker-data.interface';
 
 export default async function workOnChapter({

@@ -3,7 +3,6 @@ import styles from './bookmark.module.css';
 import div from '../../elements/div.function';
 import merge from '../../utils/merge.function';
 import BookmarkElement from './bookmark-element.interface';
-import BookmarkIdentifier from './bookmark.symbol';
 import CreateBookmarkElement from './create-bookmark-element.interface';
 
 const BookmarkComponent: CreateBookmarkElement = (
@@ -25,8 +24,6 @@ const BookmarkComponent: CreateBookmarkElement = (
   ) as unknown as BookmarkElement;
 
   bookmark.tabIndex = 0;
-
-  bookmark.elementTagIdentifier = BookmarkIdentifier;
 
   async function saveBookmark(event: MouseEvent) {
     event.stopPropagation();
@@ -69,10 +66,13 @@ const BookmarkComponent: CreateBookmarkElement = (
     },
   });
 
-  bookmark.destroy = () => {
-    bookmark.removeEventListener('click', saveBookmark);
+  bookmark.prospero = {
+    type: 'bookmark',
+    destroy: () => {
+      bookmark.removeEventListener('click', saveBookmark);
 
-    bookmark.remove();
+      bookmark.remove();
+    },
   };
 
   Promise.resolve(storage.get()).then((bookmarkData) => {

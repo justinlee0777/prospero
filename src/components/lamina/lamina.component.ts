@@ -4,7 +4,6 @@ import div from '../../elements/div.function';
 import merge from '../../utils/merge.function';
 import CreateLaminaElement from './create-lamina-element.interface';
 import LaminaElement from './lamina-element.interface';
-import LaminaIdentifier from './lamina.symbol';
 
 /**
  * A lamina that stretches over the whole book. Utilities can be placed on the lamina that
@@ -59,11 +58,13 @@ const LaminaComponent: CreateLaminaElement = (elementConfig = {}) => {
     }
   })();
 
-  laminaElement.elementTagIdentifier = LaminaIdentifier;
-  laminaElement.destroy = () => {
-    killFocusLoop(KillFocusLoopSwitch);
+  laminaElement.prospero = {
+    type: 'lamina',
+    destroy: () => {
+      killFocusLoop(KillFocusLoopSwitch);
 
-    laminaElement.remove();
+      laminaElement.remove();
+    },
   };
 
   return laminaElement;

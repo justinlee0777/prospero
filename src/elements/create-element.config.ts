@@ -8,4 +8,7 @@ export default interface CreateElementConfig {
   attributes?: Object;
   styles?: Partial<CSSStyleDeclaration>;
   eventListeners?: Partial<EventListenersMap>;
+  aria?: {
+    label?: string;
+  };
 }

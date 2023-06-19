@@ -5,9 +5,23 @@ const webpack = require('webpack');
 module.exports = {
   name: 'production-web',
   mode: 'production',
+  optimization: {
+    minimize: false,
+  },
   entry: {
-    web: ['./src/web.ts'],
-    'web/react': ['./src/react/index.ts'],
+    book: {
+      import: './src/components/book/book.component.ts',
+      dependOn: ['book/animations', 'book/listeners', 'book/theming'],
+    },
+    'book/animations': './src/components/book/animations/public-api.ts',
+    'book/listeners': './src/components/listeners/public-api.ts',
+    'book/theming': './src/components/book/theming/public-api.ts',
+    books: './src/components/books/books.component.ts',
+    'flexible-book': {
+      import: './src/components/flexible-book/flexible-book.component.ts',
+      dependOn: ['book'],
+    },
+    react: './src/react/index.ts',
   },
   output: {
     filename: '[name].js',

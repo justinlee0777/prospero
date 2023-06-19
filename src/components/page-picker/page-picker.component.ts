@@ -5,7 +5,6 @@ import input from '../../elements/input.function';
 import merge from '../../utils/merge.function';
 import CreatePagePickerElement from './create-page-picker-element.interface';
 import PagePickerElement from './page-picker-element.interface';
-import PagePickerIdentifier from './page-picker.symbol';
 
 const PagePickerComponent: CreatePagePickerElement = (elementConfig = {}) => {
   const pagePicker = input(
@@ -16,6 +15,9 @@ const PagePickerComponent: CreatePagePickerElement = (elementConfig = {}) => {
     merge(
       {
         classnames: [styles.pagePicker],
+        aria: {
+          label: 'Type in the page number and the book will flip to it.',
+        },
       },
       elementConfig
     )
@@ -40,14 +42,16 @@ const PagePickerComponent: CreatePagePickerElement = (elementConfig = {}) => {
   });
   pagePicker.addEventListener('keydown', keydownListener);
 
-  pagePicker.elementTagIdentifier = PagePickerIdentifier;
-  pagePicker.destroy = () => {
-    pagePicker.removeEventListener('click', stopPropagation);
+  pagePicker.prospero = {
+    type: 'page-picker',
+    destroy: () => {
+      pagePicker.removeEventListener('click', stopPropagation);
 
-    pagePicker.removeEventListener('blur', update);
-    pagePicker.removeEventListener('keydown', keydownListener);
+      pagePicker.removeEventListener('blur', update);
+      pagePicker.removeEventListener('keydown', keydownListener);
 
-    pagePicker.remove();
+      pagePicker.remove();
+    },
   };
 
   return pagePicker;

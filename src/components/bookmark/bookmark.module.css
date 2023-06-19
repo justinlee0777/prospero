@@ -1,5 +1,6 @@
 .bookmark {
-  border-color: black black transparent black;
+  border-color: black;
+  border-bottom-color: transparent !important;
   border-style: solid;
   border-width: 18px;
   font-size: 12px;
@@ -19,5 +20,5 @@
 }
 
 .bookmarkActivated {
-  border-color: gold gold transparent gold;
+  border-color: gold;
 }

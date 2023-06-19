@@ -1,10 +1,8 @@
 import div from '../../elements/div.function';
 import NullaryFn from '../../utils/nullary-fn.type';
 import BookElement from '../book/book-element.interface';
-import BookIdentifier from '../book/book.symbol';
 import MediaQueryListenerFactory from '../media-query/media-query-listener.factory';
 import BooksElement from './books-element.interface';
-import BooksIdentifier from './books.symbol';
 import CreateBooksElement from './create-books-element.interface';
 
 /**
@@ -18,8 +16,10 @@ const BooksComponent: CreateBooksElement = (config) => {
 
   const books = children.filter(
     (child) =>
-      'elementTagIdentifier' in child &&
-      child.elementTagIdentifier === BookIdentifier
+      'prospero' in child &&
+      typeof child.prospero === 'object' &&
+      'type' in child.prospero &&
+      child.prospero.type === 'book'
   ) as Array<BookElement>;
 
   const fallbacks = books.filter((book) => !Boolean(book.media));
@@ -27,7 +27,7 @@ const BooksComponent: CreateBooksElement = (config) => {
 
   if (!fallback) {
     throw new Error(
-      `BooksComponent could not be created. There must be one fallback Book (does not has a 'media' attribute defined).`
+      `BooksComponent could not be created. There must be one fallback Book (does not have a 'media' attribute defined).`
     );
   }
 
@@ -50,15 +50,16 @@ const BooksComponent: CreateBooksElement = (config) => {
 
   const booksElement = div(config) as unknown as BooksElement;
 
-  booksElement.elementTagIdentifier = BooksIdentifier;
+  booksElement.prospero = {
+    type: 'books',
+    destroy: () => {
+      booksElement.remove();
 
-  booksElement.destroy = () => {
-    booksElement.remove();
+      destroyMediaQueryListener();
 
-    destroyMediaQueryListener();
-
-    /** Destroy books for client. */
-    books.forEach((book) => book.destroy());
+      /** Destroy books for client. */
+      books.forEach((book) => book.prospero.destroy());
+    },
   };
 
   return booksElement;

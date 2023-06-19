@@ -1,4 +1,5 @@
 import CreateElement from './create-element.interface';
+import setARIA from './set-aria.function';
 import setAttributes from './set-attributes.function';
 import setChildren from './set-children.function';
 import setClassNames from './set-class-names.function';
@@ -22,4 +23,5 @@ export default function setElement(
   config.attributes && setAttributes(element, config.attributes);
   config.styles && setStyles(element, config.styles);
   config.eventListeners && setEventListeners(element, config.eventListeners);
+  config.aria && setARIA(element, config.aria);
 }

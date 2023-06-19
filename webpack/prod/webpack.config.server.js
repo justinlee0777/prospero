@@ -2,7 +2,9 @@ module.exports = {
   name: 'production-server',
   mode: 'production',
   entry: {
-    server: './src/server.ts',
+    pages: './src/pages.ts',
+    'server-pages': './src/server-pages.ts',
+    transformers: './src/transformers/public-api.ts',
   },
   output: {
     filename: '[name].js',

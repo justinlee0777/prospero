@@ -4,7 +4,6 @@ import BookConfig from './book-config.interface';
 import BookElement from './book-element.interface';
 import CreateBookElement from './create-book-element.interface';
 import PageChangeEvent from './page-change-event.interface';
-import CreateBookConfigPreset from './presets/create-book-config-preset.interface';
 import RequiredBookArgs from './required-book-args.interface';
 import Theme from './theming/theme.interface';
 
@@ -13,7 +12,6 @@ export {
   BookAttributes,
   BookConfig,
   BookElement,
-  CreateBookConfigPreset,
   CreateBookElement,
   PageChangeEvent,
   RequiredBookArgs,

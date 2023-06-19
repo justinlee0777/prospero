@@ -29,7 +29,7 @@ export default function useBook(
       if (book) {
         containerRef.current.appendChild(book);
 
-        return () => book.destroy();
+        return () => book.prospero.destroy();
       }
     }
   }, [containerRef.current, ...deps]);

@@ -10,7 +10,6 @@ import LaminaComponent from '../lamina/lamina.component';
 import LoadingIconComponent from '../loading-icon/loading-icon.component';
 import PagePickerComponent from '../page-picker/page-picker.component';
 import BookComponent from './book-element.interface';
-import BookIdentifier from './book.symbol';
 import CreateBookElement from './create-book-element.interface';
 import defaultBookConfig from './default-book-config.const';
 import getBookStyles from './initialization/get-book-styles.function';
@@ -68,16 +67,18 @@ const BookComponent: CreateBookElement = (
 
   const book = initialize(
     {
-      elementTagIdentifier: BookIdentifier,
       media,
-      destroy: () => {
-        book.remove();
-        destroyCallbacks.forEach((callback) => callback());
+      prospero: {
+        type: 'book',
+        destroy: () => {
+          book.remove();
+          destroyCallbacks.forEach((callback) => callback());
+        },
       },
     },
     merge(
       {
-        classnames: [theme?.className],
+        classnames: [styles.book, theme?.className],
         styles: {
           ...(config.styles ?? {}),
           ...bookStyles,
@@ -110,7 +111,7 @@ const BookComponent: CreateBookElement = (
 
   destroyCallbacks.push(
     ...listeners.map((listener) => listener(book, [decrement, increment])),
-    () => lamina.destroy()
+    () => lamina.prospero.destroy()
   );
 
   const pageNumberUpdates: Array<(pageNumber: number) => void> = [];
@@ -139,7 +140,7 @@ const BookComponent: CreateBookElement = (
       }
     };
 
-    destroyCallbacks.push(() => pagePicker.destroy());
+    destroyCallbacks.push(() => pagePicker.prospero.destroy());
   }
 
   // Add bookmark if configured
@@ -150,10 +151,16 @@ const BookComponent: CreateBookElement = (
       classnames: [styles.bookBookmark],
     });
 
-    goToPage(currentPage).then(() => {
-      bookmark.onbookmarkretrieval = ({ pageNumber }) =>
-        goToPage((currentPage = pageNumber));
-    });
+    /*
+     * Used to prevent flashing content.
+     * If the bookmark is retrieved before 1000 milliseconds, go to the bookmarked page.
+     * If not, then go to the 0th page. It is acceptable for the request to complete after 1000ms.
+     */
+    const timeoutId = setTimeout(() => goToPage(currentPage), 1000);
+    bookmark.onbookmarkretrieval = ({ pageNumber }) => {
+      goToPage((currentPage = pageNumber));
+      clearTimeout(timeoutId);
+    };
 
     bookmark.pagenumber = currentPage;
 
@@ -161,7 +168,7 @@ const BookComponent: CreateBookElement = (
 
     pageNumberUpdates.push((pageNumber) => (bookmark.pagenumber = pageNumber));
 
-    destroyCallbacks.push(() => bookmark.destroy());
+    destroyCallbacks.push(() => bookmark.prospero.destroy());
   } else {
     goToPage(currentPage);
   }
@@ -202,7 +209,7 @@ const BookComponent: CreateBookElement = (
 
     parent.appendChild(loadingIcon);
 
-    return () => loadingIcon.destroy();
+    return () => loadingIcon.prospero.destroy();
   }
 };
 
