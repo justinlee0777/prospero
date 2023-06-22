@@ -1,7 +1,7 @@
 import Big from 'big.js';
 
 import createHTMLRegex from '../../regexp/html.regexp';
-import HTMLSanitizer from '../../sanitizers/html/html.sanitizer';
+import HTMLSanitizer from '../../sanitizers/html/html.sanitizer.web';
 import HTMLTransformer from '../../transformers/html/html.transformer';
 import BigUtils from '../../utils/big';
 import DefaultLineBreakParser from '../default-line-break/default-line-break.parser';

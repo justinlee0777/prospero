@@ -2,7 +2,7 @@ import Big from 'big.js';
 
 import { dash, newline, whitespace } from '../../glyphs.const';
 import Transformer from '../../transformers/models/transformer.interface';
-import WordWidthCalculator from '../../word-width.calculator';
+import IWordWidthCalculator from '../../word-width-calculator.interface';
 import CalculateWordWidth from '../builders/calculate-word-width.interface';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import ParseWord from '../models/parse-word.interface';
@@ -48,7 +48,7 @@ export default class DefaultLineBreakParser implements Parser {
   protected parsePageOverflow: (parserState: ParserState) => ParserState;
   protected parseEnd = parseEnd;
 
-  protected calculator: WordWidthCalculator;
+  protected calculator: IWordWidthCalculator;
   protected transformers: Array<Transformer> = [];
 
   /**
@@ -81,7 +81,7 @@ export default class DefaultLineBreakParser implements Parser {
     this.parsePageOverflow = pageOverflowParser(this.config);
   }
 
-  setCalculator(calculator: WordWidthCalculator): void {
+  setCalculator(calculator: IWordWidthCalculator): void {
     this.calculator = calculator;
 
     this.bookLineHeight = Big(this.calculator.getCalculatedLineHeight());

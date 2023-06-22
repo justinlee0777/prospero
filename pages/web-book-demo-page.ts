@@ -1,7 +1,5 @@
 import './book-demo.css';
 
-import DoublePageBookPreset from '../src/components/book/presets/double-page-book-preset.const';
-import SinglePageBookPreset from '../src/components/book/presets/single-page-book-preset.const';
 import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
 import {
   IndentTransformer,
@@ -29,13 +27,15 @@ window.addEventListener('DOMContentLoaded', async () => {
         },
       },
       mediaQueryList: [
-        SinglePageBookPreset(),
+        {
+          pagesShown: 1,
+        },
         {
           pattern: {
             minWidth: 800,
           },
           config: {
-            ...DoublePageBookPreset(),
+            pagesShown: 2,
             showPagePicker: true,
             showBookmark: {
               storage: {

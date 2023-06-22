@@ -2,10 +2,10 @@ import PageStyles from '../../page-styles.interface';
 import Transformer from '../../transformers/models/transformer.interface';
 import Optional from '../../utils/optional.type';
 import toPixelUnits from '../../utils/to-pixel-units.function';
-import WordWidthCalculator from '../../word-width.calculator';
+import WordWidthCalculator from '../../word-width.calculator.server';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import Parser from '../models/parser.interface';
-import ParserFactory from '../parser.factory';
+import ParserFactory from '../parser.factory.server';
 
 const fromPageStyles = 'fromPageStyles';
 

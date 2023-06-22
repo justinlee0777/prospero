@@ -2,16 +2,22 @@
   "name": "prospero",
   "version": "0.0.9",
   "sideEffects": false,
+  "type": "module",
   "scripts": {
     "build": "rm -rf dist && webpack",
     "start": "./scripts/build-dev.sh && http-server -c-1 ./dist",
     "upload-ulysses": "./scripts/build-dev.sh && ./dist/upload-ulysses.js",
-    "build:lib": "npm run build -- --config-name production production-web production-server",
+    "build:lib": "rm -rf dist && rollup -c",
     "release": "npm run build:lib && npm publish ./dist",
     "format": "prettier --write .",
     "test": "jest"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.2",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-typescript": "^11.1.1",
     "@types/big.js": "^6.1.6",
     "@types/dompurify": "^3.0.2",
     "@types/jest": "^29.5.1",
@@ -20,15 +26,11 @@
     "@types/react": "^18.2.7",
     "@types/react-test-renderer": "^18.0.0",
     "@types/sanitize-html": "^2.9.0",
-    "copy-webpack-plugin": "^11.0.0",
-    "css-loader": "^6.7.3",
-    "html-webpack-plugin": "^5.5.0",
     "http-server": "^14.1.1",
     "jest": "^29.5.0",
     "jest-css-modules": "^2.1.0",
     "jest-environment-jsdom": "^29.5.0",
     "mini-css-extract-plugin": "^2.7.5",
-    "node-loader": "^2.0.0",
     "prettier": "^2.8.7",
     "prettier-plugin-organize-imports": "^3.2.2",
     "react-dom": "^18.2.0",
@@ -37,23 +39,21 @@
     "remark-gfm": "^3.0.1",
     "remark-parse": "^10.0.2",
     "remark-rehype": "^10.1.0",
-    "style-loader": "^3.3.2",
+    "rollup": "^3.25.1",
+    "rollup-plugin-postcss": "^4.0.2",
     "ts-jest": "^29.1.0",
-    "ts-loader": "^9.4.2",
     "typescript": "^5.0.3",
     "typescript-plugin-css-modules": "^5.0.0",
-    "unified": "^10.1.2",
-    "webpack": "^5.77.0",
-    "webpack-cli": "^5.0.1"
+    "unified": "^10.1.2"
   },
   "dependencies": {
     "big.js": "^6.2.1",
     "dompurify": "^3.0.3",
-    "jsdom": "^22.0.0",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
     "canvas": "^2.11.2",
+    "jsdom": "^22.0.0",
     "react": "^18.2.0"
   }
 }
