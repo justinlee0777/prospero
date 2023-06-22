@@ -9,9 +9,7 @@ const commonPlugins = [
   nodeResolve({
     moduleDirectories: ['node_modules'],
   }),
-  commonjs({
-    dynamicRequireTargets: ['node_modules/jsdom/**/xhr-sync-worker.js'],
-  }),
+  commonjs(),
   json(),
   typescript({
     tsconfig: 'tsconfig.prod.json',
@@ -67,6 +65,7 @@ export default [
     plugins: [
       replace({
         'html.sanitizer': 'html.sanitizer.web',
+        preventAssignment: true,
       }),
       ...commonPlugins,
       postcss({

@@ -1,5 +1,6 @@
 import './book-demo.css';
 
+import { listenToClickEvents, listenToKeyboardEvents } from '../src/components';
 import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
 import {
   IndentTransformer,
@@ -7,7 +8,7 @@ import {
 } from '../src/transformers/public-api';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/ulysses/proteus.txt');
+  const response = await fetch('./ulysses/proteus.txt');
   const text = await response.text();
 
   const container = document.body;
@@ -29,6 +30,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       mediaQueryList: [
         {
           pagesShown: 1,
+          listeners: [listenToClickEvents],
         },
         {
           pattern: {
@@ -36,6 +38,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           },
           config: {
             pagesShown: 2,
+            listeners: [listenToClickEvents, listenToKeyboardEvents],
             showPagePicker: true,
             showBookmark: {
               storage: {

@@ -1,12 +1,12 @@
 import './index.css';
 
 import PageStyles from '../src/page-styles.interface';
-import Pages from '../src/pages';
+import Pages from '../src/pages-web';
 import debounce from '../src/utils/debounce.function';
 import toPixelUnits from '../src/utils/to-pixel-units.function';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/proteus.txt');
+  const response = await fetch('./ulysses/proteus.txt');
   const text = await response.text();
 
   const container = document.body;

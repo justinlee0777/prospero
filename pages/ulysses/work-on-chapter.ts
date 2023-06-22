@@ -2,7 +2,7 @@ import { readFile } from 'node:fs';
 import { join } from 'node:path';
 import { cwd } from 'node:process';
 
-import Pages from '../../src/pages';
+import Pages from '../../src/pages-web';
 import {
   IndentTransformer,
   NewlineTransformer,
