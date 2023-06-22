@@ -1,4 +1,3 @@
-import BookSymbol from '../book.symbol';
 import initialize from './initialize.function';
 
 describe('BookComponent initialize()', () => {
@@ -6,23 +5,25 @@ describe('BookComponent initialize()', () => {
     const destroy = jest.fn();
 
     const book = initialize({
-      elementTagIdentifier: BookSymbol,
       media: {
         minWidth: 600,
       },
-      destroy,
+      prospero: {
+        destroy,
+        type: 'book',
+      },
     });
 
     expect(book).toBeTruthy();
 
     expect('tagName' in book).toBe(true);
 
-    expect(book.elementTagIdentifier).toBe(BookSymbol);
+    expect(book.prospero.type).toBe('book');
     expect(book.media).toEqual({
       minWidth: 600,
     });
 
-    book.destroy();
+    book.prospero.destroy();
 
     expect(destroy).toHaveBeenCalledTimes(1);
   });
@@ -32,8 +33,10 @@ describe('BookComponent initialize()', () => {
 
     const book = initialize(
       {
-        elementTagIdentifier: BookSymbol,
-        destroy,
+        prospero: {
+          destroy,
+          type: 'book',
+        },
       },
       {
         classnames: ['foo', 'bar'],
@@ -43,7 +46,7 @@ describe('BookComponent initialize()', () => {
       }
     );
 
-    expect(book.classList.toString()).toBe('book foo bar');
+    expect(book.classList.toString()).toBe('foo bar');
     expect(book.style.color).toBe('red');
   });
 });

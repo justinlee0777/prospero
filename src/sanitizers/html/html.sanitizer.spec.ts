@@ -1,8 +1,8 @@
-import HTMLSanitizer from './html.sanitizer';
+import ServerHTMLSanitizer from './html.sanitizer.server';
 import WebHTMLSanitizer from './html.sanitizer.web';
 
 describe('HTMLSanitizer', () => {
-  [HTMLSanitizer, WebHTMLSanitizer].forEach((Sanitizer) => {
+  [ServerHTMLSanitizer, WebHTMLSanitizer].forEach((Sanitizer) => {
     test('sanitizes', () => {
       const sanitizer = new Sanitizer();
 

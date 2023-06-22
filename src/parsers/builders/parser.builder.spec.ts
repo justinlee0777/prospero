@@ -1,107 +1,119 @@
 let mockParser: Parser;
 let mockHTMLParser: Parser;
 
-jest.mock('../parser.factory', () => {
-  return {
-    create: jest.fn().mockImplementation(
-      () =>
-        (mockParser = {
-          setCalculator: jest.fn(),
-          setProcessors: jest.fn(),
-        } as any)
-    ),
-    createForHTML: jest.fn().mockImplementation(
-      () =>
-        (mockHTMLParser = {
-          setCalculator: jest.fn(),
-          setProcessors: jest.fn(),
-        } as any)
-    ),
-  };
-});
+const mockParserFactory = {
+  create: jest.fn().mockImplementation(
+    () =>
+      (mockParser = {
+        setCalculator: jest.fn(),
+        setProcessors: jest.fn(),
+      } as any)
+  ),
+  createForHTML: jest.fn().mockImplementation(
+    () =>
+      (mockHTMLParser = {
+        setCalculator: jest.fn(),
+        setProcessors: jest.fn(),
+      } as any)
+  ),
+};
+
+jest.mock('../parser.factory.server', () => mockParserFactory);
+
+jest.mock('../parser.factory.web', () => mockParserFactory);
 
 let MockWordWidthCalculatorConstructor;
 
-jest.mock('../../word-width.calculator', () => {
-  return class MockWordWidthCalculator {
-    constructor(...args) {
-      MockWordWidthCalculatorConstructor = jest.fn();
-      MockWordWidthCalculatorConstructor(...args);
-    }
-  };
-});
+class MockWordWidthCalculator {
+  constructor(...args) {
+    MockWordWidthCalculatorConstructor = jest.fn();
+    MockWordWidthCalculatorConstructor(...args);
+  }
+}
+
+jest.mock('../../word-width.calculator.server', () => MockWordWidthCalculator);
+
+jest.mock('../../word-width.calculator.web', () => MockWordWidthCalculator);
 
 import Transformer from '../../transformers/models/transformer.interface';
 import Parser from '../models/parser.interface';
-import ParserBuilder from './parser.builder';
+import ServerParserBuilder from './parser.builder.server';
+import WebParserBuilder from './parser.builder.web';
 
-describe('ParserBuilder', () => {
-  class MockTransformer implements Transformer {
-    transform = jest.fn();
-  }
+const tests: Array<[string, any]> = [
+  ['Server ParserBuilder', ServerParserBuilder],
+  ['Web ParserBuilder', WebParserBuilder],
+];
 
-  let containerStyle;
+tests.forEach(([suiteName, ParserBuilder]) => {
+  describe(suiteName, () => {
+    class MockTransformer implements Transformer {
+      transform = jest.fn();
+    }
 
-  beforeEach(() => {
-    containerStyle = {
-      width: 600,
-      height: 400,
-      lineHeight: 24,
-      computedFontFamily: 'Times New Roman',
-      computedFontSize: '16px',
-    };
-  });
+    let containerStyle;
 
-  test('should build a parser', () => {
-    expect(new ParserBuilder().fromPageStyles(containerStyle).build()).toBe(
-      mockParser
-    );
-  });
+    beforeEach(() => {
+      containerStyle = {
+        width: 600,
+        height: 400,
+        lineHeight: 24,
+        computedFontFamily: 'Times New Roman',
+        computedFontSize: '16px',
+      };
+    });
 
-  test('should build a parser with processors', () => {
-    const processor = new MockTransformer();
+    test('should build a parser', () => {
+      expect(new ParserBuilder().fromPageStyles(containerStyle).build()).toBe(
+        mockParser
+      );
+    });
 
-    expect(
-      new ParserBuilder()
-        .fromPageStyles(containerStyle)
-        .setProcessors([processor])
-        .build()
-    ).toBe(mockParser);
+    test('should build a parser with processors', () => {
+      const processor = new MockTransformer();
 
-    expect(new ParserBuilder().fromPageStyles(containerStyle).build()).toBe(
-      mockParser
-    );
-  });
+      expect(
+        new ParserBuilder()
+          .fromPageStyles(containerStyle)
+          .setProcessors([processor])
+          .build()
+      ).toBe(mockParser);
 
-  test('should build a parser using a custom font', () => {
-    containerStyle = {
-      ...containerStyle,
-      computedFontFamily: 'Bookerly',
-    };
+      expect(new ParserBuilder().fromPageStyles(containerStyle).build()).toBe(
+        mockParser
+      );
+    });
 
-    expect(
-      new ParserBuilder()
-        .fromPageStyles(containerStyle)
-        .setFontLocation('/Bookerly.tiff')
-        .build()
-    ).toBe(mockParser);
+    test('should build a parser using a custom font', () => {
+      containerStyle = {
+        ...containerStyle,
+        computedFontFamily: 'Bookerly',
+      };
 
-    expect(MockWordWidthCalculatorConstructor).toHaveBeenCalledTimes(1);
-    expect(MockWordWidthCalculatorConstructor).toHaveBeenCalledWith(
-      '16px',
-      'Bookerly',
-      24,
-      '/Bookerly.tiff'
-    );
+      expect(
+        new ParserBuilder()
+          .fromPageStyles(containerStyle)
+          .setFontLocation('/Bookerly.tiff')
+          .build()
+      ).toBe(mockParser);
 
-    expect(new ParserBuilder().fromPageStyles(containerStyle).build()).toBe(
-      mockParser
-    );
-  });
+      expect(MockWordWidthCalculatorConstructor).toHaveBeenCalledTimes(1);
+      expect(MockWordWidthCalculatorConstructor).toHaveBeenCalledWith(
+        '16px',
+        'Bookerly',
+        24,
+        '/Bookerly.tiff'
+      );
 
-  test('should build a parser for HTML', () => {
-    expect(
-      new ParserBuilder().fromPageStyles(containerStyle).forHTML().build()
-    ).toBe(mockHTMLParser);
+      expect(new ParserBuilder().fromPageStyles(containerStyle).build()).toBe(
+        mockParser
+      );
+    });
+
+    test('should build a parser for HTML', () => {
+      expect(
+        new ParserBuilder().fromPageStyles(containerStyle).forHTML().build()
+      ).toBe(mockHTMLParser);
+    });
   });
 });

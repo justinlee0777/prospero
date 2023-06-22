@@ -11,7 +11,7 @@ describe('PagePickerComponent', () => {
 
     expect(component.className.toString()).toBe('pagePicker');
 
-    component.destroy();
+    component.prospero.destroy();
   });
 
   test('does not propagate click events', () => {
@@ -31,7 +31,7 @@ describe('PagePickerComponent', () => {
 
     parent.removeEventListener('click', clickSpy);
 
-    component.destroy();
+    component.prospero.destroy();
   });
 
   test('updates the client on blur events', () => {
@@ -56,7 +56,7 @@ describe('PagePickerComponent', () => {
     expect(onpagechange).toHaveBeenCalledTimes(1);
     expect(onpagechange).toHaveBeenCalledWith(1);
 
-    component.destroy();
+    component.prospero.destroy();
   });
 
   test('updates the client on ENTER', () => {
@@ -86,6 +86,6 @@ describe('PagePickerComponent', () => {
     expect(onpagechange).toHaveBeenCalledTimes(1);
     expect(onpagechange).toHaveBeenCalledWith(1);
 
-    component.destroy();
+    component.prospero.destroy();
   });
 });

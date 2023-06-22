@@ -9,7 +9,7 @@ describe('LaminaComponent', () => {
     expect(component).toBeTruthy();
     expect(component.className.toString()).toBe('lamina');
 
-    component.destroy();
+    component.prospero.destroy();
   });
 
   test("creates a perpetual focus-blur loop that is destroyed at the end of the component's lifetime", async () => {
@@ -39,7 +39,7 @@ describe('LaminaComponent', () => {
 
     expect(component.classList.toString()).toBe('lamina laminaActive');
 
-    component.destroy();
+    component.prospero.destroy();
 
     component.dispatchEvent(new Event('focusin'));
 

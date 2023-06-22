@@ -60,7 +60,7 @@ describe('BooksComponent', () => {
 
     expect(book.ariaHidden).toBe('false');
 
-    books.destroy();
+    books.prospero.destroy();
 
     expect(mockDestroyMediaQueryListener).toHaveBeenCalledTimes(1);
   });
@@ -86,7 +86,7 @@ describe('BooksComponent', () => {
     expect(bookElements[1].ariaHidden).toBe('true');
     expect(bookElements[2].ariaHidden).toBe('true');
 
-    books.destroy();
+    books.prospero.destroy();
 
     expect(mockDestroyMediaQueryListener).toHaveBeenCalledTimes(1);
   });
@@ -135,14 +135,14 @@ describe('BooksComponent', () => {
     expect(bookElements[1].ariaHidden).toBe('false');
     expect(bookElements[2].ariaHidden).toBe('false');
 
-    books.destroy();
+    books.prospero.destroy();
 
     expect(mockDestroyMediaQueryListener).toHaveBeenCalledTimes(1);
   });
 
   test('throws an error for Books with no Book', () => {
     expect(() => BooksComponent()).toThrowError(
-      `BooksComponent could not be created. There must be one fallback Book (does not has a 'media' attribute defined).`
+      `BooksComponent could not be created. There must be one fallback Book (does not have a 'media' attribute defined).`
     );
   });
 
@@ -152,7 +152,7 @@ describe('BooksComponent', () => {
         children: [BookComponent(pagesOutput, { media: { minWidth: 600 } })],
       })
     ).toThrowError(
-      `BooksComponent could not be created. There must be one fallback Book (does not has a 'media' attribute defined).`
+      `BooksComponent could not be created. There must be one fallback Book (does not have a 'media' attribute defined).`
     );
   });
 });
