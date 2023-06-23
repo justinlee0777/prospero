@@ -20,5 +20,5 @@
 }
 
 .bookmarkActivated {
-  border-color: gold;
+  border-color: gold gold transparent gold;
 }
