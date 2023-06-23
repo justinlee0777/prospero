@@ -12,19 +12,23 @@ As Prospero set aside his books, forsaking their awesome powers, so we shall set
 
 ### Installation
 
+`prospero` has two peer dependencies that are used only for operations on Node.
+
 The project relies on the package `canvas` so that text rendered with certain fonts can be appropriately sized. `canvas` has unique compilation if your OS does not support it out-of-the-box. Please refer to the "Compiling" section of the [GitHub](https://github.com/Automattic/node-canvas).
+
+`jsdom` is also used to simulate a Window on Node. This initializes a sanitizer that will remove certain tags from text, as they are incompatible with `prospero`. (A possible feature is to disable the sanitization so the client may accept any drawbacks.)
 
 Therefore, to install `prospero` in your project, run:
 
 ```
-npm install canvas prospero
+npm install canvas jsdom prospero
 ```
 
 ### Usage
 
-`prospero` currently has two entry-points: `prospero/server` and `prospero/web`.
+`prospero` has two barrel entry-points: `prospero/server` and `prospero/web`. For tree-shaking, there are individual entry-points divided by utility as exposed in `exports` of the `package.json`.
 
-`prospero/server` uses dependencies from the Node environment. `Pages` takes text and paginates them based on the dimensions given to it.
+`prospero/server` uses dependencies from the Node environment. `Pages` (`prospero/server/pages`) takes text and paginates them based on the dimensions given to it.
 
 ```
 const pageStyles: PageStyles = {
@@ -39,7 +43,7 @@ const pageStyles: PageStyles = {
 const galaxyFold = new Pages(pageStyles, text);
 ```
 
-`ServerPages` takes an HTTP endpoint that returns a `PaginatedResponse`.
+`ServerPages` (`prospero/server/server-pages`) takes an HTTP endpoint that returns a `PaginatedResponse`.
 
 ```
 /**
@@ -120,7 +124,7 @@ All components exported by `prospero` should be destroyed with the `destroy` API
 
 #### Look and feel
 
-The `BooksComponent` is only styled using the container styles you have passed in ex. `width`, `height`, `margin` _et cetera_. To get a book's look and feel, import `DefaultBookTheme` which will load two stylesheets to make the book look more like a book (background color, border...).
+The `BooksComponent` is only styled using the container styles you have passed in ex. `width`, `height`, `margin` _et cetera_. To get a book's look and feel, import `DefaultBookTheme` (`prospero/web/theming`) which will load two stylesheets to make the book look more like a book (background color, border...).
 
 ```
 import { BookComponent, DefaultBookThemeClassName } from 'prospero/web';
@@ -147,23 +151,9 @@ BookComponent(
 );
 ```
 
-or use a preset for animations, pages shown and event listeners:
-
-```
-import { BookComponent, SinglePageBookPreset } from 'prospero/web';
-
-BookComponent(
-    ...,
-    {
-        ...,
-        ...new SinglePageBookPreset(),
-    }
-);
-```
-
 #### Flexible Book
 
-However, for texts with 2500 words or less (essays or blog posts, for example), `prospero/web` also exports `FlexibleBookComponent`, which will dynamically size itself.
+However, for texts with 2500 words or less (essays or blog posts, for example), `prospero/web` also exports `FlexibleBookComponent` (`prospero/web/flexible-book`), which will dynamically size itself.
 
 ```
 FlexibleBookComponent({
@@ -241,7 +231,7 @@ BookComponent(
 
 ### Transformers
 
-`prospero` via both entrypoints exports basic `Transformer`s, which transform the text so that the text can be stored separately in its original form. Currently there are two transformers: `IndentTransformer` and `NewlineTransformer`.
+`prospero` via both entrypoints exports basic `Transformer`s, which transform the text so that the text can be stored separately in its original form. Currently there are two transformers: `IndentTransformer` and `NewlineTransformer`. Both are exported through the `web` and `server` entry-points.
 
 `IndentTransformer` adds indentation to the beginning of paragraphs. (I personally use this for fiction.)
 
