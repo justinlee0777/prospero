@@ -2,6 +2,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
+import { copyFileSync, mkdirSync } from 'fs';
 import postcss from 'rollup-plugin-postcss';
 
 const commonPlugins = [
@@ -22,6 +23,9 @@ const output = {
   dir,
   format,
 };
+
+mkdirSync(dir);
+copyFileSync('package.json', `${dir}/package.json`);
 
 export default [
   // Base build
