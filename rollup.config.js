@@ -1,7 +1,6 @@
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import postcss from 'rollup-plugin-postcss';
 
@@ -63,13 +62,11 @@ export default [
       preserveModules: true,
     },
     plugins: [
-      replace({
-        'html.sanitizer': 'html.sanitizer.web',
-        preventAssignment: true,
-      }),
       ...commonPlugins,
       postcss({
-        modules: true,
+        modules: {
+          generateScopedName: 'prospero__[local]',
+        },
       }),
     ],
   },

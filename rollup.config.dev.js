@@ -55,7 +55,9 @@ export default [
       commonjs(),
       typescript(),
       postcss({
-        modules: true,
+        modules: {
+          generateScopedName: 'prospero__[local]',
+        },
       }),
       html({
         fileName: `${extensionlessName}.html`,

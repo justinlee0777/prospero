@@ -1,6 +1,6 @@
 .bookmark {
   border-color: black;
-  border-bottom-color: transparent !important;
+  border-bottom-color: transparent;
   border-style: solid;
   border-width: 18px;
   font-size: 12px;
