@@ -2,7 +2,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
-import { copyFileSync, mkdirSync } from 'fs';
+import { copyFileSync, mkdirSync, readFileSync } from 'fs';
 import postcss from 'rollup-plugin-postcss';
 
 const commonPlugins = [
@@ -24,6 +24,19 @@ const output = {
   format,
 };
 
+const pkg = JSON.parse(readFileSync('./package.json', { encoding: 'utf-8' }));
+
+const externalPackages = [
+  ...Object.keys(pkg.dependencies || {}),
+  ...Object.keys(pkg.peerDependencies || {}),
+];
+
+// Creating regexes of the packages to make sure subpaths of the
+// packages are also treated as external
+const external = externalPackages.map(
+  (packageName) => new RegExp(`^${packageName}(\/.*)?`)
+);
+
 mkdirSync(dir);
 copyFileSync('package.json', `${dir}/package.json`);
 
@@ -41,7 +54,7 @@ export default [
       preserveModules: true,
     },
     plugins: [...commonPlugins],
-    external: ['canvas', 'jsdom'],
+    external,
   },
   // Web build
   {
@@ -73,6 +86,7 @@ export default [
         },
       }),
     ],
+    external,
   },
   // React build
   {
@@ -82,6 +96,6 @@ export default [
       file: `${dir}/web/react.js`,
     },
     plugins: [...commonPlugins],
-    external: ['react'],
+    external,
   },
 ];
