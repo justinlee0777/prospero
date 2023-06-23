@@ -6,6 +6,6 @@ import FlexibleBookMediaQuery from './flexible-book-media-query.interface';
 export {
   CreateFlexibleBookElement,
   FlexibleBookElement,
-  FlexibleBookPageStyles as FlexibleBookContainerStyle,
+  FlexibleBookPageStyles,
   FlexibleBookMediaQuery,
 };
