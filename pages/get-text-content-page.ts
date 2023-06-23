@@ -1,22 +1,22 @@
 import './index.css';
 
-import ContainerStyle from '../src/container-style.interface';
-import Pages from '../src/pages';
+import PageStyles from '../src/page-styles.interface';
+import Pages from '../src/pages-web';
 import debounce from '../src/utils/debounce.function';
 import toPixelUnits from '../src/utils/to-pixel-units.function';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/proteus.txt');
+  const response = await fetch('./ulysses/proteus.txt');
   const text = await response.text();
 
   const container = document.body;
   container.style.maxHeight = '100vh';
   container.style.padding = '18px';
 
-  function updateTextContent() {
+  async function updateTextContent() {
     const style = window.getComputedStyle(container);
 
-    const containerStyle: ContainerStyle = {
+    const containerStyle: PageStyles = {
       width: window.innerWidth,
       height: window.innerHeight,
       lineHeight: toPixelUnits(style.lineHeight),
@@ -44,7 +44,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const pages = new Pages(containerStyle, text);
 
-    container.textContent = pages.get(0);
+    container.textContent = await pages.get(0);
   }
 
   window.addEventListener('resize', debounce(updateTextContent), {

@@ -1,13 +1,14 @@
 import './book-demo.css';
 
-import { DefaultBookThemeClassName } from '../src/components';
-import DoublePageBookPreset from '../src/components/book/presets/double-page-book-preset.const';
-import SinglePageBookPreset from '../src/components/book/presets/single-page-book-preset.const';
+import { listenToClickEvents, listenToKeyboardEvents } from '../src/components';
 import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
-import { IndentProcessor } from '../src/processors/public-api';
+import {
+  IndentTransformer,
+  NewlineTransformer,
+} from '../src/transformers/public-api';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('../text-samples/proteus.txt');
+  const response = await fetch('./ulysses/proteus.txt');
   const text = await response.text();
 
   const container = document.body;
@@ -15,7 +16,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const flexibleBook = FlexibleBookComponent(
     {
       text,
-      containerStyle: {
+      pageStyles: {
         computedFontFamily: 'Arial',
         computedFontSize: '16px',
         lineHeight: 32,
@@ -27,18 +28,37 @@ window.addEventListener('DOMContentLoaded', async () => {
         },
       },
       mediaQueryList: [
-        SinglePageBookPreset(),
+        {
+          pagesShown: 1,
+          listeners: [listenToClickEvents],
+        },
         {
           pattern: {
             minWidth: 800,
           },
-          config: DoublePageBookPreset(),
+          config: {
+            pagesShown: 2,
+            listeners: [listenToClickEvents, listenToKeyboardEvents],
+            showPagePicker: true,
+            showBookmark: {
+              storage: {
+                get: () => JSON.parse(localStorage.getItem('proteus-bookmark')),
+                save: (bookmark) =>
+                  localStorage.setItem(
+                    'proteus-bookmark',
+                    JSON.stringify(bookmark)
+                  ),
+              },
+            },
+          },
         },
       ],
     },
     {
-      createProcessors: () => [new IndentProcessor(5)],
-      bookClassNames: [DefaultBookThemeClassName],
+      transformers: [
+        new IndentTransformer(5),
+        new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
+      ],
       forHTML: true,
     },
     {

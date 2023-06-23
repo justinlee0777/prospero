@@ -1,9 +1,5 @@
-import ContainerStyle from '../../container-style.interface';
-import Optional from '../../utils/optional.type';
+import PageStyles from '../../page-styles.interface';
 
-type FlexibleBookContainerStyle = Optional<
-  Omit<ContainerStyle, 'width' | 'height'>,
-  'border' | 'margin' | 'padding'
->;
+type FlexibleBookPageStyles = Omit<PageStyles, 'width' | 'height'>;
 
-export default FlexibleBookContainerStyle;
+export default FlexibleBookPageStyles;

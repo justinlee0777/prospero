@@ -10,14 +10,10 @@ const pageOverflowParser =
       return {
         ...state,
         pages: state.pages.concat(state.lines.join('')),
-        changes: state.changes.concat({
-          values: state.pageChanges,
-        }),
         // Cut the current text and begin on a newline.
         lines: [],
-        pageChanges: [],
         pageHeight: Big(0),
-        lineText: state.lineText.trim(),
+        lineText: state.lineText,
       };
     } else {
       return state;

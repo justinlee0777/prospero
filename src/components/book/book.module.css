@@ -2,3 +2,28 @@
   overflow: hidden;
   position: relative;
 }
+
+.bookLoadingIcon {
+  height: 24px;
+  position: absolute;
+  right: 1%;
+  top: 1%;
+  width: 24px;
+}
+
+.bookPagePicker {
+  position: absolute;
+  right: 50%;
+  top: 8px;
+  transform: translateX(50%);
+}
+
+.bookPagePickerInvalid {
+  border-color: red;
+}
+
+.bookBookmark {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}

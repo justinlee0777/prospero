@@ -12,54 +12,60 @@ As Prospero set aside his books, forsaking their awesome powers, so we shall set
 
 ### Installation
 
+`prospero` has two peer dependencies that are used only for operations on Node.
+
 The project relies on the package `canvas` so that text rendered with certain fonts can be appropriately sized. `canvas` has unique compilation if your OS does not support it out-of-the-box. Please refer to the "Compiling" section of the [GitHub](https://github.com/Automattic/node-canvas).
+
+`jsdom` is also used to simulate a Window on Node. This initializes a sanitizer that will remove certain tags from text, as they are incompatible with `prospero`. (A possible feature is to disable the sanitization so the client may accept any drawbacks.)
 
 Therefore, to install `prospero` in your project, run:
 
 ```
-npm install canvas prospero
+npm install canvas jsdom prospero
 ```
 
 ### Usage
 
-`prospero` currently has two entry-points: `prospero/server` and `prospero/web`.
+`prospero` has two barrel entry-points: `prospero/server` and `prospero/web`. For tree-shaking, there are individual entry-points divided by utility as exposed in `exports` of the `package.json`.
 
-`prospero/server` contains functions dependent on the Node environment. `PagesBuilder` takes text and paginates them based on the dimensions given to it.
-
-```
-const [galaxyFold, iphoneXR] = new PagesBuilder()
-    .setFont('12px', 'Arial')
-    .setLineHeight(24)
-    .setText('FooBarBaz')
-    .setPadding({
-        top: 8,
-        right: 8,
-        bottom: 8,
-        left: 8,
-    })
-    .addSize(280, 653)
-    .addSize(414, 896)
-    .build();
-```
-
-`prospero` currently supports only italics, bold etc. by supporting Markdown's inline elements. This is done through a `Processor`.
+`prospero/server` uses dependencies from the Node environment. `Pages` (`prospero/server/pages`) takes text and paginates them based on the dimensions given to it.
 
 ```
-new PagesBuilder()
-    .setProcessors([
-        // Sets indentations for new paragraphs.
-        new IndentProcessor(5),
-        new HTMLProcessor()
-    ])
+const pageStyles: PageStyles = {
+    computedFontSize: '12px', // must always be in pixels
+    computedFontFamily: 'Arial',
+    lineHeight: 24,
+    width: 280,
+    height: 653,
+    // If padding, margin, border is wanted for the page, then these must be specified
+};
+
+const galaxyFold = new Pages(pageStyles, text);
 ```
 
-`prospero/server` also exports `LoaderBuilder`, which loads text from a web resource or a file from the local filesystem.
+`ServerPages` (`prospero/server/server-pages`) takes an HTTP endpoint that returns a `PaginatedResponse`.
 
 ```
-let builder = await LoaderBuilder.fromWebHost('http://example.com/text.md');
-builder = await builder.asMarkdown();
-
-const text = builder.getText();
+/**
+ * JSON response follows this mold:
+ * {
+ *   "value": {
+ *     "pageStyles": PageStyles,
+ *     "content": Array<string>,
+ *   },
+ *   "page": {
+ *     /** Current page. */
+ *     "pageNumber": number,
+ *     /** Size of the page. */
+ *     "pageSize": number,
+ *     /** Total pages. */
+ *     "pages": number,
+ *     /** Total number of pages. */
+ *     "totalSize": number
+ *   }
+ * }
+ */
+const pages = new ServerPages('http://localhost:9292/book-text');
 ```
 
 `prospero/web` contains components that use data generated from `prospero/server`.
@@ -67,8 +73,6 @@ const text = builder.getText();
 The pages are not responsive. The optimal experience for `prospero` is to support multiple books for several screen sizes (currently only supporting `min-width`):
 
 ```
-const [galaxyFold, iphoneXR] = // ...
-
 BooksComponent({
     children: [
         // This is the fallback.
@@ -84,18 +88,51 @@ This component will listen to viewport changes and re-render itself appropriatel
 
 With Next.js, the ideal use case is to use `prospero/server` with `getServerSideProps` or `getStaticProps` and to mount the components from `prospero/web` on the web page.
 
+If the text is large, it is better to have a backend service working with the frontend, so that the client is not burdened with the entire text size.
+
+To assist the user, the `Pages` API exposes a method `getDataAsIndices` that stores the pages as indices within the text content than the text itself. This can be uploaded to a relational database.
+
+```
+/**
+ * JSON response follows this mold:
+ * {
+ *   "value": {
+ *     "pageStyles": PageStyles,
+ *     "content": Array<{
+ *       "beginIndex": number,
+ *       "endIndex": number
+ *     }>,
+ *   },
+ *   "page": {
+ *     /** Current page. */
+ *     "pageNumber": number,
+ *     /** Size of the page. */
+ *     "pageSize": number,
+ *     /** Total pages. */
+ *     "pages": number,
+ *     /** Total number of pages. */
+ *     "totalSize": number
+ *   }
+ * }
+ */
+new Pages(..., ...).getDataAsIndices();
+```
+
+#### Component destruction
+
+All components exported by `prospero` should be destroyed with the `destroy` API, which will get rid of event listeners.
+
 #### Look and feel
 
-The `BooksComponent` is only styled using the container styles you have passed in ex. `width`, `height`, `margin` _et cetera_. To get a book's look and feel, import the `DefaultBookThemeClassName` class name which will load a stylesheet to make the book look more like a book (background color, border...).
+The `BooksComponent` is only styled using the container styles you have passed in ex. `width`, `height`, `margin` _et cetera_. To get a book's look and feel, import `DefaultBookTheme` (`prospero/web/theming`) which will load two stylesheets to make the book look more like a book (background color, border...).
 
 ```
 import { BookComponent, DefaultBookThemeClassName } from 'prospero/web';
 
 BookComponent(
     ...,
-    ...,
     {
-      classnames: [DefaultBookThemeClassName],
+      theme: [DefaultBookTheme],
     }
   );
 ```
@@ -114,23 +151,9 @@ BookComponent(
 );
 ```
 
-or use a preset for animations, pages shown and event listeners:
-
-```
-import { BookComponent, SinglePageBookPreset } from 'prospero/web';
-
-BookComponent(
-    ...,
-    {
-        ...,
-        ...new SinglePageBookPreset(),
-    }
-);
-```
-
 #### Flexible Book
 
-However, for texts with 2500 words or less (essays or blog posts, for example), `prospero/web` also exports `FlexibleBookComponent`, which will dynamically size itself.
+However, for texts with 2500 words or less (essays or blog posts, for example), `prospero/web` also exports `FlexibleBookComponent` (`prospero/web/flexible-book`), which will dynamically size itself.
 
 ```
 FlexibleBookComponent({
@@ -170,6 +193,68 @@ and only a limited set of style values:
 
 H1 - H6 tags are converted into `<span>` with the proper font sizes.
 
+### Page Picker and Bookmarking
+
+The page picker component allows a user to open the book at any page. To add this configuration:
+
+```
+BookComponent(
+    ...,
+    {
+        ...,
+        showPagePicker: true
+    }
+);
+```
+
+Bookmarking allows the user to save their page in the book. To add this configuration, you need to define a way to save the bookmark i.e. `LocalStorage`, remote server:
+
+```
+BookComponent(
+    ...,
+    {
+        ...,
+        showBookmark: {
+            storage: {
+                get: () =>
+                    JSON.parse(localStorage.getItem('bookmark-key')),
+                save: (bookmark) =>
+                    localStorage.setItem(
+                        'bookmark-key',
+                        JSON.stringify(bookmark)
+                    ),
+            },
+      },
+    }
+);
+```
+
+### Transformers
+
+`prospero` via both entrypoints exports basic `Transformer`s, which transform the text so that the text can be stored separately in its original form. Currently there are two transformers: `IndentTransformer` and `NewlineTransformer`. Both are exported through the `web` and `server` entry-points.
+
+`IndentTransformer` adds indentation to the beginning of paragraphs. (I personally use this for fiction.)
+
+`NewlineTransformer` adds a certain number of newlines between paragraphs. (I personally use this for essays - think Medium.)
+
+### Limitations
+
+`canvas` is not thread-safe (https://github.com/Automattic/node-canvas/issues/2019). Therefore, only one `Pages` instance can work at a time, if you are working on the server.
+
+Therefore `prospero` does not support web workers, on server and web (DOM manipulation cannot be done within a web worker).
+
+`prospero` is not intended to handle block-level or replaced elements.
+
+`prospero` supports only a subset of CSS properties.
+
+`prospero` supports only some of the Markdown specification.
+
+`prospero` is an inherently imperfect attempt to reproduce the browser's layout of text (handling whitespace, breaking words, wrapping) on the server. This is how it achieves decent performance, space-wise and time-wise. Limiting what `prospero` supports to a reasonable subset of the browser's features also limits program complexity.
+
+The ideal use case for `prospero` are essays, fiction and non-fiction, and articles, which do not require any graphics beyond font.
+
+In theory, one could sacrifice performance for functionality (for example, block-level elements) by using Chromium on the server. This would be worth researching.
+
 ### Concept and architecture
 
 This section needs to be greatly expanded.
@@ -186,22 +271,6 @@ Currently, I have observed two patterns:
 
 `prospero` is meant to fit in-between: somewhat flexible and organized. Users essentially get a book on the web.
 
-#### Limitations
-
-`prospero` is not intended to handle block-level or replaced elements.
-
-`prospero` currently does not support different font sizes.
-
-`prospero` supports only a subset of CSS properties.
-
-`prospero` supports only some of the Markdown specification.
-
-`prospero` is an inherently imperfect attempt to reproduce the browser's layout of text (handling whitespace, breaking words, wrapping) on the server, as it is trying to guess at the browser's fundamental behavior - and there are several. This is how it achieves decent performance, space-wise and time-wise. Limiting what `prospero` supports to a reasonable subset of the browser's features also limits program complexity.
-
-The ideal use case for `prospero` are essays, fiction and non-fiction, and articles, which do not require any graphics beyond font.
-
-In theory, one could sacrifice performance for functionality (for example, block-level elements) by using Chromium on the server. This would be worth researching.
-
 #### Parsers and Pages
 
 `prospero` at its core is composed of parser and page models. The input for parsers is pure text; their return value is the text in a container before overflow. There would be a unique parser, for example, for each value of the `line-break` CSS property. Parsers iterate through parser states, which describe the book being built and the word being parsed. This is for transparency and helps the developer and the upcoming processors.
@@ -210,16 +279,10 @@ Pages are a layer over parsers that expose the parser's state at a given time. T
 
 Parsers return generators. A pure client-side solution of `prospero` (through the `FlexibleBookComponent`) is viable as parsing only one page of code is quite fast. For best performance, it is better to paginate content on the server and serve it to users as one would an asset.
 
-#### Processors
-
-The processors of `prospero` modify the generated parser state. Though this allows for great flexibility and a division of responsibilities from parsers, it also makes processors difficult to code.
-
-Processors are excellent for transforming text using simple triggers. They consume only the parser state, which exposes the current page, line, and word being examined at a given moment. This is a lot of data, but usually a processor only needs a subset of this to be effective.
-
-However, processors need to leave notes for other processors if they transform the text. For example, the `HTMLProcessor` (now deprecated) remembers where in the text the previous HTML tags were in order to add them in afterwards. There is no design guideline saying processors cannot be stateful, so processors need to leave behind notes if they add/delete/replace phrases, and where. Notes also have the additional benefit of being transparent and debuggable.
-
 ### Roadmap
 
-- Angular and React-compatible components
-- Bookmarking
-- Pagination on the server
+- Angular ~~and React-compatible~~ components
+
+Possible:
+
+- Idiomatic React component

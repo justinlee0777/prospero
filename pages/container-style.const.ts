@@ -1,6 +1,6 @@
-import ContainerStyle from '../src/container-style.interface';
+import PageStyles from '../src/page-styles.interface';
 
-const containerStyles: ContainerStyle = {
+const containerStyles: PageStyles = {
   width: 375,
   height: 667,
   computedFontFamily: 'Arial',
@@ -11,18 +11,6 @@ const containerStyles: ContainerStyle = {
     right: 24,
     bottom: 24,
     left: 24,
-  },
-  margin: {
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
-  border: {
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
   },
 };
 

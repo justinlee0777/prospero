@@ -1,8 +1,9 @@
-import { merge } from 'lodash-es';
-
 import CreateElementConfig from '../../elements/create-element.config';
 import div from '../../elements/div.function';
-import PagesBuilder from '../../pages.builder';
+import PageStyles from '../../page-styles.interface';
+import Pages from '../../pages-web';
+import merge from '../../utils/merge.function';
+import normalizePageStyles from '../../utils/normalize-page-styles.function';
 import BookConfig from '../book/book-config.interface';
 import BookElement from '../book/book-element.interface';
 import BookComponent from '../book/book.component';
@@ -11,8 +12,6 @@ import MediaQuerySizerConfig from '../media-query/media-query-sizer-config.inter
 import CreateFlexibleBookElement from './create-flexible-book-element.interface';
 import FlexibleBookElement from './flexible-book-element.interface';
 import FlexibleBookMediaQuery from './flexible-book-media-query.interface';
-import FlexibleBookIdentifier from './flexible-book.symbol';
-import normalizeContainerStyle from './normalize-container-style.function';
 
 /**
  * A magic book that stretches to the edges of the screen. This is perfect for short articles/essays (~2500 words).
@@ -22,12 +21,12 @@ import normalizeContainerStyle from './normalize-container-style.function';
  */
 const FlexibleBookComponent: CreateFlexibleBookElement = (
   requiredArgs,
-  { fontLocation, createProcessors, bookClassNames, forHTML } = {},
+  { fontLocation, transformers, bookClassNames, forHTML } = {},
   elementConfig = {}
 ) => {
-  const { containerStyle, text } = requiredArgs;
+  const { pageStyles, text } = requiredArgs;
 
-  const normalizedContainerStyle = normalizeContainerStyle(containerStyle);
+  const normalizedPageStyles = normalizePageStyles(pageStyles as PageStyles);
 
   let fallback: BookConfig;
   let mediaQueryList: Array<FlexibleBookMediaQuery & { matches: boolean }> = [];
@@ -68,40 +67,26 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
   let bookElement: BookElement | undefined;
 
   const size: MediaQuerySizerConfig['size'] = (width, height) => {
-    bookElement?.destroy();
-    bookElement?.remove();
+    bookElement?.prospero.destroy();
 
     const bookConfig =
       mediaQueryList.find((mediaQuery) => mediaQuery.matches)?.config ??
       fallback;
 
-    const processors = createProcessors?.() ?? [];
-
-    const [pages] = new PagesBuilder()
-      .setFont(
-        normalizedContainerStyle.computedFontSize,
-        normalizedContainerStyle.computedFontFamily,
-        fontLocation
-      )
-      .setLineHeight(normalizedContainerStyle.lineHeight)
-      .setMargin(normalizedContainerStyle.margin)
-      .setPadding(normalizedContainerStyle.padding)
-      .setBorder(normalizedContainerStyle.border)
-      .setProcessors(processors)
-      .setText(text)
-      .addSize(width / (bookConfig.pagesShown ?? 1), height)
-      .build({ html: forHTML });
-
-    bookElement = BookComponent(
+    const pages = new Pages(
       {
-        getPage: (pageNumber) => pages.get(pageNumber),
-        containerStyles: pages.getContainerStyle(),
+        ...normalizedPageStyles,
+        width: width / (bookConfig.pagesShown ?? 1),
+        height,
       },
-      bookConfig,
-      {
-        classnames: bookClassNames,
-      }
+      text,
+      transformers,
+      { fontLocation, html: forHTML }
     );
+
+    bookElement = BookComponent(pages.getData(), bookConfig, {
+      classnames: bookClassNames,
+    });
 
     flexibleBookElement.appendChild(bookElement);
   };
@@ -113,11 +98,15 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
     flexibleBookElement
   );
 
-  flexibleBookElement.destroy = () => {
-    bookElement?.destroy();
-    destroySizer();
+  flexibleBookElement.prospero = {
+    destroy: () => {
+      flexibleBookElement.remove();
+
+      bookElement?.prospero.destroy();
+      destroySizer();
+    },
+    type: 'flexible-book',
   };
-  flexibleBookElement.elementTagIdentifier = FlexibleBookIdentifier;
 
   return flexibleBookElement;
 };

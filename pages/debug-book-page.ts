@@ -3,7 +3,7 @@ import './debug-book.css';
 import { cloneDeep } from 'lodash-es';
 
 import div from '../src/elements/div.function';
-import ParserBuilder from '../src/parsers/builders/parser.builder';
+import ParserBuilder from '../src/parsers/builders/parser.builder.web';
 import ParserState from '../src/parsers/models/parser-state.interface';
 import { formatVariables } from '../src/utils/debug/format-variables.function';
 import containerStyles from './container-style.const';
@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const text = await response.text();
 
   const parser = new ParserBuilder()
-    .fromContainerStyle(containerStyles)
+    .fromPageStyles(containerStyles)
     .setProcessors(processors)
     .build();
 

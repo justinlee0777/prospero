@@ -1,7 +1,6 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
     "declaration": true
   },
   "exclude": ["pages", "**/*.spec.ts", "set-up-files-after-env.jest.ts"]

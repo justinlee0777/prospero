@@ -1,2 +1,9 @@
-export { LoaderBuilder } from './loaders/public-api';
-export * from './shared';
+import Pages from './pages-server';
+
+import ServerPages from './server-pages';
+
+export {
+  IndentTransformer,
+  NewlineTransformer,
+} from './transformers/public-api';
+export { Pages, ServerPages };

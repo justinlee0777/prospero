@@ -1,10 +1,6 @@
-import HTMLProcessor from '../src/processors/html/html.processor';
-import IndentProcessor from '../src/processors/indent/indent.processor';
-import Processor from '../src/processors/models/processor.interface';
+import IndentProcessor from '../src/transformers/indent/indent.transformer';
+import Processor from '../src/transformers/models/transformer.interface';
 
-const processors: Array<Processor> = [
-  new IndentProcessor(5),
-  new HTMLProcessor(),
-];
+const processors: Array<Processor> = [new IndentProcessor(5)];
 
 export default processors;

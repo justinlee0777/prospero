@@ -1,8 +1,8 @@
-import ContainerStyle from '../container-style.interface';
+import PageStyles from '../page-styles.interface';
 import toPixelUnits from './to-pixel-units.function';
 
-export default function containerStyleToStyleDeclaration(
-  containerStyle: ContainerStyle
+export default function pageStylesToStyleDeclaration(
+  pageStyles: PageStyles
 ): Partial<CSSStyleDeclaration> {
   const {
     width,
@@ -13,7 +13,7 @@ export default function containerStyleToStyleDeclaration(
     padding,
     margin,
     border,
-  } = containerStyle;
+  } = pageStyles;
 
   const fontSizeInPixels = toPixelUnits(computedFontSize);
   const unitlessLineHeight = lineHeight / fontSizeInPixels;

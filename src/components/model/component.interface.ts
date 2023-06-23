@@ -1,5 +1,6 @@
 export default interface Component {
-  elementTagIdentifier: Symbol;
-
-  destroy(): void;
+  prospero: {
+    type: string;
+    destroy(): void;
+  };
 }

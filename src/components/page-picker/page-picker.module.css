@@ -1,0 +1,14 @@
+.pagePicker {
+  /* Remove the number spinner. */
+  appearance: textfield;
+  font-size: 16px;
+  max-width: 64px;
+  text-align: right;
+  z-index: 100;
+}
+
+.pagePicker::-webkit-inner-spin-button,
+.pagePicker::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

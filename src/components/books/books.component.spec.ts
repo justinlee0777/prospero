@@ -1,13 +1,15 @@
 let mediaQueryBookList;
-let destroyMediaQueryListener;
+let mockDestroyMediaQueryListener;
 
 jest.mock('../media-query/media-query-listener.factory', () => ({
   create(...args) {
     mediaQueryBookList = args;
-    destroyMediaQueryListener = jest.fn();
-    return destroyMediaQueryListener;
+    mockDestroyMediaQueryListener = jest.fn();
+    return mockDestroyMediaQueryListener;
   },
 }));
+
+jest.mock('../../utils/merge.function', () => (arg) => arg);
 
 import PagesOutput from '../../pages-output.interface';
 import BookElement from '../book/book-element.interface';
@@ -17,7 +19,7 @@ import BooksComponent from './books.component';
 describe('BooksComponent', () => {
   const pagesOutput: PagesOutput = {
     pages: ['Foo', 'Bar', 'Baz'],
-    containerStyles: {
+    pageStyles: {
       width: 375,
       height: 667,
       computedFontFamily: 'Arial',
@@ -58,9 +60,9 @@ describe('BooksComponent', () => {
 
     expect(book.ariaHidden).toBe('false');
 
-    books.destroy();
+    books.prospero.destroy();
 
-    expect(destroyMediaQueryListener).toHaveBeenCalledTimes(1);
+    expect(mockDestroyMediaQueryListener).toHaveBeenCalledTimes(1);
   });
 
   test('creates Books with multiple Books', () => {
@@ -84,9 +86,9 @@ describe('BooksComponent', () => {
     expect(bookElements[1].ariaHidden).toBe('true');
     expect(bookElements[2].ariaHidden).toBe('true');
 
-    books.destroy();
+    books.prospero.destroy();
 
-    expect(destroyMediaQueryListener).toHaveBeenCalledTimes(1);
+    expect(mockDestroyMediaQueryListener).toHaveBeenCalledTimes(1);
   });
 
   test('creates Books with multiple Books for screen widths', () => {
@@ -133,14 +135,14 @@ describe('BooksComponent', () => {
     expect(bookElements[1].ariaHidden).toBe('false');
     expect(bookElements[2].ariaHidden).toBe('false');
 
-    books.destroy();
+    books.prospero.destroy();
 
-    expect(destroyMediaQueryListener).toHaveBeenCalledTimes(1);
+    expect(mockDestroyMediaQueryListener).toHaveBeenCalledTimes(1);
   });
 
   test('throws an error for Books with no Book', () => {
     expect(() => BooksComponent()).toThrowError(
-      `BooksComponent could not be created. There must be one fallback Book (does not has a 'media' attribute defined).`
+      `BooksComponent could not be created. There must be one fallback Book (does not have a 'media' attribute defined).`
     );
   });
 
@@ -150,7 +152,7 @@ describe('BooksComponent', () => {
         children: [BookComponent(pagesOutput, { media: { minWidth: 600 } })],
       })
     ).toThrowError(
-      `BooksComponent could not be created. There must be one fallback Book (does not has a 'media' attribute defined).`
+      `BooksComponent could not be created. There must be one fallback Book (does not have a 'media' attribute defined).`
     );
   });
 });

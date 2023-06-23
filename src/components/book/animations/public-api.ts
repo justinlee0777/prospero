@@ -1,3 +1,5 @@
 import SinglePageBookAnimation from './single-page-book.animation';
 
-export { SinglePageBookAnimation };
+import DoublePageBookAnimation from './double-page-book.animation';
+
+export { DoublePageBookAnimation, SinglePageBookAnimation };
