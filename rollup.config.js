@@ -6,10 +6,10 @@ import { copyFileSync, mkdirSync, readFileSync } from 'fs';
 import postcss from 'rollup-plugin-postcss';
 
 const commonPlugins = [
+  commonjs(),
   nodeResolve({
     moduleDirectories: ['node_modules'],
   }),
-  commonjs(),
   json(),
   typescript({
     tsconfig: 'tsconfig.prod.json',
@@ -84,6 +84,8 @@ export default [
         modules: {
           generateScopedName: 'prospero__[local]',
         },
+        inject: (cssVariableName) =>
+          `import styleInject from 'style-inject';\nstyleInject(${cssVariableName});`,
       }),
     ],
     external,
