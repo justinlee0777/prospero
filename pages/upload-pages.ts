@@ -1,4 +1,4 @@
-import Pages from '../src/pages-server';
+import Pages from '../src/server/pages';
 import containerStyles from './container-style.const';
 import getTextSample from './get-text-sample.function';
 import processors from './processors.const';

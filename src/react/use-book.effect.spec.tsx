@@ -3,7 +3,7 @@ jest.mock('../utils/merge.function', () => (arg) => arg);
 import renderer from 'react-test-renderer';
 
 import { useRef } from 'react';
-import { FlexibleBookComponent } from '../components';
+import { FlexibleBookComponent } from '../web';
 import useBook from './use-book.effect';
 
 describe('useBook', () => {

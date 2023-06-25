@@ -1,5 +1,5 @@
-import createKeydownListener from '../../elements/create-keydown-listener.function';
-import AddListeners from '../model/add-listeners.interface';
+import createKeydownListener from '../../../elements/create-keydown-listener.function';
+import AddListeners from '../../model/add-listeners.interface';
 
 /**
  * @returns a no-args function that destroys the listener.

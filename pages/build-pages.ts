@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import path from 'path';
 
-import Pages from '../src/pages-server';
+import Pages from '../src/server/pages';
 import containerStyles from './container-style.const';
 import getTextSample from './get-text-sample.function';
 import { pagesJsonLocation } from './pages-json-location.const';

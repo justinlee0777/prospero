@@ -1,10 +1,10 @@
-import GetPage from './get-page.interface';
-import PageStyles from './page-styles.interface';
-import PagesAsIndicesOutput from './pages-as-indices-output.interface';
-import PagesOutput from './pages-output.interface';
-import IPages from './pages.interface';
-import ParserBuilder from './parsers/builders/parser.builder.web';
-import Processor from './transformers/models/transformer.interface';
+import GetPage from '../get-page.interface';
+import PageStyles from '../page-styles.interface';
+import PagesAsIndicesOutput from '../pages-as-indices-output.interface';
+import PagesOutput from '../pages-output.interface';
+import IPages from '../pages.interface';
+import ParserBuilder from '../parsers/builders/parser.builder.web';
+import Processor from '../transformers/models/transformer.interface';
 
 export default class Pages implements IPages {
   private pageGenerator: Generator<string>;

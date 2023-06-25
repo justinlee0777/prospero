@@ -1,6 +1,6 @@
-import registerSwipeListener from '../../elements/register-swipe-listener.function';
-import SwipeDirection from '../../elements/swipe-direction.enum';
-import AddListeners from '../model/add-listeners.interface';
+import registerSwipeListener from '../../../elements/register-swipe-listener.function';
+import SwipeDirection from '../../../elements/swipe-direction.enum';
+import AddListeners from '../../model/add-listeners.interface';
 import lockElement from './lock-element.function';
 
 /**

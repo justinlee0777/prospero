@@ -1,4 +1,4 @@
-import Pages from './pages-server';
+import Pages from './server/pages';
 
 import ServerPages from './server-pages';
 

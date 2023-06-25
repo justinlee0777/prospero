@@ -39,12 +39,13 @@ const external = externalPackages.map(
 
 mkdirSync(dir);
 copyFileSync('package.json', `${dir}/package.json`);
+copyFileSync('LICENSE', `${dir}/LICENSE`);
 
 export default [
   // Base build
   {
     input: {
-      'server/pages': 'src/pages-server.ts',
+      'server/pages': 'src/server/pages.ts',
       'server/server-pages': 'src/server-pages.ts',
       'server/transformers': 'src/transformers/public-api.ts',
       server: 'src/server.ts',
@@ -60,15 +61,14 @@ export default [
   {
     input: {
       // UI Components
-      'web/book': 'src/components/book/book.component.ts',
-      'web/books': 'src/components/books/books.component.ts',
-      'web/flexible-book':
-        'src/components/flexible-book/flexible-book.component.ts',
-      'web/animations': 'src/components/book/animations/public-api.ts',
-      'web/theming': 'src/components/book/theming/public-api.ts',
-      'web/listeners': 'src/components/listeners/public-api.ts',
+      'web/book': 'src/web/book/index.ts',
+      'web/books': 'src/web/books/index.ts',
+      'web/flexible-book': 'src/web/flexible-book/index.ts',
+      'web/book/animations': 'src/web/book/animations/index.ts',
+      'web/book/theming': 'src/web/book/theming/index.ts',
+      'web/book/listeners': 'src/web/book/listeners/index.ts',
       // Web utils
-      'web/pages': 'src/pages-web.ts',
+      'web/pages': 'src/web/pages.ts',
       'web/server-pages': 'src/server-pages.ts',
       'web/transformers': 'src/transformers/public-api.ts',
       // Barrel

@@ -1,4 +1,4 @@
-import AddListeners from '../model/add-listeners.interface';
+import AddListeners from '../../model/add-listeners.interface';
 
 const listenToClickEvents: AddListeners = (book, [decrement, increment]) => {
   function flipPage(event: MouseEvent) {

@@ -1,4 +1,8 @@
 export {
+  IndentTransformer,
+  NewlineTransformer,
+} from './transformers/public-api';
+export {
   BookComponent,
   BooksComponent,
   DefaultBookTheme,
@@ -8,12 +12,8 @@ export {
   listenToClickEvents,
   listenToKeyboardEvents,
   listenToSwipeEvents,
-} from './components/index';
-export {
-  IndentTransformer,
-  NewlineTransformer,
-} from './transformers/public-api';
+} from './web/index';
 export { Pages, ServerPages };
-import Pages from './pages-web';
+import Pages from './web/pages';
 
 import ServerPages from './server-pages';

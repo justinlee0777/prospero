@@ -1,9 +1,9 @@
 import './index.css';
 
 import PageStyles from '../src/page-styles.interface';
-import Pages from '../src/pages-web';
 import debounce from '../src/utils/debounce.function';
 import toPixelUnits from '../src/utils/to-pixel-units.function';
+import Pages from '../src/web/pages';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch('./ulysses/proteus.txt');

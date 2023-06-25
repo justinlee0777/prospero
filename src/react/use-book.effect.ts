@@ -1,7 +1,7 @@
 import { RefObject, useEffect } from 'react';
 
-import BooksElement from '../components/books/books-element.interface';
-import FlexibleBookElement from '../components/flexible-book/flexible-book-element.interface';
+import BooksElement from '../web/books/books-element.interface';
+import FlexibleBookElement from '../web/flexible-book/flexible-book-element.interface';
 
 /**
  * A React hook that adds a Book to the page, in a specific place the user desires.

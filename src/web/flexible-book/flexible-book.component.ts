@@ -1,7 +1,6 @@
 import CreateElementConfig from '../../elements/create-element.config';
 import div from '../../elements/div.function';
 import PageStyles from '../../page-styles.interface';
-import Pages from '../../pages-web';
 import merge from '../../utils/merge.function';
 import normalizePageStyles from '../../utils/normalize-page-styles.function';
 import BookConfig from '../book/book-config.interface';
@@ -9,6 +8,7 @@ import BookElement from '../book/book-element.interface';
 import BookComponent from '../book/book.component';
 import MediaQueryListenerFactory from '../media-query/media-query-listener.factory';
 import MediaQuerySizerConfig from '../media-query/media-query-sizer-config.interface';
+import Pages from '../pages';
 import CreateFlexibleBookElement from './create-flexible-book-element.interface';
 import FlexibleBookElement from './flexible-book-element.interface';
 import FlexibleBookMediaQuery from './flexible-book-media-query.interface';

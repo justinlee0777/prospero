@@ -124,7 +124,7 @@ All components exported by `prospero` should be destroyed with the `destroy` API
 
 #### Look and feel
 
-The `BooksComponent` is only styled using the container styles you have passed in ex. `width`, `height`, `margin` _et cetera_. To get a book's look and feel, import `DefaultBookTheme` (`prospero/web/theming`) which will load two stylesheets to make the book look more like a book (background color, border...).
+The `BooksComponent` is only styled using the container styles you have passed in ex. `width`, `height`, `margin` _et cetera_. To get a book's look and feel, import `DefaultBookTheme` (`prospero/web/book/theming`) which will load two stylesheets to make the book look more like a book (background color, border...).
 
 ```
 import { BookComponent, DefaultBookThemeClassName } from 'prospero/web';
@@ -137,7 +137,7 @@ BookComponent(
   );
 ```
 
-You also need to configure animations:
+You also need to configure animations (`prospero/web/book/animations`):
 
 ```
 import { BookComponent, SinglePageBookAnimation } from 'prospero/web';
@@ -147,6 +147,20 @@ BookComponent(
     {
         ...,
         animation: new SinglePageBookAnimation(),
+    }
+);
+```
+
+and listeners (`prospero/web/book/listeners`) to turn the page:
+
+```
+import { BookComponent, listenToClickEvents, listenToKeyboardEvents } from 'prospero/web';
+
+BookComponent(
+    ...,
+    {
+        ...,
+        listeners: [listenToClickEvents, listenToKeyboardEvents]
     }
 );
 ```
@@ -231,7 +245,7 @@ BookComponent(
 
 ### Transformers
 
-`prospero` via both entrypoints exports basic `Transformer`s, which transform the text so that the text can be stored separately in its original form. Currently there are two transformers: `IndentTransformer` and `NewlineTransformer`. Both are exported through the `web` and `server` entry-points.
+`prospero` via both entrypoints exports basic `Transformer`s (`prospero/server/transformers` or `prospero/web/transformers`), which transform the text so that the text can be stored separately in its original form. Currently there are two transformers: `IndentTransformer` and `NewlineTransformer`. Both are exported through the `web` and `server` entry-points.
 
 `IndentTransformer` adds indentation to the beginning of paragraphs. (I personally use this for fiction.)
 
