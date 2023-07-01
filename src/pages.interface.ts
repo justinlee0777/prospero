@@ -9,19 +9,19 @@ import PagesOutput from './pages-output.interface';
 export default interface IPages {
   get: GetPage;
 
-  getPageStyles(): PageStyles | Promise<PageStyles>;
+  getPageStyles(): PageStyles;
 
-  getAll(): Array<string> | Promise<Array<string>>;
-
-  /**
-   * @returns a JS object that is compatable with the structured clone algorithm. This behavior will be unit tested.
-   * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
-   */
-  getData(): PagesOutput | Promise<PagesOutput>;
+  getAll(): Array<string>;
 
   /**
    * @returns a JS object that is compatable with the structured clone algorithm. This behavior will be unit tested.
    * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
    */
-  getDataAsIndices(): PagesAsIndicesOutput | Promise<PagesAsIndicesOutput>;
+  getData(): PagesOutput;
+
+  /**
+   * @returns a JS object that is compatable with the structured clone algorithm. This behavior will be unit tested.
+   * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
+   */
+  getDataAsIndices(): PagesAsIndicesOutput;
 }
