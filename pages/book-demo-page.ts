@@ -5,10 +5,10 @@ import {
   listenToClickEvents,
   listenToKeyboardEvents,
   listenToSwipeEvents,
-} from '../src/components';
-import DoublePageBookAnimation from '../src/components/book/animations/double-page-book.animation';
-import BookComponent from '../src/components/book/book.component';
-import BooksComponent from '../src/components/books/books.component';
+} from '../src/web';
+import DoublePageBookAnimation from '../src/web/book/animations/double-page-book.animation';
+import BookComponent from '../src/web/book/book.component';
+import BooksComponent from '../src/web/books/books.component';
 import { getPages } from './get-pages.function';
 
 window.addEventListener('DOMContentLoaded', async () => {

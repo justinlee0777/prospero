@@ -1,11 +1,11 @@
 import './book-demo.css';
 
-import { listenToClickEvents, listenToKeyboardEvents } from '../src/components';
-import FlexibleBookComponent from '../src/components/flexible-book/flexible-book.component';
 import {
   IndentTransformer,
   NewlineTransformer,
 } from '../src/transformers/public-api';
+import { listenToClickEvents, listenToKeyboardEvents } from '../src/web';
+import FlexibleBookComponent from '../src/web/flexible-book/flexible-book.component';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch('./ulysses/proteus.txt');

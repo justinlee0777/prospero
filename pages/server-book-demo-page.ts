@@ -1,15 +1,15 @@
 import './book-demo.css';
 
+import ServerPages from '../src/server-pages';
 import {
   BookComponent,
   SinglePageBookAnimation,
   listenToClickEvents,
   listenToKeyboardEvents,
   listenToSwipeEvents,
-} from '../src/components';
-import DoublePageBookAnimation from '../src/components/book/animations/double-page-book.animation';
-import BooksComponent from '../src/components/books/books.component';
-import ServerPages from '../src/server-pages';
+} from '../src/web';
+import DoublePageBookAnimation from '../src/web/book/animations/double-page-book.animation';
+import BooksComponent from '../src/web/books/books.component';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const fontUrl = 'http://127.0.0.1:8080/Bookerly-Regular.ttf';
