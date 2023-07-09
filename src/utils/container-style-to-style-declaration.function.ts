@@ -1,4 +1,4 @@
-import PageStyles from '../page-styles.interface';
+import PageStyles from '../models/page-styles.interface';
 import toPixelUnits from './to-pixel-units.function';
 
 export default function pageStylesToStyleDeclaration(

@@ -1,4 +1,4 @@
-import PageStyles from '../../page-styles.interface';
+import PageStyles from '../../models/page-styles.interface';
 import Transformer from '../../transformers/models/transformer.interface';
 import Constructor from '../../utils/constructor.type';
 import Optional from '../../utils/optional.type';

@@ -1,8 +1,8 @@
-import GetPage from './get-page.interface';
-import PageStyles from './page-styles.interface';
-import PagesAsIndicesOutput from './pages-as-indices-output.interface';
-import PagesOutput from './pages-output.interface';
-import PaginatedResponse from './paginated-response.interface';
+import GetPage from './models/get-page.interface';
+import PageStyles from './models/page-styles.interface';
+import PagesAsIndicesOutput from './models/pages-as-indices-output.interface';
+import PagesOutput from './models/pages-output.interface';
+import PaginatedResponse from './models/paginated-response.interface';
 
 /**
  * The server which the endpoint belongs to is expected to store the already-paginated data.

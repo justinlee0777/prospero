@@ -1,6 +1,6 @@
 import './index.css';
 
-import PageStyles from '../src/page-styles.interface';
+import PageStyles from '../src/models/page-styles.interface';
 import debounce from '../src/utils/debounce.function';
 import toPixelUnits from '../src/utils/to-pixel-units.function';
 import Pages from '../src/web/pages';

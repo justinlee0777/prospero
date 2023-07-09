@@ -1,7 +1,7 @@
 import { resolve } from 'path';
 
-import PageStyles from '../../src/page-styles.interface';
-import PagesAsIndicesOutput from '../../src/pages-as-indices-output.interface';
+import PageStyles from '../../src/models/page-styles.interface';
+import PagesAsIndicesOutput from '../../src/models/pages-as-indices-output.interface';
 import containerStyles from '../container-style.const';
 import workOnChapter from './work-on-chapter';
 

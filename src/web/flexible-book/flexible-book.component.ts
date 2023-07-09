@@ -1,6 +1,6 @@
 import CreateElementConfig from '../../elements/create-element.config';
 import div from '../../elements/div.function';
-import PageStyles from '../../page-styles.interface';
+import PageStyles from '../../models/page-styles.interface';
 import merge from '../../utils/merge.function';
 import normalizePageStyles from '../../utils/normalize-page-styles.function';
 import BookConfig from '../book/book-config.interface';

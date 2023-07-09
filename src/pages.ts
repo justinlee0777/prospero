@@ -1,16 +1,12 @@
-import GetPage from './get-page.interface';
-import PageStyles from './page-styles.interface';
-import PagesAsIndicesOutput from './pages-as-indices-output.interface';
-import PagesOutput from './pages-output.interface';
-import IPages from './pages.interface';
+import GetPage from './models/get-page.interface';
+import PageStyles from './models/page-styles.interface';
+import PagesAsIndicesOutput from './models/pages-as-indices-output.interface';
+import PagesConfig from './models/pages-config.interface';
+import PagesOutput from './models/pages-output.interface';
+import IPages from './models/pages.interface';
 import IParserBuilder from './parsers/builders/parser.builder.interface';
 import Processor from './transformers/models/transformer.interface';
 import Constructor from './utils/constructor.type';
-
-interface PagesConfig {
-  fontLocation?: string;
-  html?: boolean;
-}
 
 export default function Pages(ParserBuilder: {
   new (): IParserBuilder;

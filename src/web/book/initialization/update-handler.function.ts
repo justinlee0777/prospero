@@ -1,5 +1,5 @@
 import CreateElementConfig from '../../../elements/create-element.config';
-import GetPage from '../../../get-page.interface';
+import GetPage from '../../../models/get-page.interface';
 import merge from '../../../utils/merge.function';
 import PageNumberingAlignment from '../../page/page-numbering-alignment.enum';
 import pageSelector from '../../page/page-selector.const';

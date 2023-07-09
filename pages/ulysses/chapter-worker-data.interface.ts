@@ -1,4 +1,4 @@
-import PageStyles from '../../src/page-styles.interface';
+import PageStyles from '../../src/models/page-styles.interface';
 
 export default interface ChapterWorkerData {
   mobileStyles: PageStyles;
