@@ -1,4 +1,5 @@
 import CreateElementConfig from '../../elements/create-element.config';
+import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
 import Transformer from '../../transformers/models/transformer.interface';
 import BookConfig from '../book/book-config.interface';
 import FlexibleBookPageStyles from './flexible-book-container-style.interface';
@@ -37,7 +38,7 @@ interface OptionalArgs {
   /**
    * Indicates the book is meant to parse HTML.
    */
-  forHTML?: boolean;
+  forHTML?: boolean | HTMLTransformerOptions;
 }
 
 export default interface CreateFlexibleBookElement {

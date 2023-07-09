@@ -1,7 +1,9 @@
 import Big from 'big.js';
 
 import createHTMLRegex from '../../regexp/html.regexp';
+import blockLevelTags from '../../sanitizers/html/block-level-tags.const';
 import Sanitizer from '../../sanitizers/sanitizer.interface';
+import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
 import HTMLTransformer from '../../transformers/html/html.transformer';
 import BigUtils from '../../utils/big';
 import Constructor from '../../utils/constructor.type';
@@ -18,6 +20,8 @@ export default function HTMLParser(
   HTMLSanitizer: new () => Sanitizer
 ): Constructor<Parser, [CreateTextParserConfig]> {
   return class HTMLParser extends DefaultLineBreakParser {
+    private readonly blockLevelTags = blockLevelTags;
+
     /**
      * The last element will always be the original text content.
      * The first element will be either the original text content or an HTML element.
@@ -32,7 +36,10 @@ export default function HTMLParser(
       lineHeight: Big;
     } | null;
 
-    constructor(config: CreateTextParserConfig) {
+    constructor(
+      config: CreateTextParserConfig,
+      private transformerOptions?: HTMLTransformerOptions
+    ) {
       super(config);
 
       this.tokenExpression = new RegExp(
@@ -45,9 +52,12 @@ export default function HTMLParser(
       text = this.transformText(text);
 
       // transform incompatible HTML tags into compatible ones using styling to match original behavior.
-      text = new HTMLTransformer({
-        fontSize: this.config.fontSize,
-      }).transform(text);
+      text = new HTMLTransformer(
+        {
+          fontSize: this.config.fontSize,
+        },
+        this.transformerOptions
+      ).transform(text);
 
       // remove completely incompatible HTML tags.
       text = new HTMLSanitizer().sanitize(text);
@@ -159,6 +169,12 @@ export default function HTMLParser(
         parserState = this.parsePageOverflow(parserState);
 
         if (this.shouldCloseTag()) {
+          /*
+           * If the tag is a block-level tag, we need to tell the parser to move to the next line,
+           * as that is the inherent property of blocks.
+           */
+          parserState = this.parseBlockLevelTagEnding(parserState);
+
           // If there is no remaining text content left, remove the tag context and reset the calculator.
           this.tag = null;
 
@@ -191,6 +207,24 @@ export default function HTMLParser(
         return this.getNext();
       } else {
         return next.value;
+      }
+    }
+
+    protected parseBlockLevelTagEnding(state: ParserState): ParserState {
+      if (this.blockLevelTags.includes(this.tag?.name)) {
+        return {
+          ...state,
+          textIndex: state.textIndex,
+          // Cut the current text and begin on a newline.
+          lines: state.lines.concat(state.lineText),
+          pageHeight: state.pageHeight.add(state.lineHeight),
+          // Choose the current tag's line height over the default line height, if it is continued on the next line
+          lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
+          lineWidth: Big(0),
+          lineText: '',
+        };
+      } else {
+        return state;
       }
     }
 

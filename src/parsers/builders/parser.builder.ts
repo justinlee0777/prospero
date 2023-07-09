@@ -1,4 +1,5 @@
 import PageStyles from '../../models/page-styles.interface';
+import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
 import Transformer from '../../transformers/models/transformer.interface';
 import Constructor from '../../utils/constructor.type';
 import Optional from '../../utils/optional.type';
@@ -76,8 +77,9 @@ export default function ParserBuilder(
       return this;
     }
 
-    forHTML(): ParserBuilder {
-      this.ParserConstructor = ParserFactory.createForHTML;
+    forHTML(options?: HTMLTransformerOptions): ParserBuilder {
+      this.ParserConstructor = (config) =>
+        ParserFactory.createForHTML(config, options);
 
       return this;
     }

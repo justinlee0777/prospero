@@ -1,4 +1,9 @@
 import createHTMLRegex from '../../regexp/html.regexp';
+import HTMLTransformerOptions from './html-transformer-options.interface';
+
+interface HTMLTransformerConfig {
+  fontSize: number;
+}
 
 interface TransformTag {
   (tagContent: string): string;
@@ -51,7 +56,10 @@ export default class HTMLTransformer {
     ],
   ]);
 
-  constructor(private config: { fontSize: number }) {}
+  constructor(
+    private config: HTMLTransformerConfig,
+    private options?: HTMLTransformerOptions
+  ) {}
 
   transform(text: string): string {
     this.headings.forEach((transform, tag) => {
@@ -59,6 +67,14 @@ export default class HTMLTransformer {
         transform(args.at(3))
       );
     });
+
+    const hrString = this.options?.hrString ?? '* * *';
+
+    text = text.replaceAll(
+      /\<hr\/?\>/g,
+      () =>
+        `<div style="display: inline-block; text-align: center; width: 100%">${hrString}</div>`
+    );
 
     return text;
   }

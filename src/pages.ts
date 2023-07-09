@@ -5,6 +5,7 @@ import PagesConfig from './models/pages-config.interface';
 import PagesOutput from './models/pages-output.interface';
 import IPages from './models/pages.interface';
 import IParserBuilder from './parsers/builders/parser.builder.interface';
+import HTMLTransformerOptions from './transformers/html/html-transformer-options.interface';
 import Processor from './transformers/models/transformer.interface';
 import Constructor from './utils/constructor.type';
 
@@ -34,7 +35,12 @@ export default function Pages(ParserBuilder: {
       }
 
       if (html) {
-        parserBuilder = parserBuilder.forHTML();
+        let option: HTMLTransformerOptions | undefined;
+
+        if (typeof html === 'object') {
+          option = html;
+        }
+        parserBuilder = parserBuilder.forHTML(option);
       }
 
       const parser = parserBuilder.build();
