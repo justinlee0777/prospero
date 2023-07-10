@@ -5,6 +5,8 @@ import typescript from '@rollup/plugin-typescript';
 import { copyFileSync, cpSync, readdirSync } from 'fs';
 import postcss from 'rollup-plugin-postcss';
 
+const sourcemap = true;
+
 const dir = 'dist';
 
 const pageEntries = readdirSync('./pages')
@@ -31,6 +33,7 @@ export default [
       'upload-ulysses': 'pages/ulysses/upload.ts',
     },
     output: {
+      sourcemap,
       dir,
     },
     plugins: [
@@ -46,6 +49,7 @@ export default [
   ...pageEntries.map(({ extensionlessName, extension }) => ({
     input: `pages/${extensionlessName}.${extension}`,
     output: {
+      sourcemap,
       file: `${dir}/${extensionlessName}.js`,
     },
     plugins: [

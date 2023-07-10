@@ -1,5 +1,4 @@
 import { writeFileSync } from 'fs';
-import path from 'path';
 
 import Pages from '../src/server/pages';
 import containerStyles from './container-style.const';
@@ -24,7 +23,7 @@ const mobile = new Pages(
 );
 
 writeFileSync(
-  path.join(__dirname, pagesJsonLocation),
+  `./dist/${pagesJsonLocation}`,
   JSON.stringify({
     desktop: desktop.getData(),
     mobile: mobile.getData(),

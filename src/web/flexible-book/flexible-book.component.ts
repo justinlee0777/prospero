@@ -73,20 +73,28 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
       mediaQueryList.find((mediaQuery) => mediaQuery.matches)?.config ??
       fallback;
 
-    const pages = new Pages(
-      {
-        ...normalizedPageStyles,
-        width: width / (bookConfig.pagesShown ?? 1),
-        height,
-      },
-      text,
-      transformers,
-      { fontLocation, html: forHTML }
-    );
+    const pageStyles = {
+      ...normalizedPageStyles,
+      width: width / (bookConfig.pagesShown ?? 1),
+      height,
+    };
 
-    bookElement = BookComponent(pages.getData(), bookConfig, {
-      classnames: bookClassNames,
+    const pages = new Pages(pageStyles, text, transformers, {
+      fontLocation,
+      html: forHTML,
     });
+
+    bookElement = BookComponent(
+      {
+        pageStyles,
+        getPage: (pageNumber) =>
+          pageNumber >= 0 ? pages.get(pageNumber) : null,
+      },
+      bookConfig,
+      {
+        classnames: bookClassNames,
+      }
+    );
 
     flexibleBookElement.appendChild(bookElement);
   };
