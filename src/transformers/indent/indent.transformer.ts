@@ -28,21 +28,18 @@ export default class IndentTransformer implements Transformer {
        * This regex does not target HTML with no content, as they are ignored.
        */
       pattern = /(\n)(?:<.*>)?([^\n<])/g;
+    }
 
-      const result = /<.*?>/.exec(text);
+    const result = /<.*?>/.exec(text);
+    if (result?.index === 0) {
+      const matchedTag = result[0];
 
-      if (result.index === 0) {
-        const matchedTag = result[0];
-
-        text =
-          text.slice(0, matchedTag.length) +
-          this.text +
-          text.slice(matchedTag.length);
-      }
-    } else {
-      if (/[^\n]/.exec(text)?.index === 0) {
-        text = this.text + text;
-      }
+      text =
+        text.slice(0, matchedTag.length) +
+        this.text +
+        text.slice(matchedTag.length);
+    } else if (/[^\n]/.exec(text)?.index === 0) {
+      text = this.text + text;
     }
 
     return text.replace(pattern, `$1${this.text}$2`);
