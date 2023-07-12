@@ -1,6 +1,7 @@
 import './book-demo.css';
 
 import {
+  DefaultBookTheme,
   SinglePageBookAnimation,
   listenToClickEvents,
   listenToKeyboardEvents,
@@ -17,9 +18,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const desktopBook = BookComponent(
     desktop,
     {
-      pageStyles: {
-        backgroundColor: '#f9d8a7',
-      },
+      theme: DefaultBookTheme,
       animation: new DoublePageBookAnimation(),
       listeners: [listenToClickEvents, listenToKeyboardEvents],
       pagesShown: 2,
@@ -35,9 +34,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const mobileBook = BookComponent(
     mobile,
     {
-      pageStyles: {
-        backgroundColor: '#f9d8a7',
-      },
+      theme: DefaultBookTheme,
       animation: new SinglePageBookAnimation(),
       listeners: [listenToClickEvents, listenToSwipeEvents],
       pagesShown: 1,
