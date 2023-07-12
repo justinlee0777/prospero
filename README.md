@@ -301,4 +301,4 @@ Possible:
 
 - Idiomatic React component
 - Accessibility
-- Support list and quotation block
+- Support list block
