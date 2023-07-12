@@ -1,4 +1,4 @@
-import Processor from '../../transformers/models/transformer.interface';
+import Transformer from '../../transformers/models/transformer.interface';
 import IWordWidthCalculator from '../../word-width-calculator.interface';
 import ParserState from './parser-state.interface';
 
@@ -12,7 +12,7 @@ export default interface Parser {
 
   setCalculator(calculator: IWordWidthCalculator): void;
 
-  setProcessors(processors: Array<Processor>): void;
+  setTransformers(transformers: Array<Transformer>): void;
 
   generateParserStates(text: string): Generator<ParserState>;
 

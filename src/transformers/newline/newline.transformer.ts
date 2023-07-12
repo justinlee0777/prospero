@@ -5,6 +5,8 @@ import NewlineTransformerOptions from './newline-transformer-options.interface';
  * Add newlines between paragraphs if there are none.
  */
 export default class NewlineTransformer implements Transformer {
+  forHTML: boolean;
+
   constructor(private options: NewlineTransformerOptions = {}) {}
 
   transform(text: string): string {

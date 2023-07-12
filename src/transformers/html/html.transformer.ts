@@ -71,10 +71,18 @@ export default class HTMLTransformer {
     const hrString = this.options?.hrString ?? '* * *';
 
     text = text.replaceAll(
-      /\<hr\/?\>/g,
+      createHTMLRegex('hr', true),
       () =>
         `<div style="display: inline-block; text-align: center; width: 100%">${hrString}</div>`
     );
+
+    text = text.replaceAll(createHTMLRegex('blockquote'), (...args) => {
+      const content = args.at(3);
+
+      return `<div style="display: inline-block; margin: 0 ${
+        this.config.fontSize * 2
+      }px;">${content}</div>`;
+    });
 
     return text;
   }

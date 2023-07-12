@@ -6,12 +6,15 @@ import PagesOutput from './models/pages-output.interface';
 import IPages from './models/pages.interface';
 import IParserBuilder from './parsers/builders/parser.builder.interface';
 import HTMLTransformerOptions from './transformers/html/html-transformer-options.interface';
-import Processor from './transformers/models/transformer.interface';
+import Transformer from './transformers/models/transformer.interface';
 import Constructor from './utils/constructor.type';
 
 export default function Pages(ParserBuilder: {
   new (): IParserBuilder;
-}): Constructor<IPages, [PageStyles, string, Array<Processor>?, PagesConfig?]> {
+}): Constructor<
+  IPages,
+  [PageStyles, string, Array<Transformer>?, PagesConfig?]
+> {
   return class Pages {
     private pageGenerator: Generator<string>;
 
@@ -21,13 +24,13 @@ export default function Pages(ParserBuilder: {
     constructor(
       private pageStyles: PageStyles,
       text: string,
-      processors?: Array<Processor>,
+      transformers?: Array<Transformer>,
       { fontLocation, html }: PagesConfig = {}
     ) {
       let parserBuilder = new ParserBuilder().fromPageStyles(pageStyles);
 
-      if (processors) {
-        parserBuilder = parserBuilder.setProcessors(processors);
+      if (transformers) {
+        parserBuilder = parserBuilder.setTransformers(transformers);
       }
 
       if (fontLocation) {

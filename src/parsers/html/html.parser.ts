@@ -14,7 +14,7 @@ import Parser from '../models/parser.interface';
 import Word from '../models/word.interface';
 import pageOverflowParser from '../word-parsers/page-overflow.parser';
 import extractStyles from './extract-styles.function';
-import { FontStyles } from './font-styles.interface';
+import getMargin from './get-margin.function';
 
 export default function HTMLParser(
   HTMLSanitizer: new () => Sanitizer
@@ -36,11 +36,19 @@ export default function HTMLParser(
       lineHeight: Big;
     } | null;
 
+    /**
+     * Caching the original page width calculated from page styles.
+     * We will be adjusting the page width based on the block-level element being analyzed at the moment.
+     */
+    private originalPageWidth: number;
+
     constructor(
       config: CreateTextParserConfig,
       private transformerOptions?: HTMLTransformerOptions
     ) {
       super(config);
+
+      this.originalPageWidth = this.pageWidth;
 
       this.tokenExpression = new RegExp(
         `${createHTMLRegex().source}|${this.tokenExpression.source}`,
@@ -49,8 +57,6 @@ export default function HTMLParser(
     }
 
     *generateParserStates(text: string): Generator<ParserState> {
-      text = this.transformText(text);
-
       // transform incompatible HTML tags into compatible ones using styling to match original behavior.
       text = new HTMLTransformer(
         {
@@ -58,6 +64,8 @@ export default function HTMLParser(
         },
         this.transformerOptions
       ).transform(text);
+
+      text = this.transformText(text);
 
       // remove completely incompatible HTML tags.
       text = new HTMLSanitizer().sanitize(text);
@@ -92,13 +100,23 @@ export default function HTMLParser(
 
           this.iteratorQueue.unshift(tagContent.matchAll(this.tokenExpression));
 
-          let fontStyles: FontStyles;
-          if ((fontStyles = extractStyles(opening))) {
+          const { font: fontStyles, block: blockStyle } =
+            extractStyles(opening);
+          if (fontStyles) {
             // Adjust the current word-width calculator to take into account font size and weight.
             this.calculator.apply({
               size: fontStyles['font-size'],
               weight: fontStyles['font-weight'],
             });
+          }
+
+          if (blockStyle) {
+            const { margin } = blockStyle;
+            if (margin) {
+              const marginValues = getMargin(margin);
+              // Only acknowledging left and right for the time being.
+              this.pageWidth -= marginValues.left + marginValues.right;
+            }
           }
 
           this.tag = {
@@ -169,14 +187,11 @@ export default function HTMLParser(
         parserState = this.parsePageOverflow(parserState);
 
         if (this.shouldCloseTag()) {
-          /*
-           * If the tag is a block-level tag, we need to tell the parser to move to the next line,
-           * as that is the inherent property of blocks.
-           */
-          parserState = this.parseBlockLevelTagEnding(parserState);
-
           // If there is no remaining text content left, remove the tag context and reset the calculator.
           this.tag = null;
+
+          // Reset the page width to the natural width of the container.
+          this.pageWidth = this.originalPageWidth;
 
           this.calculator.reset();
         }
@@ -207,24 +222,6 @@ export default function HTMLParser(
         return this.getNext();
       } else {
         return next.value;
-      }
-    }
-
-    protected parseBlockLevelTagEnding(state: ParserState): ParserState {
-      if (this.blockLevelTags.includes(this.tag?.name)) {
-        return {
-          ...state,
-          textIndex: state.textIndex,
-          // Cut the current text and begin on a newline.
-          lines: state.lines.concat(state.lineText),
-          pageHeight: state.pageHeight.add(state.lineHeight),
-          // Choose the current tag's line height over the default line height, if it is continued on the next line
-          lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
-          lineWidth: Big(0),
-          lineText: '',
-        };
-      } else {
-        return state;
       }
     }
 

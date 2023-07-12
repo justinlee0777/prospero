@@ -65,7 +65,7 @@ export default function ParserBuilder(
     /**
      * Set processors on the building parser.
      */
-    setProcessors(transformers: Array<Transformer>): ParserBuilder {
+    setTransformers(transformers: Array<Transformer>): ParserBuilder {
       this.transformers = transformers;
 
       return this;
@@ -133,7 +133,7 @@ export default function ParserBuilder(
 
       parser.setCalculator(calculator);
 
-      parser.setProcessors(this.transformers);
+      parser.setTransformers(this.transformers);
 
       return parser;
     }

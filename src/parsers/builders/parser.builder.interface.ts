@@ -9,7 +9,7 @@ export default interface IParserBuilder {
     containerStyle: Optional<PageStyles, 'padding' | 'margin' | 'border'>
   ): IParserBuilder;
 
-  setProcessors(transformers: Array<Transformer>): IParserBuilder;
+  setTransformers(transformers: Array<Transformer>): IParserBuilder;
 
   setFontLocation(url: string): IParserBuilder;
 

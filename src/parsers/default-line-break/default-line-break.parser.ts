@@ -51,6 +51,8 @@ export default class DefaultLineBreakParser implements Parser {
   protected calculator: IWordWidthCalculator;
   protected transformers: Array<Transformer> = [];
 
+  protected pageWidth: number;
+
   /**
    * Line height for the whole book, given the font size configured.
    */
@@ -58,6 +60,8 @@ export default class DefaultLineBreakParser implements Parser {
 
   constructor(protected config: CreateTextParserConfig) {
     this.debug = config;
+
+    this.pageWidth = config.pageWidth;
 
     /**
      * <token> = <punctuatedWord> | <whitespace> | <newline>
@@ -87,7 +91,7 @@ export default class DefaultLineBreakParser implements Parser {
     this.bookLineHeight = Big(this.calculator.getCalculatedLineHeight());
   }
 
-  setProcessors(transformers: Array<Transformer>): void {
+  setTransformers(transformers: Array<Transformer>): void {
     this.transformers = transformers;
   }
 
@@ -144,10 +148,10 @@ export default class DefaultLineBreakParser implements Parser {
   }
 
   protected transformText(text: string): string {
-    return this.transformers.reduce(
-      (newText, transformer) => transformer.transform(newText),
-      text
-    );
+    return this.transformers.reduce((newText, transformer) => {
+      transformer.forHTML = true;
+      return transformer.transform(newText);
+    }, text);
   }
 
   protected initializeParserState(): ParserState {
@@ -180,7 +184,7 @@ export default class DefaultLineBreakParser implements Parser {
         parserState.pageHeight.eq(0) && parserState.lineWidth.eq(0),
       causesWordOverflow: parserState.lineWidth
         .plus(wordWidth)
-        .gte(this.config.pageWidth),
+        .gte(this.pageWidth),
       word: {
         text,
         width: wordWidth,
