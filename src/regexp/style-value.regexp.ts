@@ -8,7 +8,8 @@
  * font-size: 16px;
  * font-weight:bold
  * font-size: 16px;font-weight: bold
+ * margin: 8px 0
  */
-const StyleValueRegex = /([a-zA-Z-]+): *([a-zA-Z0-9\. ]+);?/g;
+const StyleValueRegex = /([a-zA-Z-]+): *((?:[a-zA-Z0-9\.]+ ?)+);?/g;
 
 export default StyleValueRegex;

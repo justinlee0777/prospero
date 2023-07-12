@@ -19,7 +19,7 @@ describe('HTMLRegex', () => {
     // Nested tags don't really work (for now)
     expect(
       '<p><span>foo</span></p>'.matchAll(HTMLRegex).next().value.slice()
-    ).toEqual(['<p><span>foo</span></p>', '<p><span>foo</span>', 'p', '']);
+    ).toEqual(['<p><span>foo</span></p>', '<p>', 'p', '<span>foo</span>']);
 
     // <p> tags
     expect('<p>foo</p>'.matchAll(HTMLRegex).next().value.slice()).toEqual([
@@ -73,6 +73,34 @@ describe('HTMLRegex', () => {
       '<p style="margin: 0" aria-label="bar">',
       'p',
       'foo',
+    ]);
+  });
+
+  test('match <hr> elements', () => {
+    const HRRegex = createHTMLRegex('hr', true);
+
+    // <hr> closed tags
+    expect('<hr>foo</hr>'.matchAll(HRRegex).next().value.slice()).toEqual([
+      '<hr>',
+      '<hr>',
+      'hr',
+    ]);
+
+    // <img/> tags
+    expect('<img/>'.matchAll(HRRegex).next().value).toBeUndefined();
+
+    // <hr>
+    expect('<hr>'.matchAll(HRRegex).next().value.slice()).toEqual([
+      '<hr>',
+      '<hr>',
+      'hr',
+    ]);
+
+    // <hr/>
+    expect('<hr/>'.matchAll(HRRegex).next().value.slice()).toEqual([
+      '<hr/>',
+      '<hr/>',
+      'hr',
     ]);
   });
 });

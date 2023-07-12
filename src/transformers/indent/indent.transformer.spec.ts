@@ -14,4 +14,11 @@ describe('IndentTransformer', () => {
 
     expect(transformer.transform('\nFoo')).toBe('\n    Foo');
   });
+
+  test('sets indentation into HTML blocks', () => {
+    const transformer = new IndentTransformer(4);
+    transformer.forHTML = true;
+
+    expect(transformer.transform('<div>Foo</div>')).toBe('<div>    Foo</div>');
+  });
 });

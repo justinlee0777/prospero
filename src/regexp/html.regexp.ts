@@ -40,5 +40,5 @@ export default function createHTMLRegex(
  * Second: the tag name itself
  */
 function createVoidElementRegex(tagname: string): RegExp {
-  return new RegExp(`(<(${tagname}/?).*?>)`, 'g');
+  return new RegExp(`(<(${tagname})/?.*?>)`, 'g');
 }

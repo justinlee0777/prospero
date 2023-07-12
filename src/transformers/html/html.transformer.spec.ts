@@ -43,6 +43,24 @@ describe('HTMLTransformer', () => {
     );
   });
 
+  test('transform HR tags', () => {
+    expect(transformer.transform('<hr/>')).toBe(
+      '<div style="display: inline-block; text-align: center; width: 100%">* * *</div>'
+    );
+
+    transformer = new HTMLTransformer({ fontSize: 18 }, { hrString: '- - -' });
+
+    expect(transformer.transform('<hr/>')).toBe(
+      '<div style="display: inline-block; text-align: center; width: 100%">- - -</div>'
+    );
+  });
+
+  test('transforms blockquote tags', () => {
+    expect(transformer.transform('<blockquote>foo</blockquote>')).toBe(
+      '<div style="display: inline-block; margin: 0 36px;">foo</div>'
+    );
+  });
+
   test('transforms entire text', () => {
     const text = '<h1>foo</h1>' + '<h2>bar</h2>' + '<h3>baz</h3>';
 
