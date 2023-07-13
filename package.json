@@ -35,7 +35,6 @@
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-typescript": "^11.1.1",
     "@types/big.js": "^6.1.6",
-    "@types/dompurify": "^3.0.2",
     "@types/jest": "^29.5.1",
     "@types/lodash-es": "^4.17.7",
     "@types/node": "^18.15.11",
@@ -64,7 +63,6 @@
   },
   "dependencies": {
     "big.js": "^6.2.1",
-    "dompurify": "^3.0.3",
     "lodash-es": "^4.17.21",
     "style-inject": "^0.3.0"
   },

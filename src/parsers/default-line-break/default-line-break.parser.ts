@@ -73,7 +73,11 @@ export default class DefaultLineBreakParser implements Parser {
      */
     const whitespaceExpression = `${whitespace}|${dash}`;
     const newlineExpression = newline;
-    const characterExpression = `[^${whitespace}\\${dash}${newline}]+`;
+    /**
+     * 1. As phrases with dashes can be cut by the dash, such that the
+     * word preceding contains the dash, we look for "{word without dash}{dash, optionally}"
+     */
+    const characterExpression = `[^${whitespace}\\${dash}${newline}]+${dash}?`;
     const expressions = [
       `(?<word>${characterExpression})`,
       `(?<whitespace>${whitespaceExpression})`,
