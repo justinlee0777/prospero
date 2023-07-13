@@ -181,8 +181,6 @@ export default function HTMLParser(
 
         parserState = parseText(parserState, wordDescription.word);
 
-        parserState = this.parsePageOverflow(parserState);
-
         if (this.shouldCloseTag()) {
           // If there is no remaining text content left, remove the tag context and reset the calculator.
           this.tag = null;
@@ -192,6 +190,8 @@ export default function HTMLParser(
 
           this.calculator.reset();
         }
+
+        parserState = this.parsePageOverflow(parserState);
 
         yield parserState;
       }

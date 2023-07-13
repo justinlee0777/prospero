@@ -27,7 +27,7 @@ export default class IndentTransformer implements Transformer {
        * Also added '<' in the negative list at the end.
        * This regex does not target HTML with no content, as they are ignored.
        */
-      pattern = /(\n)(?:<.*>)?([^\n<])/g;
+      pattern = /(\n(?:<.*?>)?)([^\n<])/g;
     }
 
     const result = /<.*?>/.exec(text);
@@ -42,6 +42,6 @@ export default class IndentTransformer implements Transformer {
       text = this.text + text;
     }
 
-    return text.replace(pattern, `$1${this.text}$2`);
+    return text.replaceAll(pattern, `$1${this.text}$2`);
   }
 }
