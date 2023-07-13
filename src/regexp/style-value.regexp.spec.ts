@@ -22,5 +22,11 @@ describe('StyleValueRegexp', () => {
       ['display: block;', 'display', 'block'],
       ['font-size: 18px;', 'font-size', '18px'],
     ]);
+
+    expect(
+      [...'margin: 4px 8px 12px;'.matchAll(StyleValueRegexp)].map((match) =>
+        match.slice()
+      )
+    ).toEqual([['margin: 4px 8px 12px;', 'margin', '4px 8px 12px']]);
   });
 });

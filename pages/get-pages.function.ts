@@ -1,4 +1,4 @@
-import PagesOutput from '../src/pages-output.interface';
+import PagesOutput from '../src/models/pages-output.interface';
 import { pagesJsonLocation } from './pages-json-location.const';
 
 interface Data {

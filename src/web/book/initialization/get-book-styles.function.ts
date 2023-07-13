@@ -1,4 +1,4 @@
-import PageStyles from '../../../page-styles.interface';
+import PageStyles from '../../../models/page-styles.interface';
 import pageStylesToStyleDeclaration from '../../../utils/container-style-to-style-declaration.function';
 import toPixelUnits from '../../../utils/to-pixel-units.function';
 

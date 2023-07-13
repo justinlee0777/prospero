@@ -1,6 +1,6 @@
 jest.mock('../../../utils/merge.function', () => (arg) => arg);
 
-import PagesOutput from '../../../pages-output.interface';
+import PagesOutput from '../../../models/pages-output.interface';
 import DefaultPageFlipAnimation from '../animations/default-page-flip.animation';
 import BookComponent from '../book.component';
 import updateHandler from './update-handler.function';

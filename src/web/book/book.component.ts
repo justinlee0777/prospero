@@ -1,7 +1,7 @@
 import styles from './book.module.css';
 
 import CreateElementConfig from '../../elements/create-element.config';
-import GetPage from '../../get-page.interface';
+import GetPage from '../../models/get-page.interface';
 import merge from '../../utils/merge.function';
 import normalizePageStyles from '../../utils/normalize-page-styles.function';
 import NullaryFn from '../../utils/nullary-fn.type';

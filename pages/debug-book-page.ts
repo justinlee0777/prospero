@@ -8,7 +8,7 @@ import ParserState from '../src/parsers/models/parser-state.interface';
 import { formatVariables } from '../src/utils/debug/format-variables.function';
 import containerStyles from './container-style.const';
 import { pagesJsonLocation } from './pages-json-location.const';
-import processors from './processors.const';
+import transformers from './transformers.const';
 
 window.addEventListener('DOMContentLoaded', async () => {
   const response = await fetch(pagesJsonLocation);
@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const parser = new ParserBuilder()
     .fromPageStyles(containerStyles)
-    .setProcessors(processors)
+    .setTransformers(transformers)
     .build();
 
   document.body.appendChild(

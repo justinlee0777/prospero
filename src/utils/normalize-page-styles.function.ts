@@ -1,4 +1,4 @@
-import PageStyles from '../page-styles.interface';
+import PageStyles from '../models/page-styles.interface';
 
 export default function normalizePageStyles(
   pageStyles: PageStyles

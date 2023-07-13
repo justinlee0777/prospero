@@ -1,3 +1,3 @@
-import Processor from './models/transformer.interface';
+import Transformer from './models/transformer.interface';
 
-export { Processor };
+export { Transformer };

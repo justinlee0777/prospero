@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import useBook from '../src/react/use-book.effect';
 import {
   BookComponent,
   BooksComponent,
@@ -8,9 +9,8 @@ import {
   listenToClickEvents,
   listenToKeyboardEvents,
   listenToSwipeEvents,
-} from '../src/components';
-import DoublePageBookAnimation from '../src/components/book/animations/double-page-book.animation';
-import useBook from '../src/react/use-book.effect';
+} from '../src/web';
+import DoublePageBookAnimation from '../src/web/book/animations/double-page-book.animation';
 import { getPages } from './get-pages.function';
 
 const { desktop, mobile } = await getPages();

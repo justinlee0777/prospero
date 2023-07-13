@@ -1,4 +1,5 @@
 import CalculateWordWidth from './parsers/builders/calculate-word-width.interface';
+import { FontStyles } from './parsers/html/font-styles.interface';
 
 export default interface IWordWidthCalculator {
   calculate: CalculateWordWidth;
@@ -12,7 +13,7 @@ export default interface IWordWidthCalculator {
   /**
    * Apply a temporary change in font ex. for a header.
    */
-  apply({ size, weight }: { size?: string; weight?: string }): void;
+  apply(styles: FontStyles): void;
 
   /**
    * Reset to the original font after a temporary change.

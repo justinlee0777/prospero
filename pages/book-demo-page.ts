@@ -1,14 +1,15 @@
 import './book-demo.css';
 
 import {
+  DefaultBookTheme,
   SinglePageBookAnimation,
   listenToClickEvents,
   listenToKeyboardEvents,
   listenToSwipeEvents,
-} from '../src/components';
-import DoublePageBookAnimation from '../src/components/book/animations/double-page-book.animation';
-import BookComponent from '../src/components/book/book.component';
-import BooksComponent from '../src/components/books/books.component';
+} from '../src/web';
+import DoublePageBookAnimation from '../src/web/book/animations/double-page-book.animation';
+import BookComponent from '../src/web/book/book.component';
+import BooksComponent from '../src/web/books/books.component';
 import { getPages } from './get-pages.function';
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -17,9 +18,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const desktopBook = BookComponent(
     desktop,
     {
-      pageStyles: {
-        backgroundColor: '#f9d8a7',
-      },
+      theme: DefaultBookTheme,
       animation: new DoublePageBookAnimation(),
       listeners: [listenToClickEvents, listenToKeyboardEvents],
       pagesShown: 2,
@@ -35,9 +34,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const mobileBook = BookComponent(
     mobile,
     {
-      pageStyles: {
-        backgroundColor: '#f9d8a7',
-      },
+      theme: DefaultBookTheme,
       animation: new SinglePageBookAnimation(),
       listeners: [listenToClickEvents, listenToSwipeEvents],
       pagesShown: 1,

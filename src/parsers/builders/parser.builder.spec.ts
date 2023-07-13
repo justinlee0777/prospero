@@ -6,14 +6,14 @@ const mockParserFactory = {
     () =>
       (mockParser = {
         setCalculator: jest.fn(),
-        setProcessors: jest.fn(),
+        setTransformers: jest.fn(),
       } as any)
   ),
   createForHTML: jest.fn().mockImplementation(
     () =>
       (mockHTMLParser = {
         setCalculator: jest.fn(),
-        setProcessors: jest.fn(),
+        setTransformers: jest.fn(),
       } as any)
   ),
 };
@@ -48,6 +48,7 @@ const tests: Array<[string, any]> = [
 tests.forEach(([suiteName, ParserBuilder]) => {
   describe(suiteName, () => {
     class MockTransformer implements Transformer {
+      forHTML = false;
       transform = jest.fn();
     }
 
@@ -75,7 +76,7 @@ tests.forEach(([suiteName, ParserBuilder]) => {
       expect(
         new ParserBuilder()
           .fromPageStyles(containerStyle)
-          .setProcessors([processor])
+          .setTransformers([processor])
           .build()
       ).toBe(mockParser);
 

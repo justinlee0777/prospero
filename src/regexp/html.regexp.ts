@@ -19,10 +19,26 @@ const anyTag = '[A-Za-z0-9]+';
  * - baz</span>
  * - baz<span>
  */
-export default function createHTMLRegex(tagname = anyTag): RegExp {
+export default function createHTMLRegex(
+  tagname = anyTag,
+  voidElement = false
+): RegExp {
+  if (voidElement) {
+    return createVoidElementRegex(tagname);
+  }
+
   const openingTag = `<(${tagname}).*?>`;
-  const tagContent = '[^<>]*';
+  const tagContent = '[\\S\\s]*?';
   const closingTag = '</\\2>';
 
   return new RegExp(`(${openingTag})(${tagContent})${closingTag}`, 'g');
+}
+
+/**
+ * Capture groups:
+ * First: the entire opening tag, plus attributes
+ * Second: the tag name itself
+ */
+function createVoidElementRegex(tagname: string): RegExp {
+  return new RegExp(`(<(${tagname})/?.*?>)`, 'g');
 }

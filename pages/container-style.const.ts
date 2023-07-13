@@ -1,4 +1,4 @@
-import PageStyles from '../src/page-styles.interface';
+import PageStyles from '../src/models/page-styles.interface';
 
 const containerStyles: PageStyles = {
   width: 375,

@@ -1,4 +1,5 @@
-enum FontStyle {
+export enum FontStyle {
+  'font-family' = 'font-family',
   'font-size' = 'font-size',
   'font-weight' = 'font-weight',
 }

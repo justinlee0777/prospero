@@ -1,7 +1,7 @@
 import { nextTick } from 'process';
 
-import div from '../../elements/div.function';
-import NullaryFn from '../../utils/nullary-fn.type';
+import div from '../../../elements/div.function';
+import NullaryFn from '../../../utils/nullary-fn.type';
 import lockElement from './lock-element.function';
 
 describe('BookComponent lockElement()', () => {

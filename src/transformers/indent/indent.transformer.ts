@@ -4,6 +4,8 @@ import Transformer from '../models/transformer.interface';
  * Add indentation to new paragraphs.
  */
 export default class IndentTransformer implements Transformer {
+  forHTML: boolean;
+
   private text: string;
 
   constructor(private spaces: number) {
@@ -17,11 +19,29 @@ export default class IndentTransformer implements Transformer {
      * The first capture group is a newline.
      * The second capture group is a contentful character.
      */
-    const pattern = /(\n)([^\n])/g;
+    let pattern = /(\n)([^\n])/g;
 
-    // If the first paragraph is contentful (before the first newline), pad the beginning.
-    const padBeginning = text.match(/[^\n]+\n/) ? this.text : '';
+    if (this.forHTML) {
+      /*
+       * Adds a non-captured expression for the HTML tag (<.*>), which is optional (using ?).
+       * Also added '<' in the negative list at the end.
+       * This regex does not target HTML with no content, as they are ignored.
+       */
+      pattern = /(\n)(?:<.*>)?([^\n<])/g;
+    }
 
-    return padBeginning + text.replace(pattern, `$1${this.text}$2`);
+    const result = /<.*?>/.exec(text);
+    if (result?.index === 0) {
+      const matchedTag = result[0];
+
+      text =
+        text.slice(0, matchedTag.length) +
+        this.text +
+        text.slice(matchedTag.length);
+    } else if (/[^\n]/.exec(text)?.index === 0) {
+      text = this.text + text;
+    }
+
+    return text.replace(pattern, `$1${this.text}$2`);
   }
 }

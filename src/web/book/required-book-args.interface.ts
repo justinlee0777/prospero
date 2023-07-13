@@ -1,6 +1,6 @@
-import GetPage from '../../get-page.interface';
-import PageStyles from '../../page-styles.interface';
-import PagesOutput from '../../pages-output.interface';
+import GetPage from '../../models/get-page.interface';
+import PageStyles from '../../models/page-styles.interface';
+import PagesOutput from '../../models/pages-output.interface';
 
 interface BookArgsWithGetPage {
   getPage: GetPage;

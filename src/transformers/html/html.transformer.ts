@@ -1,4 +1,9 @@
 import createHTMLRegex from '../../regexp/html.regexp';
+import HTMLTransformerOptions from './html-transformer-options.interface';
+
+interface HTMLTransformerConfig {
+  fontSize: number;
+}
 
 interface TransformTag {
   (tagContent: string): string;
@@ -51,13 +56,32 @@ export default class HTMLTransformer {
     ],
   ]);
 
-  constructor(private config: { fontSize: number }) {}
+  constructor(
+    private config: HTMLTransformerConfig,
+    private options?: HTMLTransformerOptions
+  ) {}
 
   transform(text: string): string {
     this.headings.forEach((transform, tag) => {
       text = text.replaceAll(createHTMLRegex(tag), (...args) =>
         transform(args.at(3))
       );
+    });
+
+    const hrString = this.options?.hrString ?? '* * *';
+
+    text = text.replaceAll(
+      createHTMLRegex('hr', true),
+      () =>
+        `<div style="display: inline-block; text-align: center; width: 100%">${hrString}</div>`
+    );
+
+    text = text.replaceAll(createHTMLRegex('blockquote'), (...args) => {
+      const content = args.at(3);
+
+      return `<div style="display: inline-block; margin: 0 ${
+        this.config.fontSize * 2
+      }px;">${content}</div>`;
     });
 
     return text;
