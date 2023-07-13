@@ -1,7 +1,19 @@
+import IWordWidthCalculator from './word-width-calculator.interface';
 import ServerWordWidthCalculator from './word-width.calculator.server';
 import WebWordWidthCalculator from './word-width.calculator.web';
 
-const tests: Array<[string, any]> = [
+const tests: Array<
+  [
+    string,
+    {
+      new (
+        size: string,
+        family: string,
+        lineHeight: number
+      ): IWordWidthCalculator;
+    }
+  ]
+> = [
   ['Server WordWidthCalculator', ServerWordWidthCalculator],
   ['Web WordWidthCalculator', WebWordWidthCalculator],
 ];
@@ -48,8 +60,8 @@ tests.forEach(([suiteName, WordWidthCalculator]) => {
       const calculator = new WordWidthCalculator('16px', 'Arial', 32);
 
       calculator.apply({
-        size: '24px',
-        weight: 'bold',
+        'font-size': '24px',
+        'font-weight': 'bold',
       });
 
       expect(calculator.calculate(' ')).toBe(6.66796875);
@@ -70,5 +82,31 @@ tests.forEach(([suiteName, WordWidthCalculator]) => {
 
       expect(calculator.calculate('baz')).toBe(25.796875);
     });
+  });
+
+  test('changes font family and resets', () => {
+    const calculator = new WordWidthCalculator('16px', 'Arial', 32);
+
+    calculator.apply({
+      'font-family': 'monospace',
+    });
+
+    expect(calculator.calculate(' ')).toBe(9.6015625);
+
+    expect(calculator.calculate('foo')).toBe(28.8046875);
+
+    expect(calculator.calculate('bar')).toBe(28.8046875);
+
+    expect(calculator.calculate('baz')).toBe(28.8046875);
+
+    calculator.reset();
+
+    expect(calculator.calculate(' ')).toBe(4.4453125);
+
+    expect(calculator.calculate('foo')).toBe(22.2421875);
+
+    expect(calculator.calculate('bar')).toBe(23.125);
+
+    expect(calculator.calculate('baz')).toBe(25.796875);
   });
 });

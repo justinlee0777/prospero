@@ -1,4 +1,5 @@
 import CalculateWordWidth from './parsers/builders/calculate-word-width.interface';
+import { FontStyles } from './parsers/html/font-styles.interface';
 import Constructor from './utils/constructor.type';
 import toPixelUnits from './utils/to-pixel-units.function';
 import IWordWidthCalculator from './word-width-calculator.interface';
@@ -52,8 +53,12 @@ export default function WordWidthCalculator(
     /**
      * Apply a temporary change in font ex. for a header.
      */
-    apply({ size, weight }: { size?: string; weight?: string }): void {
-      let font = `${size ?? this.fontSize} ${this.fontFamily}`;
+    apply(styles: FontStyles): void {
+      const size = styles['font-size'] ?? this.fontSize;
+      const weight = styles['font-weight'];
+      const family = styles['font-family'] ?? this.fontFamily;
+
+      let font = `${size ?? this.fontSize} ${family}`;
 
       if (weight) {
         font = `${weight} ${font}`;

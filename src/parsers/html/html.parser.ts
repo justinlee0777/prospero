@@ -104,10 +104,7 @@ export default function HTMLParser(
             extractStyles(opening);
           if (fontStyles) {
             // Adjust the current word-width calculator to take into account font size and weight.
-            this.calculator.apply({
-              size: fontStyles['font-size'],
-              weight: fontStyles['font-weight'],
-            });
+            this.calculator.apply(fontStyles);
           }
 
           if (blockStyle) {

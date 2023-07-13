@@ -57,4 +57,15 @@ describe('extractStyles()', () => {
       margin: '8px',
     });
   });
+
+  test('extracts font-family from the <code> tag', () => {
+    expect(extractStyles('<code>').font).toEqual({
+      'font-family': 'monospace',
+    });
+
+    expect(extractStyles('<code style="font-weight: bold">').font).toEqual({
+      'font-family': 'monospace',
+      'font-weight': 'bold',
+    });
+  });
 });
