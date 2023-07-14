@@ -18,9 +18,7 @@ const mockParserFactory = {
   ),
 };
 
-jest.mock('../parser.factory.server', () => mockParserFactory);
-
-jest.mock('../parser.factory.web', () => mockParserFactory);
+jest.mock('../parser.factory', () => mockParserFactory);
 
 let MockWordWidthCalculatorConstructor;
 

@@ -61,6 +61,16 @@ describe('HTMLTransformer', () => {
     );
   });
 
+  test('eliminates spaces at the beginning and ending of block level tags', () => {
+    expect(
+      transformer.transform(
+        `<blockquote>\n<p>\nDo or do not. There is no try.\n</p>\n</blockquote>`
+      )
+    ).toBe(
+      '<div style="display: inline-block; margin: 0 36px;"><p>\nDo or do not. There is no try.\n</p></div>'
+    );
+  });
+
   test('transforms entire text', () => {
     const text = '<h1>foo</h1>' + '<h2>bar</h2>' + '<h3>baz</h3>';
 

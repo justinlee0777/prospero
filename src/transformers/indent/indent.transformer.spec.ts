@@ -22,5 +22,9 @@ describe('IndentTransformer', () => {
     expect(transformer.transform('\nFoo')).toBe('\n    Foo');
 
     expect(transformer.transform('<div>Foo</div>')).toBe('<div>    Foo</div>');
+
+    expect(transformer.transform('\n<div>Bar</div>')).toBe(
+      '\n<div>    Bar</div>'
+    );
   });
 });
