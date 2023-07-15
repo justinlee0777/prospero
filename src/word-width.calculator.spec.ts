@@ -109,4 +109,30 @@ tests.forEach(([suiteName, WordWidthCalculator]) => {
 
     expect(calculator.calculate('baz')).toBe(25.796875);
   });
+
+  test('changes font style and resets', () => {
+    const calculator = new WordWidthCalculator('16px', 'Arial', 32);
+
+    calculator.apply({
+      'font-style': 'italic',
+    });
+
+    expect(calculator.calculate(' ')).toBe(4.4453125);
+
+    expect(calculator.calculate('foo')).toBe(22.2421875);
+
+    expect(calculator.calculate('bar')).toBe(23.125);
+
+    expect(calculator.calculate('baz')).toBe(25.796875);
+
+    calculator.reset();
+
+    expect(calculator.calculate(' ')).toBe(4.4453125);
+
+    expect(calculator.calculate('foo')).toBe(22.2421875);
+
+    expect(calculator.calculate('bar')).toBe(23.125);
+
+    expect(calculator.calculate('baz')).toBe(25.796875);
+  });
 });

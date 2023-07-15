@@ -13,36 +13,41 @@ import AllowedTags from './allowed-tags.const';
 import extractStyles from './extract-styles.function';
 import getMargin from './get-margin.function';
 
+/**
+ * Describes an HTML tag found in the text.
+ */
+interface ParserContextTag {
+  opening: string;
+  name: string;
+  lineHeight: Big;
+}
+
+/**
+ * The context of the parser - there are really two types only:
+ * 1. the entire text
+ * 2. HTML tags
+ */
+interface ParserContext {
+  /** Use to get the words within the text or the current HTML tag. */
+  content: IterableIterator<RegExpMatchArray>;
+  pageWidth: number;
+
+  tag?: ParserContextTag;
+}
+
 export default class HTMLParser extends DefaultLineBreakParser {
   private readonly allowedTags = AllowedTags;
 
   /**
-   * The last element will always be the original text content.
-   * The first element will be either the original text content or an HTML element.
-   * The parser currently is not expected to handle nested HTML tags - thus elements are only one - level deep.
-   * Thus there are always only 0 - 2 elements in the array.
+   * The 0th-element is the current context.
    */
-  private iteratorQueue: Array<IterableIterator<RegExpMatchArray>>;
-  private tag: {
-    opening: string;
-    name: string;
-    remainingTextContentLength: number;
-    lineHeight: Big;
-  } | null;
-
-  /**
-   * Caching the original page width calculated from page styles.
-   * We will be adjusting the page width based on the block-level element being analyzed at the moment.
-   */
-  private originalPageWidth: number;
+  private queue: Array<ParserContext>;
 
   constructor(
     config: CreateTextParserConfig,
     private transformerOptions?: HTMLTransformerOptions
   ) {
     super(config);
-
-    this.originalPageWidth = this.pageWidth;
 
     this.tokenExpression = new RegExp(
       `${createHTMLRegex().source}|${this.tokenExpression.source}`,
@@ -61,7 +66,12 @@ export default class HTMLParser extends DefaultLineBreakParser {
 
     text = this.transformText(text);
 
-    this.iteratorQueue = [text.matchAll(this.tokenExpression)];
+    this.queue = [
+      {
+        content: text.matchAll(this.tokenExpression),
+        pageWidth: this.pageWidth,
+      },
+    ];
 
     const calculateWordWidth = (word) => this.calculator.calculate(word);
 
@@ -71,7 +81,7 @@ export default class HTMLParser extends DefaultLineBreakParser {
 
     let token: RegExpMatchArray;
 
-    while ((token = this.getNext())) {
+    while ((token = this.getNext(parserState))) {
       const { groups } = token;
 
       /*
@@ -90,16 +100,14 @@ export default class HTMLParser extends DefaultLineBreakParser {
         const tagName = token.at(2);
         const tagContent = token.at(3);
 
-        // Create a new context from the HTML content, regardless if the tag is used or not.
-        this.iteratorQueue.unshift(tagContent.matchAll(this.tokenExpression));
+        const context: ParserContext = {
+          content: tagContent.matchAll(this.tokenExpression),
+          // Take the page width of the current context
+          pageWidth: this.queue.at(0).pageWidth,
+        };
 
-        /*
-         * The assumption is that all identified tags are closed tags.
-         * 3 is therefore the characters "</>", in "<${tagName}/>".
-         * This should only be done when we're nested within a tag.
-         */
-        const tagLength = opening.length + tagName.length + 3;
-        this.tag && (this.tag.remainingTextContentLength -= tagLength);
+        // Create a new context from the HTML content, regardless if the tag is used or not.
+        this.queue.unshift(context);
 
         // Only process allowed tags.
         if (this.allowedTags.includes(tagName)) {
@@ -115,15 +123,15 @@ export default class HTMLParser extends DefaultLineBreakParser {
             if (margin) {
               const marginValues = getMargin(margin);
               // Only acknowledging left and right for the time being.
-              this.pageWidth -= marginValues.left + marginValues.right;
+              context.pageWidth -= marginValues.left + marginValues.right;
+
+              this.pageWidth = context.pageWidth;
             }
           }
 
-          this.tag = {
+          context.tag = {
             opening,
             name: tagName,
-            // Use the size of the text content within the HTML to determine when to end the HTML tag.
-            remainingTextContentLength: tagContent.length,
             // Choose the greater line height. Code breaks if the line height is smaller.
             lineHeight: BigUtils.max(
               this.bookLineHeight,
@@ -167,33 +175,9 @@ export default class HTMLParser extends DefaultLineBreakParser {
         calculateWordWidth
       );
 
-      /*
-       * Old note: This is wrong. It is possible to transform only part of a word.
-       * This considers the entire word.
-       * I don't know what use case that would fulfill, however.
-       *
-       * New note: This actually does work, having observed the ping.txt. I forgot the
-       * HTML regex creates its own context and cuts into words properly.
-       * Who was it that said that good (in this case, decent) code can exhibit surprising behavior?
-       */
-      this.tag && (this.tag.remainingTextContentLength -= word.length);
-
-      // Add the closing tag if there is no remaining text content left.
-      wordDescription.word.text += this.getClosingTag();
-
       const parseText = this.chooseWordParser(wordDescription);
 
       parserState = parseText(parserState, wordDescription.word);
-
-      if (this.shouldCloseTag()) {
-        // If there is no remaining text content left, remove the tag context and reset the calculator.
-        this.tag = null;
-
-        // Reset the page width to the natural width of the container.
-        this.pageWidth = this.originalPageWidth;
-
-        this.calculator.reset();
-      }
 
       parserState = this.parsePageOverflow(parserState);
 
@@ -206,21 +190,31 @@ export default class HTMLParser extends DefaultLineBreakParser {
   }
 
   /**
+   * @param parserState is only passed so this function can alter its state, as it knows when tags are closed.
+   *  Possibly a break in encapsulation.
    * @returns the next token - either from the original text or a nested HTML tag - or 'null', if
    * there are no tokens left.
    */
-  private getNext(): RegExpMatchArray | null {
-    if (this.iteratorQueue.length === 0) {
+  private getNext(parserState: ParserState): RegExpMatchArray | null {
+    if (this.queue.length === 0) {
       return null;
     }
 
-    const iterator = this.iteratorQueue.at(0);
-    const next = iterator.next();
+    const iterator = this.queue.at(0);
+    const next = iterator.content.next();
 
     if (next.done) {
-      this.iteratorQueue = this.iteratorQueue.slice(1);
+      // Add the closing tag if there is no remaining text content left.
+      parserState.lineText += this.getCurrentClosingTag();
 
-      return this.getNext();
+      this.calculator.reset();
+
+      this.queue = this.queue.slice(1);
+
+      // Reset the page width of the current context.
+      this.pageWidth = this.queue.at(0)?.pageWidth ?? 0;
+
+      return this.getNext(parserState);
     } else {
       return next.value;
     }
@@ -280,15 +274,20 @@ export default class HTMLParser extends DefaultLineBreakParser {
   /**
    * Overriding original page overflow parser to make sure the opening tag is applied on a new page.
    */
-  protected parsePageOverflow = function (state: ParserState) {
+  protected parsePageOverflow = function (
+    this: HTMLParser,
+    state: ParserState
+  ) {
     if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
       return {
         ...state,
-        pages: state.pages.concat(state.lines.join('')),
+        pages: state.pages.concat(
+          state.lines.join('') + this.getFullClosingTag()
+        ),
         // Cut the current text and begin on a newline.
         lines: [],
         pageHeight: Big(0),
-        lineText: this.getOpeningTag() + state.lineText,
+        lineText: this.getFullOpeningTag() + state.lineText,
       };
     } else {
       return state;
@@ -299,26 +298,53 @@ export default class HTMLParser extends DefaultLineBreakParser {
     this.config
   );
 
-  private getOpeningTag(): string {
-    return this.tag?.opening ?? '';
+  private getCurrentOpeningTag(): string {
+    const tagContext = this.queue.find((context) => Boolean(context.tag));
+
+    return tagContext?.tag.opening ?? '';
   }
 
   private openTag(state: ParserState): ParserState {
     return {
       ...state,
-      lineText: state.lineText + this.getOpeningTag(),
+      lineText: state.lineText + this.getCurrentOpeningTag(),
     };
   }
 
-  private shouldCloseTag(): boolean {
-    return this.tag?.remainingTextContentLength <= 0 ?? false;
-  }
+  private getCurrentClosingTag(): string {
+    const tagContext = this.queue.find((context) => Boolean(context.tag));
 
-  private getClosingTag(): string {
-    if (this.shouldCloseTag()) {
-      return `</${this.tag.name}>`;
+    if (tagContext) {
+      return `</${tagContext.tag.name}>`;
     } else {
       return '';
     }
+  }
+
+  /**
+   * Used when new pages are started and contexts are carried over.
+   */
+  private getFullOpeningTag(): string {
+    // Works backwards as the 0th context is the current context, and thus later ones are parent tags.
+    return this.queue.reduceRight((acc, context) => {
+      if (context.tag) {
+        return acc + context.tag.opening;
+      } else {
+        return acc;
+      }
+    }, '');
+  }
+
+  /**
+   * Used when pages are ending and contexts have not closed yet.
+   */
+  private getFullClosingTag(): string {
+    return this.queue.reduce((acc, context) => {
+      if (context.tag) {
+        return acc + `</${context.tag.name}>`;
+      } else {
+        return acc;
+      }
+    }, '');
   }
 }

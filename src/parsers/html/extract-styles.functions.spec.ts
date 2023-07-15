@@ -68,4 +68,15 @@ describe('extractStyles()', () => {
       'font-weight': 'bold',
     });
   });
+
+  test('extracts font-style from the <em> tag', () => {
+    expect(extractStyles('<em>').font).toEqual({
+      'font-style': 'italic',
+    });
+
+    expect(extractStyles('<em style="font-weight: bold">').font).toEqual({
+      'font-style': 'italic',
+      'font-weight': 'bold',
+    });
+  });
 });

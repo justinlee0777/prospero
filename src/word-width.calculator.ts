@@ -57,11 +57,16 @@ export default function WordWidthCalculator(
       const size = styles['font-size'] ?? this.fontSize;
       const weight = styles['font-weight'];
       const family = styles['font-family'] ?? this.fontFamily;
+      const style = styles['font-style'];
 
       let font = `${size ?? this.fontSize} ${family}`;
 
       if (weight) {
         font = `${weight} ${font}`;
+      }
+
+      if (style) {
+        font = `${style} ${font}`;
       }
 
       this.context.font = font;
