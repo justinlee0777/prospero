@@ -24,41 +24,42 @@ export default class HTMLTransformer implements Transformer {
     [
       'h1',
       (tagContent) =>
-        `<span style="font-weight: bold; font-size: ${
+        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 2
-        }px">${tagContent}</span>`,
+        }px">${tagContent}</div>`,
     ],
     [
       'h2',
       (tagContent) =>
-        `<span style="font-weight: bold; font-size: ${
+        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 1.5
-        }px">${tagContent}</span>`,
+        }px">${tagContent}</div>`,
     ],
     [
       'h3',
       (tagContent) =>
-        `<span style="font-weight: bold; font-size: ${
+        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 1.17
-        }px">${tagContent}</span>`,
+        }px">${tagContent}</div>`,
     ],
     [
       'h4',
-      (tagContent) => `<span style="font-weight: bold">${tagContent}</span>`,
+      (tagContent) =>
+        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold">${tagContent}</div>`,
     ],
     [
       'h5',
       (tagContent) =>
-        `<span style="font-weight: bold; font-size: ${
+        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 0.83
-        }px">${tagContent}</span>`,
+        }px">${tagContent}</div>`,
     ],
     [
       'h6',
       (tagContent) =>
-        `<span style="font-weight: bold; font-size: ${
+        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 0.67
-        }px">${tagContent}</span>`,
+        }px">${tagContent}</div>`,
     ],
   ]);
 
@@ -91,7 +92,7 @@ export default class HTMLTransformer implements Transformer {
     text = text.replaceAll(createHTMLRegex('blockquote'), (...args) => {
       const content = args.at(3);
 
-      return `<div style="white-space: pre-wrap; margin: 0 ${
+      return `<div style="margin: 0 ${
         this.config.fontSize * 2
       }px;">${content}</div>`;
     });

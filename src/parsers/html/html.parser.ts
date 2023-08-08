@@ -148,13 +148,17 @@ export default class HTMLParser implements Parser {
 
     const tokens = this.getTokens(text);
 
+    let initial: ParserState;
+
     if (!parserState) {
       // This denotes the top-level HTMLParser. Create the parser state.
-      parserState = this.initializeParserState();
+      parserState = initial = this.initializeParserState();
 
       yield parserState;
     } else {
       // This denotes a non-root HTMLParser.
+
+      initial = parserState;
 
       parserState = {
         ...parserState,
@@ -203,7 +207,7 @@ export default class HTMLParser implements Parser {
             break;
           default:
             throw new Error(
-              `Void-content tag ${token.tag.name} is not supported by HTMLParser. Please contact the code owner.`
+              `Void-content tag '${token.tag.name}' is not supported by HTMLParser. Please contact the code owner.`
             );
         }
       } else {
@@ -228,7 +232,7 @@ export default class HTMLParser implements Parser {
       let result: IteratorResult<ParserState>;
 
       while (!(result = generator.next()).done) {
-        yield (parserState = this.handlePageEnd(parserState, result.value));
+        yield (parserState = this.handlePageEnd(initial, result.value));
       }
     }
 
@@ -387,16 +391,36 @@ export default class HTMLParser implements Parser {
     }
   }
 
+  /**
+   * This is a bit of a hack. There's no way currently to inform a child generator that the parent has changed
+   * the parser state - for example, to add ending tags at the end of pages or starting tags at the start of new pages.
+   * So we are just adding them to every parser state, which is computationally wasteful.
+   * @param initialState describes where the parser began.
+   * @param newParserState
+   */
   private handlePageEnd(
-    parserState: ParserState,
+    initialState: ParserState,
     newParserState: ParserState
   ): ParserState {
-    if (newParserState.pages.length > parserState.pages.length) {
-      const pages = [...newParserState.pages];
-      pages[parserState.pages.length] += this.getClosingTag();
+    const initialLength = initialState.pages.length;
+    const diff = newParserState.pages.length - initialLength;
 
+    if (diff > 0) {
+      const pages = [...newParserState.pages];
+
+      for (let i = 0; i < diff; i++) {
+        pages[initialLength + i] += this.getClosingTag();
+      }
+
+      // This modification is for the current page.
       const lines = [...newParserState.lines];
       lines[0] = this.getOpeningTag() + (newParserState.lines[0] ?? '');
+
+      // These modifications are for pages between the current page and the initial page.
+      for (let i = 0; i < diff - 1; i++) {
+        pages[initialLength + i] =
+          this.getOpeningTag() + pages[initialLength + i];
+      }
 
       return {
         ...newParserState,

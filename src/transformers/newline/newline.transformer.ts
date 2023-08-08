@@ -12,7 +12,7 @@ export default class NewlineTransformer implements Transformer {
 
   private sectionBegan = false;
 
-  constructor(private options: NewlineTransformerOptions = {}) { }
+  constructor(private options: NewlineTransformerOptions = {}) {}
 
   transform(text: string): string {
     const sectionBeginning = this.sectionBegan
