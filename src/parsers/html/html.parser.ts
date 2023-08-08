@@ -3,59 +3,135 @@ import Big from 'big.js';
 import createHTMLRegex from '../../regexp/html.regexp';
 import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
 import HTMLTransformer from '../../transformers/html/html.transformer';
+import Transformer from '../../transformers/models/transformer.interface';
 import BigUtils from '../../utils/big';
+import IWordWidthCalculator from '../../word-width-calculator.interface';
+import CreateLineBreakParserConfig from '../default-line-break/create-line-break-parser-config.interface';
 import DefaultLineBreakParser from '../default-line-break/default-line-break.parser';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import ParserState from '../models/parser-state.interface';
-import Word from '../models/word.interface';
+import Parser from '../models/parser.interface';
+import parseEnd from '../word-parsers/end.parser';
+import createNewlineParser from '../word-parsers/newline/newline.parser';
 import pageOverflowParser from '../word-parsers/page-overflow.parser';
 import AllowedTags from './allowed-tags.const';
+import { BlockStyles } from './block-styles.interface';
 import extractStyles from './extract-styles.function';
+import { FontStyles } from './font-styles.interface';
 import getMargin from './get-margin.function';
+import WhiteSpaceValues from './white-space-values.enum';
 
 /**
- * Describes an HTML tag found in the text.
- */
-interface ParserContextTag {
-  opening: string;
-  name: string;
-  lineHeight: Big;
-}
-
-/**
- * The context of the parser - there are really two types only:
- * 1. the entire text
- * 2. HTML tags
+ * The context of the parser.
+ * Contains information on the styles in the parser's allowlist, used for parsing.
  */
 interface ParserContext {
-  /** Use to get the words within the text or the current HTML tag. */
-  content: IterableIterator<RegExpMatchArray>;
   pageWidth: number;
+  lineHeight: Big;
 
-  tag?: ParserContextTag;
+  blockStyles?: BlockStyles;
+  fontStyles?: FontStyles;
+  /**
+   * Describes an HTML tag found in the text.
+   */
+  tag?: {
+    opening: string;
+    name: string;
+  };
 }
 
-export default class HTMLParser extends DefaultLineBreakParser {
-  private readonly allowedTags = AllowedTags;
+/**
+ * Text content with information on the HTML tag, if any.
+ */
+interface Token {
+  /** String content only. */
+  content: string;
+
+  /** Information on the tag if the text is nested in an HTML tag. */
+  tag?: {
+    name: string;
+    opening: string;
+    closing: string;
+  };
+}
+
+export default class HTMLParser implements Parser {
+  /**
+   * This is used to debug the parser. Beware if you use this directly.
+   */
+  public debug: CreateTextParserConfig;
 
   /**
-   * The 0th-element is the current context.
+   * Tags that HTMLParser recognizes.
    */
-  private queue: Array<ParserContext>;
+  private static readonly allowedTags = AllowedTags;
+
+  private readonly parsePageOverflowFromLineHeightChange: (
+    state: ParserState
+  ) => ParserState;
+
+  private htmlExpression: RegExp;
+
+  private calculator: IWordWidthCalculator;
+  private transformers: Array<Transformer> = [];
+
+  /**
+   * Line height for the whole book, given the font size configured.
+   */
+  private bookLineHeight: Big;
 
   constructor(
-    config: CreateTextParserConfig,
-    private transformerOptions?: HTMLTransformerOptions
+    private config: CreateTextParserConfig,
+    private transformerOptions?: HTMLTransformerOptions,
+    private context?: ParserContext
   ) {
-    super(config);
+    this.debug = config;
 
-    this.tokenExpression = new RegExp(
-      `${createHTMLRegex().source}|${this.tokenExpression.source}`,
-      this.tokenExpression.flags
+    this.parsePageOverflowFromLineHeightChange = pageOverflowParser(config);
+
+    const htmlRegex = createHTMLRegex();
+    this.htmlExpression = new RegExp(
+      `${htmlRegex.source}`,
+      htmlRegex.flags + 'd'
+    );
+
+    if (!this.context) {
+      this.context = {
+        pageWidth: this.config.pageWidth,
+        lineHeight: Big(0),
+        blockStyles: {
+          margin: '0px',
+        },
+      };
+    }
+  }
+
+  setCalculator(calculator: IWordWidthCalculator): void {
+    this.calculator = calculator;
+
+    if (this.context.fontStyles) {
+      // Change the calculator from the parent if there are font styles.
+      this.calculator.apply(this.context.fontStyles);
+    }
+
+    /*
+     * This code will essentially break lines that are smaller than the default font size,
+     * meaning it will overestimate and not fill out the page entirely.
+     */
+    this.bookLineHeight = this.context.lineHeight = Big(
+      this.calculator.getCalculatedLineHeight()
     );
   }
 
-  *generateParserStates(text: string): Generator<ParserState> {
+  setTransformers(transformers: Array<Transformer>): void {
+    this.transformers = transformers;
+  }
+
+  *generateParserStates(
+    text: string,
+    parserState?: ParserState,
+    end = parseEnd
+  ): Generator<ParserState> {
     // transform incompatible HTML tags into compatible ones using styling to match original behavior.
     text = new HTMLTransformer(
       {
@@ -64,287 +140,305 @@ export default class HTMLParser extends DefaultLineBreakParser {
       this.transformerOptions
     ).transform(text);
 
-    text = this.transformText(text);
+    // transform text. Tell the transformers they are working with HTML.
+    text = this.transformers.reduce((newText, transformer) => {
+      transformer.forHTML = true;
+      return transformer.transform(newText);
+    }, text);
 
-    this.queue = [
-      {
-        content: text.matchAll(this.tokenExpression),
-        pageWidth: this.pageWidth,
-      },
-    ];
+    const tokens = this.getTokens(text);
 
-    const calculateWordWidth = (word) => this.calculator.calculate(word);
+    if (!parserState) {
+      // This denotes the top-level HTMLParser. Create the parser state.
+      parserState = this.initializeParserState();
 
-    let parserState = this.initializeParserState();
+      yield parserState;
+    } else {
+      // This denotes a non-root HTMLParser.
 
-    yield parserState;
+      parserState = {
+        ...parserState,
+        lineHeight: this.bookLineHeight,
+      };
 
-    let token: RegExpMatchArray;
+      // If the change in font size causes the current line to overflow, set a new page.
+      parserState = this.parsePageOverflowFromLineHeightChange(parserState);
 
-    while ((token = this.getNext(parserState))) {
-      const { groups } = token;
-
-      /*
-       * Not the best way of identifying the HTML tag, but named capture groups seem to break
-       * with nested capture groups
-       */
-      const htmlExpression =
-        token.filter((group) => Boolean(group)).length === 4;
-
-      if (htmlExpression) {
-        /*
-         * If an HTML expression, set the program to the HTML context:
-         * parse the HTML context and tell the program to add opening and closing tags in certain places.
-         */
-        const opening = token.at(1);
-        const tagName = token.at(2);
-        const tagContent = token.at(3);
-
-        const context: ParserContext = {
-          content: tagContent.matchAll(this.tokenExpression),
-          // Take the page width of the current context
-          pageWidth: this.queue.at(0).pageWidth,
-        };
-
-        // Create a new context from the HTML content, regardless if the tag is used or not.
-        this.queue.unshift(context);
-
-        // Only process allowed tags.
-        if (this.allowedTags.includes(tagName)) {
-          const { font: fontStyles, block: blockStyle } =
-            extractStyles(opening);
-          if (fontStyles) {
-            // Adjust the current word-width calculator to take into account font size and weight.
-            this.calculator.apply(fontStyles);
-          }
-
-          if (blockStyle) {
-            const { margin } = blockStyle;
-            if (margin) {
-              const marginValues = getMargin(margin);
-              // Only acknowledging left and right for the time being.
-              context.pageWidth -= marginValues.left + marginValues.right;
-
-              this.pageWidth = context.pageWidth;
-            }
-          }
-
-          context.tag = {
-            opening,
-            name: tagName,
-            // Choose the greater line height. Code breaks if the line height is smaller.
-            lineHeight: BigUtils.max(
-              this.bookLineHeight,
-              Big(this.calculator.getCalculatedLineHeight())
-            ),
-          };
-
-          parserState = {
-            ...parserState,
-            /*
-             * This code will essentially break lines that are smaller than the default font size,
-             * meaning it will overestimate and not fill out the page entirely.
-             */
-            lineHeight: BigUtils.max(
-              this.bookLineHeight,
-              Big(this.calculator.getCalculatedLineHeight())
-            ),
-          };
-
-          // If the change in font size causes the current line to overflow, set a new page.
-          parserState = this.parsePageOverflowFromLineHeightChange(parserState);
-
-          // Create an opening tag.
-          parserState = this.openTag(parserState);
-        }
-
-        /*
-         * There is no content to parse (the tags are not treated directly as content).
-         * Continue the program using the current HTML tag as content.
-         */
-        continue;
-      }
-
-      const word = token.at(0);
-
-      const wordDescription = this.getWordDescription(
-        parserState,
-        Boolean(groups['newline']),
-        Boolean(groups['whitespace']),
-        word,
-        calculateWordWidth
-      );
-
-      const parseText = this.chooseWordParser(wordDescription);
-
-      parserState = parseText(parserState, wordDescription.word);
-
-      parserState = this.parsePageOverflow(parserState);
+      // Create an opening tag.
+      parserState = this.openTag(parserState);
 
       yield parserState;
     }
 
-    parserState = this.parseEnd(parserState);
+    for (const token of tokens) {
+      let generator: Generator<ParserState>;
+
+      if (!token.tag) {
+        const textContent = token.content;
+
+        const whiteSpace = this.context.blockStyles?.['white-space'];
+        const config: CreateLineBreakParserConfig = {
+          ...this.config,
+          /*
+           * The default 'white-space' configuration ignores newlines
+           * ( https://developer.mozilla.org/en-US/docs/Web/CSS/white-space#syntax )
+           */
+          ignoreNewline: !whiteSpace || whiteSpace === WhiteSpaceValues.NORMAL,
+        };
+
+        const parser = new DefaultLineBreakParser(config);
+
+        parser.setCalculator(this.calculator);
+
+        /*
+         * Note the absence of a 'setTransformers' invocation.
+         * The transformers act funny without the entire text.
+         */
+
+        generator = parser.generateParserStates(textContent, parserState, null);
+      } else if (!token.tag.closing) {
+        switch (token.tag.name) {
+          case 'br':
+            generator = this.parseBRTag(parserState, token.tag.opening);
+            break;
+          default:
+            throw new Error(
+              `Void-content tag ${token.tag.name} is not supported by HTMLParser. Please contact the code owner.`
+            );
+        }
+      } else {
+        const opening = token.tag.opening;
+        const tagName = token.tag.name;
+        const tagContent = token.content;
+
+        const context = this.createParserContext(opening, tagName);
+
+        const parser = new HTMLParser(
+          this.config,
+          this.transformerOptions,
+          context
+        );
+
+        parser.setCalculator(this.calculator);
+        parser.setTransformers(this.transformers);
+
+        generator = parser.generateParserStates(tagContent, parserState, null);
+      }
+
+      let result: IteratorResult<ParserState>;
+
+      while (!(result = generator.next()).done) {
+        yield (parserState = this.handlePageEnd(parserState, result.value));
+      }
+    }
+
+    parserState = this.endHTMLElement(parserState);
+
+    parserState = end?.(parserState) ?? parserState;
+
+    this.calculator.reset();
 
     yield parserState;
   }
 
-  /**
-   * @param parserState is only passed so this function can alter its state, as it knows when tags are closed.
-   *  Possibly a break in encapsulation.
-   * @returns the next token - either from the original text or a nested HTML tag - or 'null', if
-   * there are no tokens left.
-   */
-  private getNext(parserState: ParserState): RegExpMatchArray | null {
-    if (this.queue.length === 0) {
-      return null;
-    }
+  *generatePages(text: string): Generator<string> {
+    const parserStates = this.generateParserStates(text);
 
-    const iterator = this.queue.at(0);
-    const next = iterator.content.next();
+    let parserState: ParserState;
 
-    if (next.done) {
-      // Add the closing tag if there is no remaining text content left.
-      parserState.lineText += this.getCurrentClosingTag();
+    for (const newParserState of parserStates) {
+      if (
+        parserState &&
+        newParserState.pages.length > parserState.pages.length
+      ) {
+        yield newParserState.pages.at(-1);
+      }
 
-      this.calculator.reset();
-
-      this.queue = this.queue.slice(1);
-
-      // Reset the page width of the current context.
-      this.pageWidth = this.queue.at(0)?.pageWidth ?? 0;
-
-      return this.getNext(parserState);
-    } else {
-      return next.value;
+      parserState = newParserState;
     }
   }
 
-  protected parseNewline = function (
-    state: ParserState,
-    word: Word
-  ): ParserState {
+  /**
+   * Generates tokens for the parser to analyze based on the given text.
+   * Tokens consist of two types:
+   * 1. Immediate HTML tags with info on the tags
+   * 2. The content in-between HTML tags, treated as pure text.
+   *
+   * For example,
+   * "foo<p>bar<br/></p>baz"
+   * is handled as
+   * - foo
+   * - <p>bar<br/></p>
+   * - baz
+   */
+  private *getTokens(text: string): Generator<Token> {
+    let prev = 0;
+
+    for (const html of text.matchAll(this.htmlExpression)) {
+      const [begin, end] = html.indices[0];
+
+      const textContent = text.slice(prev, begin);
+
+      if (textContent) {
+        yield {
+          content: textContent,
+        };
+      }
+
+      yield {
+        content: html[3],
+
+        tag: {
+          opening: html[1],
+          closing: html[4],
+          name: html[2],
+        },
+      };
+
+      prev = end;
+    }
+
+    const textContent = text.slice(prev);
+
+    if (textContent) {
+      yield {
+        content: textContent,
+      };
+    }
+  }
+
+  private initializeParserState(): ParserState {
     return {
-      ...state,
-      textIndex: state.textIndex + word.text.length,
-      // Cut the current text and begin on a newline.
-      lines: state.lines.concat(state.lineText + word.text),
-      pageHeight: state.pageHeight.add(state.lineHeight),
-      // Choose the current tag's line height over the default line height, if it is continued on the next line
-      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
+      pages: [],
+      textIndex: 0,
+
+      lines: [],
+      pageHeight: Big(0),
+
       lineWidth: Big(0),
+      lineHeight: this.bookLineHeight,
       lineText: '',
     };
-  };
-
-  protected parseWhitespaceAtTextOverflow = function (
-    state: ParserState,
-    word: Word
-  ): ParserState {
-    return {
-      ...state,
-      textIndex: state.textIndex + word.text.length,
-      // Cut the current text and begin on a newline.
-      lines: state.lines.concat(state.lineText),
-      pageHeight: state.pageHeight.add(state.lineHeight),
-      // Choose the current tag's line height over the default line height, if it is continued on the next line
-      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
-      lineWidth: Big(0),
-      lineText: word.text,
-    };
-  };
-
-  protected parseWordAtTextOverflow = function (
-    state: ParserState,
-    word: Word
-  ): ParserState {
-    return {
-      ...state,
-      textIndex: state.textIndex + word.text.length,
-      // Cut the current text and begin on a newline.
-      lines: state.lines.concat(state.lineText),
-      pageHeight: state.pageHeight.add(state.lineHeight),
-      // Choose the current tag's line height over the default line height, if it is continued on the next line
-      lineHeight: this.tag?.lineHeight ?? this.bookLineHeight,
-      lineWidth: word.width,
-      lineText: word.text,
-    };
-  };
+  }
 
   /**
-   * Overriding original page overflow parser to make sure the opening tag is applied on a new page.
+   * Create the context for a new HTMLParser, using the given tag opening and name.
+   * Calculates font and block styles.
+   * If the tag is not allowed by the parser i.e. too difficult to parse, it is ignored and the
+   * context is treated as pure text content, using the current parser's context.
    */
-  protected parsePageOverflow = function (
-    this: HTMLParser,
-    state: ParserState
-  ) {
-    if (state.pageHeight.add(state.lineHeight).gte(this.config.pageHeight)) {
+  private createParserContext(
+    tagOpening: string,
+    tagName: string
+  ): ParserContext {
+    if (HTMLParser.allowedTags.includes(tagName)) {
+      const { font: fontStyles, block: blockStyles } =
+        extractStyles(tagOpening);
+
+      let { pageWidth } = this.context;
+
+      if (blockStyles) {
+        const marginStyle = blockStyles.margin;
+        if (marginStyle) {
+          const margin = getMargin(marginStyle);
+          pageWidth -= margin.left + margin.right;
+        }
+      }
+
       return {
-        ...state,
-        pages: state.pages.concat(
-          state.lines.join('') + this.getFullClosingTag()
+        tag: {
+          opening: tagOpening,
+          name: tagName,
+        },
+        pageWidth,
+        blockStyles,
+        fontStyles,
+        // Choose the greater line height. Code breaks if the line height is smaller.
+        lineHeight: BigUtils.max(
+          this.bookLineHeight,
+          Big(this.calculator.getCalculatedLineHeight())
         ),
-        // Cut the current text and begin on a newline.
-        lines: [],
-        pageHeight: Big(0),
-        lineText: this.getFullOpeningTag() + state.lineText,
       };
     } else {
-      return state;
+      return this.context;
     }
-  };
+  }
 
-  private parsePageOverflowFromLineHeightChange = pageOverflowParser(
-    this.config
-  );
+  private getOpeningTag(): string {
+    const tag = this.context.tag;
 
-  private getCurrentOpeningTag(): string {
-    const tagContext = this.queue.find((context) => Boolean(context.tag));
-
-    return tagContext?.tag.opening ?? '';
+    return tag?.opening ?? '';
   }
 
   private openTag(state: ParserState): ParserState {
     return {
       ...state,
-      lineText: state.lineText + this.getCurrentOpeningTag(),
+      lineText: state.lineText + this.getOpeningTag(),
     };
   }
 
-  private getCurrentClosingTag(): string {
-    const tagContext = this.queue.find((context) => Boolean(context.tag));
+  private getClosingTag(): string {
+    const tag = this.context.tag;
 
-    if (tagContext) {
-      return `</${tagContext.tag.name}>`;
+    if (tag) {
+      return `</${tag.name}>`;
     } else {
       return '';
     }
   }
 
-  /**
-   * Used when new pages are started and contexts are carried over.
-   */
-  private getFullOpeningTag(): string {
-    // Works backwards as the 0th context is the current context, and thus later ones are parent tags.
-    return this.queue.reduceRight((acc, context) => {
-      if (context.tag) {
-        return acc + context.tag.opening;
-      } else {
-        return acc;
-      }
-    }, '');
+  private handlePageEnd(
+    parserState: ParserState,
+    newParserState: ParserState
+  ): ParserState {
+    if (newParserState.pages.length > parserState.pages.length) {
+      const pages = [...newParserState.pages];
+      pages[parserState.pages.length] += this.getClosingTag();
+
+      const lines = [...newParserState.lines];
+      lines[0] = this.getOpeningTag() + (newParserState.lines[0] ?? '');
+
+      return {
+        ...newParserState,
+        pages,
+        lines,
+      };
+    } else {
+      return newParserState;
+    }
   }
 
   /**
-   * Used when pages are ending and contexts have not closed yet.
+   * End a parsed HTMLElement, by adding the closing tag.
    */
-  private getFullClosingTag(): string {
-    return this.queue.reduce((acc, context) => {
-      if (context.tag) {
-        return acc + `</${context.tag.name}>`;
-      } else {
-        return acc;
-      }
-    }, '');
+  private endHTMLElement(parserState: ParserState): ParserState {
+    const newParserState: ParserState = {
+      ...parserState,
+      // Add the closing tag if there is no remaining text content left.
+      lineText: (parserState.lineText += this.getClosingTag()),
+    };
+
+    if (this.context.blockStyles) {
+      // End the parsing of a block-level element by setting the parser on a newline.
+      return createNewlineParser(newParserState, {
+        text: '',
+        width: Big(0),
+      });
+    } else {
+      return newParserState;
+    }
+  }
+
+  /**
+   * <br> should be handled as a newline. QUESTION: Does it act as a newline in an inline element?
+   */
+  private *parseBRTag(
+    parserState: ParserState,
+    tagOpening: string
+  ): Generator<ParserState> {
+    yield createNewlineParser(parserState, {
+      text: tagOpening,
+      width: Big(0),
+    });
   }
 }

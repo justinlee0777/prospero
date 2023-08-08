@@ -19,7 +19,8 @@ describe('IndentTransformer', () => {
     const transformer = new IndentTransformer(4);
     transformer.forHTML = true;
 
-    expect(transformer.transform('\nFoo')).toBe('\n    Foo');
+    // The transformer only recognizes HTML.
+    expect(transformer.transform('\nFoo')).toBe('\nFoo');
 
     expect(transformer.transform('<div>Foo</div>')).toBe('<div>    Foo</div>');
 

@@ -16,6 +16,8 @@ export default function Pages(ParserBuilder: {
   [PageStyles, string, Array<Transformer>?, PagesConfig?]
 > {
   return class Pages {
+    private readonly forHTML: boolean;
+
     private pageGenerator: Generator<string>;
 
     private cachedPages: Array<string> = [];
@@ -44,6 +46,8 @@ export default function Pages(ParserBuilder: {
           option = html;
         }
         parserBuilder = parserBuilder.forHTML(option);
+
+        this.forHTML = Boolean(html);
       }
 
       const parser = parserBuilder.build();
@@ -93,6 +97,7 @@ export default function Pages(ParserBuilder: {
      */
     getData(): PagesOutput {
       return {
+        html: this.forHTML,
         pages: this.getAll(),
         pageStyles: this.pageStyles,
       };

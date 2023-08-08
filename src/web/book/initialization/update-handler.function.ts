@@ -15,6 +15,7 @@ interface PageConfig {
   animation: BookAnimation;
   showPageNumbers: boolean;
 
+  html?: boolean;
   elementConfig?: CreateElementConfig;
 }
 
@@ -29,6 +30,7 @@ export default function updateHandler(
     animation,
     elementConfig = {},
     showPageNumbers,
+    html,
   }: PageConfig
 ): UpdatePage {
   return async (pageNumber: number) => {
@@ -68,6 +70,7 @@ export default function updateHandler(
 
       return PageComponent(
         {
+          html,
           numbering,
         },
         merge<CreateElementConfig>(

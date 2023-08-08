@@ -28,5 +28,11 @@ describe('StyleValueRegexp', () => {
         match.slice()
       )
     ).toEqual([['margin: 4px 8px 12px;', 'margin', '4px 8px 12px']]);
+
+    expect(
+      [...'white-space: break-spaces;'.matchAll(StyleValueRegexp)].map(
+        (match) => match.slice()
+      )
+    ).toEqual([['white-space: break-spaces;', 'white-space', 'break-spaces']]);
   });
 });

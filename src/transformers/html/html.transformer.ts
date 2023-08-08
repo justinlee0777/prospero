@@ -77,41 +77,24 @@ export default class HTMLTransformer implements Transformer {
     const hrString = this.options?.hrString ?? '* * *';
 
     text = text.replaceAll(
-      createHTMLRegex('hr', true),
+      createHTMLRegex('hr'),
       () =>
-        `<div style="display: inline-block; text-align: center; width: 100%">${hrString}</div>`
+        `<div style="white-space: pre-wrap; display: inline-block; text-align: center; width: 100%">${hrString}</div>`
     );
+
+    text = text.replaceAll(createHTMLRegex('p'), (...args) => {
+      const content = args.at(3);
+
+      return `<div style="white-space: pre-wrap; margin: 0;">${content}</div>`;
+    });
 
     text = text.replaceAll(createHTMLRegex('blockquote'), (...args) => {
       const content = args.at(3);
 
-      return `<div style="display: inline-block; margin: 0 ${
+      return `<div style="white-space: pre-wrap; margin: 0 ${
         this.config.fontSize * 2
       }px;">${content}</div>`;
     });
-
-    text = this.blockLevelTags.reduce((finalText, tag) => {
-      /*
-       * Capture group: The opening tag for a block-level element.
-       * After the capture group is at least one space character.
-       * The regex removes the unnecessary space in a block-level element which is ignored (based on
-       * 'white-space: normal').
-       */
-      const openingSpaces = new RegExp(`(<${tag}[^\\/]*?>)\\s+`, 'g');
-
-      /*
-       * First capture group: any end of a tag.
-       * Second capture group: the end of a block-level element.
-       * In-between is at least one space character.
-       * The regex removes the unnecessary space at the end of a block-level element ONLY if the element
-       * is nested.
-       */
-      const endingSpaces = new RegExp(`(<\\/.*?>)\\s+(<\\/${tag}>)`, 'g');
-
-      return finalText
-        .replaceAll(openingSpaces, '$1')
-        .replaceAll(endingSpaces, '$1$2');
-    }, text);
 
     return text;
   }

@@ -2,6 +2,7 @@ import blockLevelTags from './block-level-tags.const';
 
 const AllowedTags = [
   'a',
+  'br',
   'code',
   'del',
   'em',

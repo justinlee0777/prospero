@@ -45,29 +45,25 @@ describe('HTMLTransformer', () => {
 
   test('transform HR tags', () => {
     expect(transformer.transform('<hr/>')).toBe(
-      '<div style="display: inline-block; text-align: center; width: 100%">* * *</div>'
+      '<div style="white-space: pre-wrap; display: inline-block; text-align: center; width: 100%">* * *</div>'
     );
 
     transformer = new HTMLTransformer({ fontSize: 18 }, { hrString: '- - -' });
 
     expect(transformer.transform('<hr/>')).toBe(
-      '<div style="display: inline-block; text-align: center; width: 100%">- - -</div>'
+      '<div style="white-space: pre-wrap; display: inline-block; text-align: center; width: 100%">- - -</div>'
     );
   });
 
   test('transforms blockquote tags', () => {
     expect(transformer.transform('<blockquote>foo</blockquote>')).toBe(
-      '<div style="display: inline-block; margin: 0 36px;">foo</div>'
+      '<div style="white-space: pre-wrap; margin: 0 36px;">foo</div>'
     );
   });
 
-  test('eliminates spaces at the beginning and ending of block level tags', () => {
-    expect(
-      transformer.transform(
-        `<blockquote>\n<p>\nDo or do not. There is no try.\n</p>\n</blockquote>`
-      )
-    ).toBe(
-      '<div style="display: inline-block; margin: 0 36px;"><p>\nDo or do not. There is no try.\n</p></div>'
+  test('transforms p tags', () => {
+    expect(transformer.transform('<p>foo</p>')).toBe(
+      '<div style="white-space: pre-wrap; margin: 0;">foo</div>'
     );
   });
 

@@ -1,15 +1,10 @@
-interface Margin {
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-}
+import BoxProperties from './box-properties.interface';
 
 /**
  * Interprets the margin CSS value and returns the calculated margins into JS.
  * Only accepts pixel.
  */
-export default function getMargin(cssValue: string): Margin {
+export default function getMargin(cssValue: string): BoxProperties {
   const values = cssValue.split(' ').map((value) => parseInt(value));
 
   if (values.length > 3) {

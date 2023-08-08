@@ -12,6 +12,8 @@ const anyTag = '[A-Za-z0-9]+';
  * - <div>foo</div>
  * - <span>bar</span>
  * - <span style="color: blue">foo</span>
+ * - <br/>
+ * - <br>
  * Disallowed:
  * - <span>foo</div>
  * - foo
@@ -19,26 +21,10 @@ const anyTag = '[A-Za-z0-9]+';
  * - baz</span>
  * - baz<span>
  */
-export default function createHTMLRegex(
-  tagname = anyTag,
-  voidElement = false
-): RegExp {
-  if (voidElement) {
-    return createVoidElementRegex(tagname);
-  }
-
-  const openingTag = `<(${tagname}).*?>`;
+export default function createHTMLRegex(tagname = anyTag): RegExp {
+  const openingTag = `<(${tagname}).*?/?>`;
   const tagContent = '[\\S\\s]*?';
   const closingTag = '</\\2>';
 
-  return new RegExp(`(${openingTag})(${tagContent})${closingTag}`, 'g');
-}
-
-/**
- * Capture groups:
- * First: the entire opening tag, plus attributes
- * Second: the tag name itself
- */
-function createVoidElementRegex(tagname: string): RegExp {
-  return new RegExp(`(<(${tagname})/?.*?>)`, 'g');
+  return new RegExp(`(${openingTag})(?:(${tagContent})(${closingTag}))?`, 'g');
 }
