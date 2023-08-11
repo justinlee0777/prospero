@@ -1,8 +1,8 @@
-import blockLevelTags from './block-level-tags.const';
+import blockLevelTags from './allowed-block-level-tags.const';
+import allowedVoidTags from './allowed-void-elements.const';
 
 const AllowedTags = [
   'a',
-  'br',
   'code',
   'del',
   'em',
@@ -10,6 +10,7 @@ const AllowedTags = [
   'strong',
   'sub',
   'sup',
+  ...allowedVoidTags,
   ...blockLevelTags,
 ];
 

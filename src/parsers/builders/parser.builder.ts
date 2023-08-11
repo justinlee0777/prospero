@@ -7,17 +7,20 @@ import toPixelUnits from '../../utils/to-pixel-units.function';
 import IWordWidthCalculator from '../../word-width-calculator.interface';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import Parser from '../models/parser.interface';
-import ParserFactory from '../parser.factory';
+import IParserFactory from '../parser-factory.interface';
 import IParserBuilder from './parser.builder.interface';
 
-export default function ParserBuilder(WordWidthCalculator: {
-  new (
-    computedFontSize: string,
-    computedFontFamily: string,
-    lineHeight: number,
-    fontLocation?: string
-  ): IWordWidthCalculator;
-}): Constructor<IParserBuilder, []> {
+export default function ParserBuilder(
+  WordWidthCalculator: {
+    new (
+      computedFontSize: string,
+      computedFontFamily: string,
+      lineHeight: number,
+      fontLocation?: string
+    ): IWordWidthCalculator;
+  },
+  ParserFactory: IParserFactory
+): Constructor<IParserBuilder, []> {
   return class ParserBuilder {
     private ParserConstructor: (config: CreateTextParserConfig) => Parser =
       ParserFactory.create;

@@ -1,4 +1,3 @@
-import blockLevelTags from '../../parsers/html/block-level-tags.const';
 import createHTMLRegex from '../../regexp/html.regexp';
 import Transformer from '../models/transformer.interface';
 import HTMLTransformerOptions from './html-transformer-options.interface';
@@ -17,8 +16,6 @@ interface TransformTag {
  */
 export default class HTMLTransformer implements Transformer {
   readonly forHTML = true;
-
-  private readonly blockLevelTags = blockLevelTags;
 
   private headings: Map<string, TransformTag> = new Map([
     [

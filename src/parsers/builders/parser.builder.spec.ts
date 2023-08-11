@@ -1,7 +1,7 @@
 let mockParser: Parser;
 let mockHTMLParser: Parser;
 
-const mockParserFactory = {
+const mockParserFactory = () => ({
   create: jest.fn().mockImplementation(
     () =>
       (mockParser = {
@@ -16,7 +16,7 @@ const mockParserFactory = {
         setTransformers: jest.fn(),
       } as any)
   ),
-};
+});
 
 jest.mock('../parser.factory', () => mockParserFactory);
 

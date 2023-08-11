@@ -1,3 +1,5 @@
+import blockLevelTags from '../../parsers/html/allowed-block-level-tags.const';
+import allowedVoidTags from '../../parsers/html/allowed-void-elements.const';
 import createHTMLRegex from '../../regexp/html.regexp';
 import Transformer from '../models/transformer.interface';
 
@@ -7,9 +9,9 @@ import Transformer from '../models/transformer.interface';
 export default class IndentTransformer implements Transformer {
   forHTML: boolean;
 
-  private readonly blockTags = new Set(['div']);
+  private readonly blockTags = new Set(blockLevelTags);
 
-  private readonly voidTags = new Set(['br']);
+  private readonly voidTags = new Set(allowedVoidTags);
 
   private text: string;
 
@@ -25,30 +27,18 @@ export default class IndentTransformer implements Transformer {
        * Any whitespace here gets ignored, so the newline is placed after.
        */
       const pattern = new RegExp(
-        `${htmlPattern.source}(\n+)?`,
+        `(<([A-Za-z0-9]+).*?/?>)(\n+)?`,
         htmlPattern.flags
       );
 
-      return text.replace(
-        pattern,
-        (
-          match,
-          opening,
-          tagName,
-          tagContent = '',
-          ending = '',
-          newline = ''
-        ) => {
-          if (this.blockTags.has(tagName)) {
-            // Place newline after the tag opening.
-            return `${opening}${this.text}${tagContent}${ending}${newline}`;
-          } else if (this.voidTags.has(tagName)) {
-            return `${opening}${newline}${this.text}`;
-          } else {
-            return match;
-          }
+      return text.replace(pattern, (match, opening, tagName, newline = '') => {
+        if (this.blockTags.has(tagName) || this.voidTags.has(tagName)) {
+          // Place newline after the tag opening.
+          return `${opening}${newline}${this.text}`;
+        } else {
+          return match;
         }
-      );
+      });
     } else {
       /*
        * Match lines that end with a newline but also have at least one non-newline character succeeding them (this indicates
