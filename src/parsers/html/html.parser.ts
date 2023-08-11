@@ -299,6 +299,11 @@ export default function HTMLParser(Tokenizer: {
       }
     }
 
+    /**
+     * Update the WordWidthCalculator when a context is pushed or popped.
+     * The deepest context with a change in font styles is used.
+     * If no context is found, then the calculator resets to its default configuration.
+     */
     private updateCalculator(parserState: ParserState): ParserState {
       const context = this.contexts
         .slice()
