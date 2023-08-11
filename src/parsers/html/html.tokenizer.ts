@@ -1,4 +1,5 @@
 import allowedVoidTags from './allowed-void-elements.const';
+import voidTags from './void-elements.const';
 
 /**
  * Text content with information on the HTML tag, if any.
@@ -46,6 +47,9 @@ export default abstract class HTMLTokenizer<
   Loader = any,
   Element extends ElementConstruct = any
 > {
+  private static allowedVoidTags = allowedVoidTags;
+  private static voidTags = voidTags;
+
   private loader: Loader;
 
   constructor() {}
@@ -73,7 +77,7 @@ export default abstract class HTMLTokenizer<
           const element = node as unknown as Element;
           const tagName = element.tagName.toLowerCase();
 
-          const closing = this.getInnerHTML(element, this.loader)
+          const closing = !HTMLTokenizer.voidTags.includes(tagName)
             ? `</${tagName}>`
             : undefined;
 
@@ -104,7 +108,7 @@ export default abstract class HTMLTokenizer<
 
     const tagName = element.tagName.toLowerCase();
 
-    if (!allowedVoidTags.includes(tagName)) {
+    if (!HTMLTokenizer.allowedVoidTags.includes(tagName)) {
       yield {
         tagName,
         type: TokenType.END_HTML,

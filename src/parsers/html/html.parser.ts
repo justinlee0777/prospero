@@ -171,6 +171,10 @@ export default function HTMLParser(Tokenizer: {
             yield (parserState = this.handlePageEnd(initial, result.value));
           }
         } else if (token.type === TokenType.HTML) {
+          if (!HTMLParser.allowedTags.includes(token.tag.name)) {
+            continue;
+          }
+
           if (token.tag.closing) {
             const opening = token.tag.opening;
             const tagName = token.tag.name;
@@ -196,12 +200,16 @@ export default function HTMLParser(Tokenizer: {
                 ));
                 break;
               default:
-                throw new Error(
+                console.error(
                   `Void-content tag '${token.tag.name}' is not supported by HTMLParser. Please contact the code owner.`
                 );
             }
           }
         } else if (token.type === TokenType.END_HTML) {
+          if (!HTMLParser.allowedTags.includes(token.tagName)) {
+            continue;
+          }
+
           yield (parserState = this.endHTMLElement(parserState));
 
           this.contexts.pop();
