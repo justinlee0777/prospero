@@ -21,10 +21,16 @@ const PageComponent: CreatePageElement = (pageConfig, config = {}) => {
     children.push(numbering);
   }
 
+  let classnames = [pageClassName];
+
+  if (!pageConfig.html) {
+    classnames = [...classnames, styles.textOnlyPage];
+  }
+
   const page = div(
     merge(
       {
-        classnames: [pageClassName],
+        classnames,
         children,
       },
       config

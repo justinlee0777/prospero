@@ -1,6 +1,5 @@
-import PageStyles from './page-styles.interface';
+import RequiredPagesOutput from './required-pages-output.interface';
 
-export default interface PagesOutput {
+export default interface PagesOutput extends RequiredPagesOutput {
   pages: Array<string>;
-  pageStyles: PageStyles;
 }

@@ -9,6 +9,7 @@ describe('BookComponent updateHandler()', () => {
   const pages = ['foo', 'bar', 'baz'];
 
   const pagesOutput: PagesOutput = {
+    html: false,
     pages,
     pageStyles: {
       width: 400,

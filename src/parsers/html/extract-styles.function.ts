@@ -29,6 +29,13 @@ export default function extractStyles(htmlString: string): Styles {
     fontStyles[FontStyle['font-family']] = 'monospace';
   }
 
+  // Handle a specific use case for <em> tags, which have 'font-style: italic'
+  const emRegex = /\<em.*\>/;
+
+  if (emRegex.test(htmlString)) {
+    fontStyles[FontStyle['font-style']] = 'italic';
+  }
+
   for (const [, property, value] of styles) {
     if (ValidFontStyles.includes(property)) {
       // Only permit allowed font styles.

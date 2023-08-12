@@ -89,6 +89,7 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
         pageStyles,
         getPage: (pageNumber) =>
           pageNumber >= 0 ? pages.get(pageNumber) : null,
+        html: Boolean(forHTML),
       },
       bookConfig,
       {

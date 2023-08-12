@@ -24,6 +24,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const desktopBook = BookComponent(
     {
+      html: false,
       getPage: (pageNumber) => desktopPages.get(pageNumber),
       pageStyles: desktopStyles,
     },
@@ -57,6 +58,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const mobileBook = BookComponent(
     {
+      html: false,
       getPage: (pageNumber) => mobilePages.get(pageNumber),
       pageStyles: mobileStyles,
     },

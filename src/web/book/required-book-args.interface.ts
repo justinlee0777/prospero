@@ -1,10 +1,10 @@
 import GetPage from '../../models/get-page.interface';
-import PageStyles from '../../models/page-styles.interface';
 import PagesOutput from '../../models/pages-output.interface';
 
-interface BookArgsWithGetPage {
+type PageInfo = Pick<PagesOutput, 'pageStyles' | 'html'>;
+
+interface BookArgsWithGetPage extends PageInfo {
   getPage: GetPage;
-  pageStyles: PageStyles;
 }
 
 interface BooksArgsWithPages extends PagesOutput {}

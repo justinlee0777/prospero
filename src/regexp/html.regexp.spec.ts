@@ -8,18 +8,41 @@ describe('HTMLRegex', () => {
     expect('foo'.matchAll(HTMLRegex).next().value).toBeUndefined();
 
     // not closed
-    expect('<p>foo'.matchAll(HTMLRegex).next().value).toBeUndefined();
+    expect('<p>foo'.matchAll(HTMLRegex).next().value.slice()).toEqual([
+      '<p>',
+      '<p>',
+      'p',
+      undefined,
+      undefined,
+    ]);
 
     // mismatching tags
-    expect('<p>foo</span>'.matchAll(HTMLRegex).next().value).toBeUndefined();
+    expect('<p>foo</span>'.matchAll(HTMLRegex).next().value.slice()).toEqual([
+      '<p>',
+      '<p>',
+      'p',
+      undefined,
+      undefined,
+    ]);
 
-    // Do not match <img/> tags (for now)
-    expect('<img/>'.matchAll(HTMLRegex).next().value).toBeUndefined();
+    expect('<img/>'.matchAll(HTMLRegex).next().value.slice()).toEqual([
+      '<img/>',
+      '<img/>',
+      'img',
+      undefined,
+      undefined,
+    ]);
 
     // Nested tags don't really work (for now)
     expect(
       '<p><span>foo</span></p>'.matchAll(HTMLRegex).next().value.slice()
-    ).toEqual(['<p><span>foo</span></p>', '<p>', 'p', '<span>foo</span>']);
+    ).toEqual([
+      '<p><span>foo</span></p>',
+      '<p>',
+      'p',
+      '<span>foo</span>',
+      '</p>',
+    ]);
 
     // <p> tags
     expect('<p>foo</p>'.matchAll(HTMLRegex).next().value.slice()).toEqual([
@@ -27,11 +50,12 @@ describe('HTMLRegex', () => {
       '<p>',
       'p',
       'foo',
+      '</p>',
     ]);
 
     // <span> tags
     expect('<span>bar</span>'.matchAll(HTMLRegex).next().value.slice()).toEqual(
-      ['<span>bar</span>', '<span>', 'span', 'bar']
+      ['<span>bar</span>', '<span>', 'span', 'bar', '</span>']
     );
 
     // <p> tags with style and aria-label
@@ -45,6 +69,7 @@ describe('HTMLRegex', () => {
       '<p style="margin: 0" aria-label="bar">',
       'p',
       'foo',
+      '</p>',
     ]);
   });
 
@@ -60,6 +85,7 @@ describe('HTMLRegex', () => {
       '<p>',
       'p',
       'foo',
+      '</p>',
     ]);
 
     // <p> tags with style and aria-label
@@ -73,17 +99,20 @@ describe('HTMLRegex', () => {
       '<p style="margin: 0" aria-label="bar">',
       'p',
       'foo',
+      '</p>',
     ]);
   });
 
   test('match <hr> elements', () => {
-    const HRRegex = createHTMLRegex('hr', true);
+    const HRRegex = createHTMLRegex('hr');
 
     // <hr> closed tags
     expect('<hr>foo</hr>'.matchAll(HRRegex).next().value.slice()).toEqual([
-      '<hr>',
+      '<hr>foo</hr>',
       '<hr>',
       'hr',
+      'foo',
+      '</hr>',
     ]);
 
     // <img/> tags

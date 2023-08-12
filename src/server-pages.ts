@@ -31,6 +31,8 @@ export default class ServerPages {
   private readonly requests: Map<string, Promise<PaginatedResponse>> =
     new Map();
 
+  private forHTML: boolean | undefined;
+
   private pages: Array<string> | undefined;
 
   private cachedPageStyles: PageStyles | undefined;
@@ -110,7 +112,7 @@ export default class ServerPages {
   async getData(): Promise<PagesOutput> {
     const pages = await this.getAll();
 
-    return { pages, pageStyles: this.cachedPageStyles };
+    return { html: this.forHTML, pages, pageStyles: this.cachedPageStyles };
   }
 
   async getDataAsIndices(): Promise<PagesAsIndicesOutput> {
@@ -131,6 +133,7 @@ export default class ServerPages {
     });
 
     return {
+      html: this.forHTML,
       text,
       pages,
       pageStyles: await this.getPageStyles(),
@@ -162,6 +165,7 @@ export default class ServerPages {
   private async initialize(): Promise<void> {
     const { value, page } = await this.fetch(1, 1);
 
+    this.forHTML = value.html;
     this.pages = Array(page.totalSize);
     this.cachedPageStyles = value.pageStyles;
   }

@@ -16,6 +16,7 @@ import createWhitespaceAtTextOverflowParser from '../word-parsers/whitespace/whi
 import parseWhitespaceInline from '../word-parsers/whitespace/whitespace-inline.parser';
 import createWordAtTextOverflowParser from '../word-parsers/word/word-at-text-overflow.parser';
 import parseWord from '../word-parsers/word/word.parser';
+import CreateLineBreakParserConfig from './create-line-break-parser-config.interface';
 
 /**
  * Describes the effect a word has on a page.
@@ -30,7 +31,7 @@ interface WordDescription {
 
 export default class DefaultLineBreakParser implements Parser {
   /**
-   * This is used to debug the parser. Beware if you use this directly. Or don't, I don't really care beyond documentation.
+   * This is used to debug the parser. Beware if you use this directly.
    */
   public debug: CreateTextParserConfig;
 
@@ -46,7 +47,6 @@ export default class DefaultLineBreakParser implements Parser {
   protected parseWord = parseWord;
 
   protected parsePageOverflow: (parserState: ParserState) => ParserState;
-  protected parseEnd = parseEnd;
 
   protected calculator: IWordWidthCalculator;
   protected transformers: Array<Transformer> = [];
@@ -58,7 +58,7 @@ export default class DefaultLineBreakParser implements Parser {
    */
   protected bookLineHeight: Big;
 
-  constructor(protected config: CreateTextParserConfig) {
+  constructor(protected config: CreateLineBreakParserConfig) {
     this.debug = config;
 
     this.pageWidth = config.pageWidth;
@@ -78,11 +78,14 @@ export default class DefaultLineBreakParser implements Parser {
      * word preceding contains the dash, we look for "{word without dash}{dash, optionally}"
      */
     const characterExpression = `[^${whitespace}\\${dash}${newline}]+${dash}?`;
-    const expressions = [
+    let expressions = [
       `(?<word>${characterExpression})`,
       `(?<whitespace>${whitespaceExpression})`,
-      `(?<newline>${newlineExpression})`,
     ];
+
+    if (!config.ignoreNewline) {
+      expressions = expressions.concat(`(?<newline>${newlineExpression})`);
+    }
 
     this.tokenExpression = new RegExp(expressions.join('|'), 'g');
 
@@ -99,15 +102,21 @@ export default class DefaultLineBreakParser implements Parser {
     this.transformers = transformers;
   }
 
-  *generateParserStates(text: string): Generator<ParserState> {
+  *generateParserStates(
+    text: string,
+    parserState?: ParserState,
+    end = parseEnd
+  ): Generator<ParserState> {
     text = this.transformText(text);
 
     const tokens = text.matchAll(this.tokenExpression);
     const calculateWordWidth = (word) => this.calculator.calculate(word);
 
-    let parserState = this.initializeParserState();
+    if (!parserState) {
+      parserState = this.initializeParserState();
 
-    yield parserState;
+      yield parserState;
+    }
 
     for (const token of tokens) {
       const { 0: word, groups } = token;
@@ -129,7 +138,7 @@ export default class DefaultLineBreakParser implements Parser {
       yield parserState;
     }
 
-    parserState = this.parseEnd(parserState);
+    parserState = end?.(parserState) ?? parserState;
 
     yield parserState;
   }
@@ -153,7 +162,7 @@ export default class DefaultLineBreakParser implements Parser {
 
   protected transformText(text: string): string {
     return this.transformers.reduce((newText, transformer) => {
-      transformer.forHTML = true;
+      transformer.forHTML = false;
       return transformer.transform(newText);
     }, text);
   }

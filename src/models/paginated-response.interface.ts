@@ -2,6 +2,7 @@ import PageStyles from './page-styles.interface';
 
 export default interface PaginatedResponse {
   value: {
+    html: boolean;
     pageStyles: PageStyles;
     content: Array<string>;
   };
