@@ -1,4 +1,5 @@
 import PageStyles from '../src/models/page-styles.interface';
+import normalizePageStyles from '../src/utils/normalize-page-styles.function';
 
 const containerStyles: PageStyles = {
   width: 375,
@@ -14,4 +15,4 @@ const containerStyles: PageStyles = {
   },
 };
 
-export default containerStyles;
+export default normalizePageStyles(containerStyles);

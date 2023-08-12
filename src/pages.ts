@@ -46,9 +46,9 @@ export default function Pages(ParserBuilder: {
           option = html;
         }
         parserBuilder = parserBuilder.forHTML(option);
-
-        this.forHTML = Boolean(html);
       }
+
+      this.forHTML = Boolean(html);
 
       const parser = parserBuilder.build();
 
@@ -120,6 +120,7 @@ export default function Pages(ParserBuilder: {
       });
 
       return {
+        html: this.forHTML,
         text,
         pages,
         pageStyles: this.pageStyles,

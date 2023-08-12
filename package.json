@@ -22,7 +22,7 @@
   },
   "scripts": {
     "start": "rm -rf dist && rollup -c ./rollup.config.dev.js && ./scripts/build-dev.sh && http-server -c-1 ./dist",
-    "upload-ulysses": "./scripts/build-dev.sh && ./dist/upload-ulysses.js",
+    "upload-ulysses": "rm -rf dist && rollup -c ./rollup.config.dev.js && ./scripts/build-dev.sh && node --harmony ./dist/upload-ulysses.js",
     "build:lib": "rm -rf dist && rollup -c",
     "release": "npm run build:lib && npm publish ./dist",
     "format": "prettier --write .",

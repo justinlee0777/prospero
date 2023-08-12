@@ -1,9 +1,12 @@
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
 
 import PageStyles from '../../src/models/page-styles.interface';
 import PagesAsIndicesOutput from '../../src/models/pages-as-indices-output.interface';
 import containerStyles from '../container-style.const';
 import workOnChapter from './work-on-chapter';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const chapters = [
   'telemachus',
@@ -43,7 +46,7 @@ const responses = await Promise.all(
     workOnChapter({
       mobileStyles,
       desktopStyles,
-      filename: resolve(__dirname, `./text-samples/ulysses/${chapter}.txt`),
+      filename: resolve(__dirname, `./ulysses/${chapter}.txt`),
     })
   )
 );
@@ -85,12 +88,14 @@ responses.forEach((response) => {
 });
 
 const mobilePages: PagesAsIndicesOutput = {
+  html: false,
   pages: mobile,
   pageStyles: mobileStyles,
   text: compiledText,
 };
 
 const desktopPages: PagesAsIndicesOutput = {
+  html: false,
   pages: desktop,
   pageStyles: desktopStyles,
   text: compiledText,

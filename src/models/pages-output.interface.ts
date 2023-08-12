@@ -1,8 +1,5 @@
-import PageStyles from './page-styles.interface';
+import RequiredPagesOutput from './required-pages-output.interface';
 
-export default interface PagesOutput {
-  /** Whether the inputted text was parsed as HTML. */
-  html?: boolean;
+export default interface PagesOutput extends RequiredPagesOutput {
   pages: Array<string>;
-  pageStyles: PageStyles;
 }

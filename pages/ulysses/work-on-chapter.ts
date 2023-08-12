@@ -2,11 +2,11 @@ import { readFile } from 'node:fs';
 import { join } from 'node:path';
 import { cwd } from 'node:process';
 
+import Pages from '../../src/server/pages';
 import {
   IndentTransformer,
   NewlineTransformer,
 } from '../../src/transformers/public-api';
-import Pages from '../../src/web/pages';
 import ChapterWorkerData from './chapter-worker-data.interface';
 
 export default async function workOnChapter({
@@ -28,12 +28,10 @@ export default async function workOnChapter({
   const fontLocation = join(cwd(), 'pages/Bookerly-Regular.ttf');
 
   const desktop = new Pages(desktopStyles, text, processors, {
-    html: true,
     fontLocation,
   }).getDataAsIndices();
 
   const mobile = new Pages(mobileStyles, text, processors, {
-    html: true,
     fontLocation,
   }).getDataAsIndices();
 
