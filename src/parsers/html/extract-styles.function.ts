@@ -36,6 +36,12 @@ export default function extractStyles(htmlString: string): Styles {
     fontStyles[FontStyle['font-style']] = 'italic';
   }
 
+  const strongRegex = /\<strong.*\>/;
+
+  if (strongRegex.test(htmlString)) {
+    fontStyles[FontStyle['font-weight']] = 'bold';
+  }
+
   for (const [, property, value] of styles) {
     if (ValidFontStyles.includes(property)) {
       // Only permit allowed font styles.

@@ -79,4 +79,15 @@ describe('extractStyles()', () => {
       'font-weight': 'bold',
     });
   });
+
+  test('extracts font-weight from the <strong> tag', () => {
+    expect(extractStyles('<strong>').font).toEqual({
+      'font-weight': 'bold',
+    });
+
+    expect(extractStyles('<strong style="font-style: oblique">').font).toEqual({
+      'font-weight': 'bold',
+      'font-style': 'oblique',
+    });
+  });
 });
