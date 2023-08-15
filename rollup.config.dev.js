@@ -24,6 +24,8 @@ cpSync('text-samples', dir, { recursive: true });
 
 copyFileSync('pages/Bookerly-Regular.ttf', `${dir}/Bookerly-Regular.ttf`);
 
+cpSync('pages/Bookerly', dir, { recursive: true });
+
 export default [
   // Scripts
   {

@@ -385,10 +385,16 @@ export default function HTMLParser(Tokenizer: {
 
         // This modification is for the current page.
         const lines = [...newParserState.lines];
-        lines[0] = openingTag + (newParserState.lines[0] ?? '');
+        let lineText = newParserState.lineText;
+
+        if (newParserState.lines[0]) {
+          lines[0] = openingTag + newParserState.lines[0];
+        } else {
+          lineText = openingTag + lineText;
+        }
 
         // These modifications are for pages between the current page and the initial page.
-        for (let i = 0; i < diff - 1; i++) {
+        for (let i = 0; i < diff; i++) {
           pages[initialLength + i] = openingTag + pages[initialLength + i];
         }
 
@@ -396,6 +402,7 @@ export default function HTMLParser(Tokenizer: {
           ...newParserState,
           pages,
           lines,
+          lineText,
         };
       } else {
         return newParserState;

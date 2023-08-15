@@ -1,3 +1,4 @@
+import FontLocations from '../../models/font-locations.interface';
 import PageStyles from '../../models/page-styles.interface';
 import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
 import Transformer from '../../transformers/models/transformer.interface';
@@ -16,7 +17,7 @@ export default function ParserBuilder(
       computedFontSize: string,
       computedFontFamily: string,
       lineHeight: number,
-      fontLocation?: string
+      fontLocation?: FontLocations
     ): IWordWidthCalculator;
   },
   ParserFactory: IParserFactory
@@ -29,7 +30,7 @@ export default function ParserBuilder(
 
     private transformers: Array<Transformer> = [];
 
-    private fontLocation: string;
+    private fontLocation: FontLocations;
 
     /**
      * Use ContainerStyle to initialize much of what you need for a parser.
@@ -71,8 +72,8 @@ export default function ParserBuilder(
       return this;
     }
 
-    setFontLocation(url: string): ParserBuilder {
-      this.fontLocation = url;
+    setFontLocation(urlOrLocations: FontLocations): ParserBuilder {
+      this.fontLocation = urlOrLocations;
 
       return this;
     }

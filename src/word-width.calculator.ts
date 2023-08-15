@@ -1,3 +1,4 @@
+import FontLocations from './models/font-locations.interface';
 import CalculateWordWidth from './parsers/builders/calculate-word-width.interface';
 import { FontStyles } from './parsers/html/font-styles.interface';
 import Constructor from './utils/constructor.type';
@@ -5,7 +6,7 @@ import toPixelUnits from './utils/to-pixel-units.function';
 import IWordWidthCalculator from './word-width-calculator.interface';
 
 export default function WordWidthCalculator(
-  registerFont: (fontFamily: string, fontLocation?: string) => void,
+  registerFont: (fontFamily: string, fontLocation?: FontLocations) => void,
   createCanvas: () => HTMLCanvasElement
 ): Constructor<IWordWidthCalculator, [string, string, number, string?]> {
   /**
@@ -27,7 +28,7 @@ export default function WordWidthCalculator(
       private fontSize: string,
       private fontFamily: string,
       lineHeightInPixels: number,
-      fontLocation?: string
+      fontLocation?: FontLocations
     ) {
       registerFont(fontFamily, fontLocation);
 
