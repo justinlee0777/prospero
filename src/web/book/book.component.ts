@@ -160,6 +160,9 @@ const BookComponent: CreateBookElement = (
     const timeoutId = setTimeout(() => goToPage(currentPage), 1000);
     bookmark.onbookmarkretrieval = ({ pageNumber }) => {
       goToPage((currentPage = pageNumber));
+
+      animation?.initialize({ pageNumber });
+
       clearTimeout(timeoutId);
     };
 

@@ -251,6 +251,8 @@ BookComponent(
 
 `NewlineTransformer` adds a certain number of newlines between paragraphs. (I personally use this for essays - think Medium.)
 
+Both are stateful, so do not reuse them across books; please create new instances.
+
 ### Limitations
 
 `canvas` is not thread-safe (https://github.com/Automattic/node-canvas/issues/2019). Therefore, only one `Pages` instance can work at a time, if you are working on the server.

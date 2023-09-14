@@ -1,6 +1,10 @@
 import PageElement from '../page/page-element.interface';
 import BookElement from './book-element.interface';
 
+export interface BookAnimationInit {
+  pageNumber: number;
+}
+
 /**
  * Contract for book animations.
  * TBH, not sure how composing different animations will work in the future.
@@ -21,4 +25,10 @@ export default interface BookAnimation {
     oldPages: Array<PageElement>,
     newPages: Array<PageElement>
   ): Promise<void>;
+
+  /**
+   * Supplies the animation with initial state, such as page number. This is useful if
+   * the animation is stateful ex. directional.
+   */
+  initialize(config: BookAnimationInit): void;
 }

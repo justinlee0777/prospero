@@ -20,18 +20,20 @@ export default async function workOnChapter({
     )
   );
 
-  const processors = [
-    new IndentTransformer(5),
-    new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
-  ];
+  const processors = function () {
+    return [
+      new IndentTransformer(5),
+      new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
+    ];
+  };
 
   const fontLocation = join(cwd(), 'pages/Bookerly-Regular.ttf');
 
-  const desktop = new Pages(desktopStyles, text, processors, {
+  const desktop = new Pages(desktopStyles, text, processors(), {
     fontLocation,
   }).getDataAsIndices();
 
-  const mobile = new Pages(mobileStyles, text, processors, {
+  const mobile = new Pages(mobileStyles, text, processors(), {
     fontLocation,
   }).getDataAsIndices();
 

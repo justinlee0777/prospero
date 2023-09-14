@@ -1,7 +1,7 @@
 import styles from './double-page-book-animation.module.css';
 
 import PageElement from '../../page/page-element.interface';
-import BookAnimation from '../book-animation.interface';
+import BookAnimation, { BookAnimationInit } from '../book-animation.interface';
 import BookElement from '../book-element.interface';
 
 interface Config {
@@ -17,6 +17,10 @@ export default class DoublePageBookAnimation implements BookAnimation {
 
   constructor({ milliseconds }: Config = { milliseconds: 600 }) {
     this.milliseconds = milliseconds;
+  }
+
+  initialize({ pageNumber }: BookAnimationInit): void {
+    this.pageNumber = pageNumber;
   }
 
   async changePage(
