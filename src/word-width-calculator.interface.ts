@@ -1,5 +1,5 @@
+import { FontStyles } from './html/extract-styles/font-styles.interface';
 import CalculateWordWidth from './parsers/builders/calculate-word-width.interface';
-import { FontStyles } from './parsers/html/font-styles.interface';
 
 export default interface IWordWidthCalculator {
   calculate: CalculateWordWidth;

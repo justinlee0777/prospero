@@ -1,5 +1,9 @@
 import Big from 'big.js';
 
+import AllowedTags from '../../html/allowed-html/allowed-tags.const';
+import extractStyles from '../../html/extract-styles/extract-styles.function';
+import WhiteSpaceValues from '../../html/extract-styles/white-space-values.enum';
+import getMargin from '../../html/get-margin/get-margin.function';
 import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
 import HTMLTransformer from '../../transformers/html/html.transformer';
 import Transformer from '../../transformers/models/transformer.interface';
@@ -10,12 +14,8 @@ import DefaultLineBreakParser from '../default-line-break/default-line-break.par
 import ChangeParserState from '../models/change-parser-state.interface';
 import ParserGenerator from '../models/parser-generator.interface';
 import ParserState from '../models/parser-state.interface';
-import AllowedTags from './allowed-tags.const';
-import extractStyles from './extract-styles.function';
-import getMargin from './get-margin.function';
 import { ParserContext } from './html-parser-constructor.interface';
 import HTMLTokenizer, { Token, TokenType } from './html.tokenizer';
-import WhiteSpaceValues from './white-space-values.enum';
 import ParseBlockElementClosing from './word-parsers/block-element-closing.parser';
 import ParseBlockElementOpening from './word-parsers/block-element-opening.parser';
 import ParseBRTag from './word-parsers/br-tag.parser';

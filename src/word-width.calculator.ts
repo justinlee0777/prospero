@@ -1,6 +1,6 @@
+import { FontStyles } from './html/extract-styles/font-styles.interface';
 import FontLocations from './models/font-locations.interface';
 import CalculateWordWidth from './parsers/builders/calculate-word-width.interface';
-import { FontStyles } from './parsers/html/font-styles.interface';
 import Constructor from './utils/constructor.type';
 import toPixelUnits from './utils/to-pixel-units.function';
 import IWordWidthCalculator from './word-width-calculator.interface';
