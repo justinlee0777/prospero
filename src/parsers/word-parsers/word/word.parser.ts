@@ -1,12 +1,14 @@
-import ParseWord from '../../models/parse-word.interface';
+import ChangeParserState from '../../models/change-parser-state.interface';
+import ParserState from '../../models/parser-state.interface';
+import Word from '../../models/word.interface';
 
-const parseWord: ParseWord = (state, word) => {
-  return {
-    ...state,
-    textIndex: state.textIndex + word.text.length,
-    lineWidth: state.lineWidth.plus(word.width),
-    lineText: state.lineText + word.text,
-  };
-};
-
-export default parseWord;
+export default class ParseWord implements ChangeParserState<Word> {
+  parse(state: ParserState, word: Word): ParserState {
+    return {
+      ...state,
+      textIndex: state.textIndex + word.text.length,
+      lineWidth: state.lineWidth.plus(word.width),
+      lineText: state.lineText + word.text,
+    };
+  }
+}

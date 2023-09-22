@@ -1,6 +1,7 @@
 import Transformer from '../../transformers/models/transformer.interface';
 import IWordWidthCalculator from '../../word-width-calculator.interface';
-import Parse from './parse.interface';
+import ChangeParserState from './change-parser-state.interface';
+import ParserGenerator from './parser-generator.interface';
 import ParserState from './parser-state.interface';
 
 export default interface Parser {
@@ -16,6 +17,12 @@ export default interface Parser {
   setTransformers(transformers: Array<Transformer>): void;
 
   /**
+   * Creates a self-contained generator that parses each token of the text atomically.
+   * @param text to parse.
+   */
+  createGenerator(text: string, initial?: ParserState): ParserGenerator;
+
+  /**
    * @param text to parse.
    * @param parserState to work on top of. This is the connective tissue between different parsers.
    * @param end handler for the parser. For example, the end of a parser may be to finish the entire book or section.
@@ -24,7 +31,7 @@ export default interface Parser {
   generateParserStates(
     text: string,
     parserState?: ParserState,
-    end?: Parse
+    end?: ChangeParserState<void>
   ): Generator<ParserState>;
 
   generatePages(text: string): Generator<string>;
