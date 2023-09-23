@@ -1,5 +1,5 @@
 import ChangeParserState from '../../models/change-parser-state.interface';
-import ParserState from '../../models/parser-state.interface';
+import ParserState from '../../models/parser.state';
 import ParseNewline from '../../word-parsers/newline/newline.parser';
 import ParseHTMLElementOpening from './html-element-opening.parser';
 
@@ -18,7 +18,9 @@ export default class ParseBlockElementOpening
   }
 
   parse(state: ParserState, tagOpening: string): ParserState {
-    if (state.lineText.length > 0) {
+    const { lineText } = state.initial;
+
+    if (lineText.length > 0) {
       state = this.parseNewline.parse(state);
     }
 

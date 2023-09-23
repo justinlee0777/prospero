@@ -5,7 +5,7 @@ import Transformer from '../../transformers/models/transformer.interface';
 import IWordWidthCalculator from '../../word-width-calculator.interface';
 import ChangeParserState from '../models/change-parser-state.interface';
 import ParserGenerator from '../models/parser-generator.interface';
-import ParserState from '../models/parser-state.interface';
+import ParserState from '../models/parser.state';
 import Word from '../models/word.interface';
 import ParseNewline from '../word-parsers/newline/newline.parser';
 import ParsePageOverflow from '../word-parsers/page-overflow.parser';
@@ -46,7 +46,7 @@ export default class DefaultLineBreakParserGenerator
     if (initialState) {
       this.value = initialState;
     } else {
-      this.value = {
+      this.value = new ParserState({
         pages: [],
         textIndex: 0,
 
@@ -56,7 +56,7 @@ export default class DefaultLineBreakParserGenerator
         lineWidth: Big(0),
         lineHeight: Big(config.lineHeight),
         lineText: '',
-      };
+      });
     }
 
     // Initialize changes in ParserState.
@@ -126,7 +126,7 @@ export default class DefaultLineBreakParserGenerator
 
       const isNewline = Boolean(groups['newline']);
       const isWhitespace = Boolean(groups['whitespace']);
-      const causesWordOverflow = value.lineWidth
+      const causesWordOverflow = value.initial.lineWidth
         .plus(wordWidth)
         .gte(this.config.pageWidth);
 

@@ -13,7 +13,7 @@ import CreateLineBreakParserConfig from '../default-line-break/create-line-break
 import DefaultLineBreakParser from '../default-line-break/default-line-break.parser';
 import ChangeParserState from '../models/change-parser-state.interface';
 import ParserGenerator from '../models/parser-generator.interface';
-import ParserState from '../models/parser-state.interface';
+import ParserState from '../models/parser.state';
 import { ParserContext } from './html-parser-constructor.interface';
 import HTMLTokenizer, { Token, TokenType } from './html.tokenizer';
 import ParseBlockElementClosing from './word-parsers/block-element-closing.parser';
@@ -77,7 +77,7 @@ export default class HTMLParserGenerator implements ParserGenerator {
     if (initialState) {
       this.value = initialState;
     } else {
-      this.value = {
+      this.value = new ParserState({
         pages: [],
         textIndex: 0,
 
@@ -87,7 +87,7 @@ export default class HTMLParserGenerator implements ParserGenerator {
         lineWidth: Big(0),
         lineHeight: Big(this.config.lineHeight),
         lineText: '',
-      };
+      });
     }
 
     // Initialize changes in parser state.

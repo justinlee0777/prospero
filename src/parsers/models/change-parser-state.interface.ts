@@ -1,4 +1,4 @@
-import ParserState from './parser-state.interface';
+import ParserState from './parser.state';
 
 export default interface ChangeParserState<Change> {
   /**

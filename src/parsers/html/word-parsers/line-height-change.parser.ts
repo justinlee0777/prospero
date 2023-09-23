@@ -3,7 +3,7 @@ import Big from 'big.js';
 import BigUtils from '../../../utils/big';
 import ChangeParserState from '../../models/change-parser-state.interface';
 import CreateTextParserConfig from '../../models/create-text-parser-config.interface';
-import ParserState from '../../models/parser-state.interface';
+import ParserState from '../../models/parser.state';
 import ParsePageOverflow from '../../word-parsers/page-overflow.parser';
 
 /**
@@ -17,10 +17,9 @@ export default class ChangeLineHeight implements ChangeParserState<number> {
   }
 
   parse(state: ParserState, lineHeight: number): ParserState {
-    state = {
-      ...state,
+    state = state.change({
       lineHeight: BigUtils.max(Big(this.config.lineHeight), Big(lineHeight)),
-    };
+    });
 
     return this.parsePageOverflow.parse(state);
   }

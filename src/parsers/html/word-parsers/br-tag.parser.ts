@@ -1,5 +1,5 @@
 import ChangeParserState from '../../models/change-parser-state.interface';
-import ParserState from '../../models/parser-state.interface';
+import ParserState from '../../models/parser.state';
 import ParseNewline from '../../word-parsers/newline/newline.parser';
 
 /**
@@ -13,10 +13,11 @@ export default class ParseBRTag implements ChangeParserState<string> {
   }
 
   parse(state: ParserState, tag: string): ParserState {
-    state = {
-      ...state,
-      lineText: state.lineText + tag,
-    };
+    const { lineText } = state.initial;
+
+    state = state.change({
+      lineText: lineText + tag,
+    });
 
     return this.parseNewline.parse(state);
   }

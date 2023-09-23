@@ -2,7 +2,7 @@ import Transformer from '../../transformers/models/transformer.interface';
 import IWordWidthCalculator from '../../word-width-calculator.interface';
 import ChangeParserState from './change-parser-state.interface';
 import ParserGenerator from './parser-generator.interface';
-import ParserState from './parser-state.interface';
+import ParserState from './parser.state';
 
 export default interface Parser {
   /**

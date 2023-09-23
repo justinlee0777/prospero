@@ -1,5 +1,5 @@
 import ChangeParserState from '../../models/change-parser-state.interface';
-import ParserState from '../../models/parser-state.interface';
+import ParserState from '../../models/parser.state';
 import ParseNewline from '../../word-parsers/newline/newline.parser';
 import ParseHTMLElementClosing from './html-element-closing.parser';
 

@@ -1,4 +1,4 @@
-import ParserState from '../../models/parser-state.interface';
+import ParserState from '../../models/parser.state';
 
 export default interface ElementOverflowArgs {
   /**

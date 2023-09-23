@@ -3,8 +3,8 @@ import Transformer from '../../transformers/models/transformer.interface';
 import IWordWidthCalculator from '../../word-width-calculator.interface';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import ParserGenerator from '../models/parser-generator.interface';
-import ParserState from '../models/parser-state.interface';
 import Parser from '../models/parser.interface';
+import ParserState from '../models/parser.state';
 import ParseEnd from '../word-parsers/end.parser';
 import HTMLParserConstructor from './html-parser-constructor.interface';
 import HTMLParserGenerator from './html.parser.generator';
@@ -75,9 +75,9 @@ export default function HTMLParser(Tokenizer: {
       for (const newParserState of parserStates) {
         if (
           parserState &&
-          newParserState.pages.length > parserState.pages.length
+          newParserState.initial.pages.length > parserState.initial.pages.length
         ) {
-          yield newParserState.pages.at(-1);
+          yield newParserState.initial.pages.at(-1);
         }
 
         parserState = newParserState;

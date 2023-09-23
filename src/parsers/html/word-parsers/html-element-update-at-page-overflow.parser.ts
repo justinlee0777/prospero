@@ -1,5 +1,5 @@
 import ChangeParserState from '../../models/change-parser-state.interface';
-import ParserState from '../../models/parser-state.interface';
+import ParserState from '../../models/parser.state';
 import ElementOverflowArgs from './element-overflow-args.interface';
 
 /**
@@ -13,14 +13,14 @@ export default class UpdateHTMLElementAtPageOverflow
 {
   parse(state: ParserState, change: ElementOverflowArgs): ParserState {
     const { previous } = change;
+    let { pages, lineText } = state.initial;
+
     if (previous) {
-      const previousLength = previous.pages.length;
-      const diff = state.pages.length - previousLength;
+      const previousLength = previous.initial.pages.length;
+      const diff = pages.length - previousLength;
 
       if (diff > 0) {
         const { openingTags: openingTag, closingTags: closingTag } = change;
-
-        let { pages, lineText } = state;
 
         pages = [...pages];
 
@@ -36,11 +36,10 @@ export default class UpdateHTMLElementAtPageOverflow
 
         lineText = openingTag + lineText;
 
-        state = {
-          ...state,
+        state = state.change({
           pages,
           lineText,
-        };
+        });
       }
     }
 

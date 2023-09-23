@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash-es';
 
 import div from '../src/elements/div.function';
 import ParserBuilder from '../src/parsers/builders/parser.builder.web';
-import ParserState from '../src/parsers/models/parser-state.interface';
+import ParserState from '../src/parsers/models/parser.state';
 import { formatVariables } from '../src/utils/debug/format-variables.function';
 import containerStyles from './container-style.const';
 import { pagesJsonLocation } from './pages-json-location.const';
@@ -30,7 +30,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     })
   );
 
-  const filter = (parserState: ParserState) => parserState.pages.length === 2;
+  const filter = (parserState: ParserState) =>
+    parserState.initial.pages.length === 2;
 
   const parserStates = parser.generateParserStates(text);
 
