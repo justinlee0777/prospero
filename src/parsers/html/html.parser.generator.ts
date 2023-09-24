@@ -14,20 +14,25 @@ import DefaultLineBreakParser from '../default-line-break/default-line-break.par
 import ChangeParserState from '../models/change-parser-state.interface';
 import ParserGenerator from '../models/parser-generator.interface';
 import ParserState from '../models/parser.state';
+import ParsePageOverflow from '../word-parsers/page-overflow.parser';
+import HTMLContext from './html-context.interface';
 import { ParserContext } from './html-parser-constructor.interface';
 import HTMLTokenizer, { Token, TokenType } from './html.tokenizer';
 import ParseBlockElementClosing from './word-parsers/block-element-closing.parser';
 import ParseBlockElementOpening from './word-parsers/block-element-opening.parser';
 import ParseBRTag from './word-parsers/br-tag.parser';
-import ElementOverflowArgs from './word-parsers/element-overflow-args.interface';
 import ParseHTMLElementClosing from './word-parsers/html-element-closing.parser';
 import ParseHTMLElementOpening from './word-parsers/html-element-opening.parser';
-import UpdateHTMLElementAtPageOverflow from './word-parsers/html-element-update-at-page-overflow.parser';
 import ChangeLineHeight from './word-parsers/line-height-change.parser';
+import ParseHTMLPageOverflow from './word-parsers/parse-html-page-overflow.parser';
 
-export default class HTMLParserGenerator implements ParserGenerator {
+export default class HTMLParserGenerator
+  implements ParserGenerator, HTMLContext
+{
   done: boolean;
   value: ParserState;
+
+  parsePageOverflow: ChangeParserState<void>;
 
   /**
    * Tags that HTMLParser recognizes.
@@ -41,8 +46,8 @@ export default class HTMLParserGenerator implements ParserGenerator {
   private readonly parseBlockElementOpening: ChangeParserState<string>;
   private readonly parseBlockElementClosing: ChangeParserState<string>;
   private readonly parseBRTag: ChangeParserState<string>;
-  private readonly updateHTMLElementAtPageOverflow: ChangeParserState<ElementOverflowArgs>;
-  private readonly changeLineHeight: ChangeParserState<number>;
+  private readonly changeLineHeight: ChangeParserState<Big>;
+  private readonly parsePageOverflowFromLineHeightChange: ChangeParserState<void>;
 
   /**
    * Current HTML context to parse text with.
@@ -91,14 +96,15 @@ export default class HTMLParserGenerator implements ParserGenerator {
     }
 
     // Initialize changes in parser state.
+    this.parsePageOverflow = new ParseHTMLPageOverflow(this);
+
     this.parseHTMLElementOpening = new ParseHTMLElementOpening();
     this.parseHTMLElementClosing = new ParseHTMLElementClosing();
     this.parseBlockElementOpening = new ParseBlockElementOpening();
     this.parseBlockElementClosing = new ParseBlockElementClosing();
     this.parseBRTag = new ParseBRTag();
-    this.updateHTMLElementAtPageOverflow =
-      new UpdateHTMLElementAtPageOverflow();
-    this.changeLineHeight = new ChangeLineHeight(config);
+    this.changeLineHeight = new ChangeLineHeight();
+    this.parsePageOverflowFromLineHeightChange = new ParsePageOverflow();
 
     // Initialize the current HTML tree - as we have not read the tree yet, there is none.
     this.contexts = [
@@ -181,6 +187,8 @@ export default class HTMLParserGenerator implements ParserGenerator {
        */
 
       this.textGenerator = parser.createGenerator(textContent, value);
+      // Override how the generator handles page overflows.
+      this.textGenerator.parsePageOverflow = this.parsePageOverflow;
 
       value = this.nextText();
     } else if (token.type === TokenType.HTML) {
@@ -207,8 +215,16 @@ export default class HTMLParserGenerator implements ParserGenerator {
         }
         value = this.changeLineHeight.parse(
           value,
-          this.wordWidthCalculator.getCalculatedLineHeight()
+          BigUtils.max(
+            Big(value.initial.lineHeight),
+            Big(this.wordWidthCalculator.getCalculatedLineHeight())
+          )
         );
+
+        const { pageHeight, lineHeight } = value.initial;
+        if (pageHeight.add(lineHeight).gte(this.config.pageHeight)) {
+          value = this.parsePageOverflowFromLineHeightChange.parse(value);
+        }
       } else {
         switch (token.tag.name) {
           case 'br':
@@ -242,8 +258,13 @@ export default class HTMLParserGenerator implements ParserGenerator {
         this.updateCalculator();
         value = this.changeLineHeight.parse(
           value,
-          this.wordWidthCalculator.getCalculatedLineHeight()
+          Big(this.wordWidthCalculator.getCalculatedLineHeight())
         );
+
+        const { pageHeight, lineHeight } = value.initial;
+        if (pageHeight.add(lineHeight).gte(this.config.pageHeight)) {
+          value = this.parsePageOverflowFromLineHeightChange.parse(value);
+        }
       }
     }
 
@@ -254,6 +275,33 @@ export default class HTMLParserGenerator implements ParserGenerator {
       this.value = value;
       return value;
     }
+  }
+
+  /**
+   * Gets the opening tag of the current HTML tag or the entire tree.
+   * @param last denotes whether to get the current HTML tag or the entire chain.
+   */
+  getOpeningTag(last = true): string {
+    const contexts = last ? [this.context] : this.contexts.slice();
+
+    return contexts.reduce(
+      (tag, context) => (tag += context.tag?.opening ?? ''),
+      ''
+    );
+  }
+
+  /**
+   * Gets the closing tag of the current HTML tag or the entire tree.
+   * Gets the tags backwards, if the latter.
+   * @param last denotes whether to get the current HTML tag or the entire chain.
+   */
+  getClosingTag(last = true): string {
+    const contexts = last ? [this.context] : this.contexts.slice().reverse();
+
+    return contexts.reduce(
+      (tag, context) => (tag += context.tag ? `</${context.tag.name}>` : ''),
+      ''
+    );
   }
 
   private nextText(): ParserState | null {
@@ -268,13 +316,7 @@ export default class HTMLParserGenerator implements ParserGenerator {
     if (textGenerator.done) {
       return null;
     } else {
-      const value = textGenerator.next(this.value);
-
-      return this.updateHTMLElementAtPageOverflow.parse(value, {
-        previous: this.value,
-        openingTags: this.getOpeningTag(),
-        closingTags: this.getClosingTag(),
-      });
+      return textGenerator.next(this.value);
     }
   }
 
@@ -337,32 +379,5 @@ export default class HTMLParserGenerator implements ParserGenerator {
     } else {
       this.wordWidthCalculator.reset();
     }
-  }
-
-  /**
-   * Gets the opening tag of the current HTML tag or the entire tree.
-   * @param last denotes whether to get the current HTML tag or the entire chain.
-   */
-  private getOpeningTag(last = true): string {
-    const contexts = last ? [this.context] : this.contexts.slice();
-
-    return contexts.reduce(
-      (tag, context) => (tag += context.tag?.opening ?? ''),
-      ''
-    );
-  }
-
-  /**
-   * Gets the closing tag of the current HTML tag or the entire tree.
-   * Gets the tags backwards, if the latter.
-   * @param last denotes whether to get the current HTML tag or the entire chain.
-   */
-  private getClosingTag(last = true): string {
-    const contexts = last ? [this.context] : this.contexts.slice().reverse();
-
-    return contexts.reduce(
-      (tag, context) => (tag += context.tag ? `</${context.tag.name}>` : ''),
-      ''
-    );
   }
 }

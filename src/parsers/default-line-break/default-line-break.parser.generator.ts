@@ -21,6 +21,8 @@ export default class DefaultLineBreakParserGenerator
   done: boolean;
   value: ParserState;
 
+  parsePageOverflow: ChangeParserState<void>;
+
   private readonly tokens: IterableIterator<RegExpMatchArray>;
 
   private readonly parseNewline: ChangeParserState<void>;
@@ -30,8 +32,6 @@ export default class DefaultLineBreakParserGenerator
 
   private readonly parseWordAtTextOverflow: ChangeParserState<Word>;
   private readonly parseWord: ChangeParserState<Word>;
-
-  private readonly parsePageOverflow: ChangeParserState<void>;
 
   constructor(
     text: string,
@@ -68,7 +68,7 @@ export default class DefaultLineBreakParserGenerator
     this.parseWordAtTextOverflow = new ParseWordAtTextOverflow();
     this.parseWord = new ParseWord();
 
-    this.parsePageOverflow = new ParsePageOverflow(config);
+    this.parsePageOverflow = new ParsePageOverflow();
 
     // Break the text down into text tokens for future analysis.
     text = this.transformText(text);
@@ -148,11 +148,12 @@ export default class DefaultLineBreakParserGenerator
         }
       }
 
-      value = this.parsePageOverflow.parse(value);
+      const { pageHeight, lineHeight } = value.initial;
+      if (pageHeight.add(lineHeight).gte(this.config.pageHeight)) {
+        value = this.parsePageOverflow.parse(value);
+      }
 
-      this.value = value;
-
-      return this.value;
+      return (this.value = value);
     }
   }
 

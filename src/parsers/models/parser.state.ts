@@ -1,3 +1,4 @@
+import { formatVariables } from '../../utils/debug/format-variables.function';
 import ParserStateObject from './parser-state-object.interface';
 
 /**
@@ -8,7 +9,7 @@ export default class ParserState<
 > {
   private readonly workingCopy: InternalState;
 
-  constructor(public initial: InternalState) {
+  constructor(public readonly initial: InternalState) {
     this.workingCopy = { ...initial };
   }
 
@@ -17,6 +18,22 @@ export default class ParserState<
       ...this.workingCopy,
       ...changes,
     });
+  }
+
+  /**
+   * Prints the parser state as a printable string.
+   * @param omit are the properties to remove from the printable string; very useful for complex objects like arrays
+   * @returns a string
+   */
+  print(omit: Array<string> = ['pages', 'lines']): string {
+    const { workingCopy } = this;
+    const printable = { ...workingCopy };
+
+    for (const key of omit) {
+      delete printable[key];
+    }
+
+    return formatVariables(printable);
   }
 
   private newInstance(initial: InternalState): this {

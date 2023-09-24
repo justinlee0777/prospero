@@ -7,7 +7,6 @@ export default class ParseWord implements ChangeParserState<Word> {
     const { textIndex, lineWidth, lineText } = state.initial;
 
     return state.change({
-      ...state,
       textIndex: textIndex + word.text.length,
       lineWidth: lineWidth.plus(word.width),
       lineText: lineText + word.text,
