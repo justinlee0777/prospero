@@ -1,17 +1,22 @@
 import Big from 'big.js';
 
-import ParseWord from '../../models/parse-word.interface';
+import ChangeParserState from '../../models/change-parser-state.interface';
+import ParserState from '../../models/parser.state';
 
-const createWhitespaceAtTextOverflowParser: ParseWord = (state, word) => {
-  return {
-    ...state,
-    textIndex: state.textIndex + word.text.length,
-    // Cut the current text and begin on a newline.
-    lines: state.lines.concat(state.lineText),
-    pageHeight: state.pageHeight.add(state.lineHeight),
-    lineWidth: Big(0),
-    lineText: word.text,
-  };
-};
+export default class ParseWhitespaceAtTextOverflow
+  implements ChangeParserState<void>
+{
+  parse(state: ParserState): ParserState {
+    const { textIndex, lines, lineText, pageHeight, lineHeight } =
+      state.initial;
 
-export default createWhitespaceAtTextOverflowParser;
+    return state.change({
+      textIndex: textIndex + 1,
+      // Cut the current text and begin on a newline.
+      lines: lines.concat(lineText),
+      pageHeight: pageHeight.add(lineHeight),
+      lineWidth: Big(0),
+      lineText: ' ',
+    });
+  }
+}

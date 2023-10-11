@@ -130,6 +130,7 @@ export default function ParserBuilder(
         fontSize: toPixelUnits(computedFontSize),
         pageHeight: containerHeight,
         pageWidth: containerWidth,
+        lineHeight,
       });
 
       parser.setCalculator(calculator);

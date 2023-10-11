@@ -3,7 +3,7 @@ import Big from 'big.js';
 /**
  * The current state of the text parser.
  */
-export default interface ParserState {
+export default interface ParserStateObject {
   // The below section describes the book so far.
   pages: Array<string>;
   /** Index in the original text after the change. */

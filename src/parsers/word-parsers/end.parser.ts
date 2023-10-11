@@ -1,18 +1,18 @@
 import Big from 'big.js';
 
-import ParserState from '../models/parser-state.interface';
+import ChangeParserState from '../models/change-parser-state.interface';
+import ParserState from '../models/parser.state';
 
-const parseEnd: (state: ParserState) => ParserState = (state) => {
-  return {
-    ...state,
-    pages: state.pages.concat(state.lines.join('') + state.lineText),
-    page: '',
-    // Cut the current text and begin on a newline.
-    lines: [],
-    line: 0,
-    lineWidth: Big(0),
-    lineText: '',
-  };
-};
+export default class ParseEnd implements ChangeParserState<void> {
+  parse(state: ParserState): ParserState {
+    const { pages, lines, lineText } = state.initial;
 
-export default parseEnd;
+    return state.change({
+      pages: pages.concat(lines.join('') + lineText),
+      // Cut the current text and begin on a newline.
+      lines: [],
+      lineWidth: Big(0),
+      lineText: '',
+    });
+  }
+}

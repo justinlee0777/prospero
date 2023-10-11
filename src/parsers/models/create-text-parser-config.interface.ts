@@ -5,4 +5,6 @@ export default interface CreateTextParserConfig {
   pageHeight: number;
   /** The width of the page, in pixels. */
   pageWidth: number;
+  /** The original line height of the page before considering HTML elements. */
+  lineHeight: number;
 }

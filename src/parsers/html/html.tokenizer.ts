@@ -1,5 +1,5 @@
-import allowedVoidTags from './allowed-void-elements.const';
-import voidTags from './void-elements.const';
+import allowedVoidTags from '../../html/allowed-html/allowed-void-elements.const';
+import voidTags from '../../html/allowed-html/void-elements.const';
 
 /**
  * Text content with information on the HTML tag, if any.

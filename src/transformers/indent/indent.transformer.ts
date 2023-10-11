@@ -1,5 +1,5 @@
-import blockLevelTags from '../../parsers/html/allowed-block-level-tags.const';
-import allowedVoidTags from '../../parsers/html/allowed-void-elements.const';
+import blockLevelTags from '../../html/allowed-html/allowed-block-level-tags.const';
+import allowedVoidTags from '../../html/allowed-html/allowed-void-elements.const';
 import createHTMLRegex from '../../regexp/html.regexp';
 import Transformer from '../models/transformer.interface';
 
