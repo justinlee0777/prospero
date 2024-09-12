@@ -21,40 +21,40 @@ export default class HTMLTransformer implements Transformer {
     [
       'h1',
       (tagContent) =>
-        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
+        `<div style="margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 2
         }px">${tagContent}</div>`,
     ],
     [
       'h2',
       (tagContent) =>
-        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
+        `<div style="margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 1.5
         }px">${tagContent}</div>`,
     ],
     [
       'h3',
       (tagContent) =>
-        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
+        `<div style="margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 1.17
         }px">${tagContent}</div>`,
     ],
     [
       'h4',
       (tagContent) =>
-        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold">${tagContent}</div>`,
+        `<div style="margin: 0; font-weight: bold">${tagContent}</div>`,
     ],
     [
       'h5',
       (tagContent) =>
-        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
+        `<div style="margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 0.83
         }px">${tagContent}</div>`,
     ],
     [
       'h6',
       (tagContent) =>
-        `<div style="white-space: pre-wrap; display: inline-block; margin: 0; font-weight: bold; font-size: ${
+        `<div style="margin: 0; font-weight: bold; font-size: ${
           this.config.fontSize * 0.67
         }px">${tagContent}</div>`,
     ],
@@ -77,13 +77,13 @@ export default class HTMLTransformer implements Transformer {
     text = text.replaceAll(
       createHTMLRegex('hr'),
       () =>
-        `<div style="white-space: pre-wrap; display: inline-block; text-align: center; width: 100%">${hrString}</div>`
+        `<div style="text-align: center; width: 100%">${hrString}</div>`
     );
 
     text = text.replaceAll(createHTMLRegex('p'), (...args) => {
       const content = args.at(3);
 
-      return `<div style="white-space: pre-wrap; margin: 0;">${content}</div>`;
+      return `<div style="margin: 0;">${content}</div>`;
     });
 
     text = text.replaceAll(createHTMLRegex('blockquote'), (...args) => {

@@ -7,6 +7,7 @@ import DefaultLineBreakParser from "../default-line-break/default-line-break.par
 import CreateTextParserConfig from "../models/create-text-parser-config.interface";
 import Parser from "../models/parser.interface";
 import Transformer from '../../transformers/models/transformer.interface';
+import HTMLParser from "../html/html.parser";
 
 export default class ParserBuilder {
     private ParserConstructor: (config: CreateTextParserConfig) => Parser = (config) => new DefaultLineBreakParser(config);
@@ -15,6 +16,7 @@ export default class ParserBuilder {
 
     private transformers: Array<Transformer> = [];
 
+    // TODO need to implement
     private fontLocation: FontLocations;
 
     /**
@@ -64,7 +66,10 @@ export default class ParserBuilder {
     }
 
     forHTML(options?: HTMLTransformerOptions): ParserBuilder {
-      throw new Error('forHTML not implemented')
+      this.ParserConstructor = (config) =>
+        new HTMLParser(config, options);
+
+      return this;
     }
 
     /**
@@ -75,9 +80,7 @@ export default class ParserBuilder {
       const {
         width,
         height,
-        computedFontFamily,
         computedFontSize,
-        lineHeight,
         padding,
         margin,
         border,

@@ -1,5 +1,3 @@
-import Big from 'big.js';
-
 import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
 import Constructor from '../../utils/constructor.type';
 import CreateLineBreakParserConfig from '../default-line-break/create-line-break-parser-config.interface';
@@ -13,7 +11,7 @@ import { FontStyles } from './font-styles.interface';
  */
 export interface ParserContext {
   pageWidth: number;
-  lineHeight: Big;
+  // lineHeight: Big;
 
   blockStyles?: BlockStyles;
   fontStyles?: FontStyles;

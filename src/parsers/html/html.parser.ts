@@ -1,31 +1,21 @@
-import Big from 'big.js';
-
 import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
 import HTMLTransformer from '../../transformers/html/html.transformer';
 import Transformer from '../../transformers/models/transformer.interface';
-import BigUtils from '../../utils/big';
-import IWordWidthCalculator from '../../word-width-calculator.interface';
-import CreateLineBreakParserConfig from '../default-line-break/create-line-break-parser-config.interface';
-import DefaultLineBreakParser from '../default-line-break/default-line-break.parser';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import ParserState from '../models/parser-state.interface';
 import Parser from '../models/parser.interface';
-import parseEnd from '../word-parsers/end.parser';
-import createNewlineParser from '../word-parsers/newline/newline.parser';
-import pageOverflowParser from '../word-parsers/page-overflow.parser';
 import AllowedTags from './allowed-tags.const';
 import extractStyles from './extract-styles.function';
 import getMargin from './get-margin.function';
-import HTMLParserConstructor, {
+import {
   ParserContext,
 } from './html-parser-constructor.interface';
 import HTMLTokenizer, { TokenType } from './html.tokenizer';
-import WhiteSpaceValues from './white-space-values.enum';
+import div from '../../elements/div.function';
+import { dash, newline, whitespace } from '../../glyphs.const';
+import pageStylesToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
 
-export default function HTMLParser(Tokenizer: {
-  new (): HTMLTokenizer;
-}): HTMLParserConstructor {
-  return class HTMLParser implements Parser {
+export default class HTMLParser implements Parser {
     /**
      * This is used to debug the parser. Beware if you use this directly.
      */
@@ -35,13 +25,7 @@ export default function HTMLParser(Tokenizer: {
      * Tags that HTMLParser recognizes.
      */
     private static readonly allowedTags = AllowedTags;
-
-    private readonly tokenizer = new Tokenizer();
-
-    private readonly parsePageOverflowFromLineHeightChange: (
-      state: ParserState
-    ) => ParserState;
-
+  
     /**
      * Current HTML context to parse text with.
      * The 0th element is the root of the document, which has no enhancements.
@@ -55,13 +39,10 @@ export default function HTMLParser(Tokenizer: {
       return this.contexts.at(-1);
     }
 
-    private calculator: IWordWidthCalculator;
     private transformers: Array<Transformer> = [];
 
-    /**
-     * Line height for the whole book, given the font size configured.
-     */
-    private bookLineHeight: Big;
+
+    private tokenExpression: RegExp;
 
     constructor(
       private config: CreateTextParserConfig,
@@ -69,27 +50,38 @@ export default function HTMLParser(Tokenizer: {
     ) {
       this.debug = config;
 
-      this.parsePageOverflowFromLineHeightChange = pageOverflowParser(config);
-
       this.contexts = [
         {
           pageWidth: this.config.pageWidth,
-          lineHeight: Big(0),
+          // lineHeight: Big(0),
           blockStyles: {
             margin: '0px',
           },
         },
       ];
-    }
 
-    setCalculator(calculator: IWordWidthCalculator): void {
-      this.calculator = calculator;
+      /**
+     * <token> = <punctuatedWord> | <whitespace> | <newline>
+     * <punctuatedWord> = <punctuation> <word> <punctuation>
+     * <punctuation> = "!" | "?" ... | ""
+     * <word> = alphabetic sequence with at least one character
+     * <whitespace> = " -"
+     * <newline> = "\n"
+     */
+    const whitespaceExpression = `${whitespace}|${dash}`;
+    const newlineExpression = newline;
+    /**
+     * 1. As phrases with dashes can be cut by the dash, such that the
+     * word preceding contains the dash, we look for "{word without dash}{dash, optionally}"
+     */
+    const characterExpression = `[^${whitespace}\\${dash}${newline}]+${dash}?`;
+    let expressions = [
+      `(?<word>${characterExpression})`,
+      `(?<whitespace>${whitespaceExpression})`,
+      `(?<newline>${newlineExpression})`
+    ];
 
-      /*
-       * This code will essentially break lines that are smaller than the default font size,
-       * meaning it will overestimate and not fill out the page entirely.
-       */
-      this.bookLineHeight = Big(this.calculator.getCalculatedLineHeight());
+    this.tokenExpression = new RegExp(expressions.join('|'), 'g');
     }
 
     setTransformers(transformers: Array<Transformer>): void {
@@ -98,9 +90,9 @@ export default function HTMLParser(Tokenizer: {
 
     *generateParserStates(
       text: string,
-      parserState?: ParserState,
-      end = parseEnd
-    ): Generator<ParserState> {
+      // parserState?: ParserState,
+      // end = parseEnd
+    ): Generator<string> {
       // transform incompatible HTML tags into compatible ones using styling to match original behavior.
       text = new HTMLTransformer(
         {
@@ -115,21 +107,38 @@ export default function HTMLParser(Tokenizer: {
         return transformer.transform(newText);
       }, text);
 
-      const tokens = this.tokenizer.getTokens(text);
+      const { pageStyles } = this.config;
 
-      let initial: ParserState;
+      const textElement = div();
 
-      if (!parserState) {
-        // This denotes the top-level HTMLParser. Create the parser state.
-        parserState = initial = this.initializeParserState();
+    const styles = {
+      ...pageStylesToStyleDeclaration(pageStyles),
+      boxSizing: 'border-box',
+      position: 'absolute',
+      left: '-99in',
+    }
 
-        yield parserState;
-      }
+    const page = div({
+      styles,
+      children: [textElement],
+    });
+
+    document.body.appendChild(page);
+
+    const computedStyles = getComputedStyle(page);
+    const pageHeight = page.clientHeight - parseFloat(computedStyles.paddingTop) - parseFloat(computedStyles.paddingBottom);
+
+    let pageContent = '';
+
+      const tokenizer = new HTMLTokenizer();
+
+      const tokens = tokenizer.getTokens(text);
 
       for (const token of tokens) {
         if (token.type === TokenType.TEXT) {
           const textContent = token.content;
 
+          /*
           let config: CreateLineBreakParserConfig = {
             ...this.config,
           };
@@ -143,32 +152,46 @@ export default function HTMLParser(Tokenizer: {
               /*
                * The default 'white-space' configuration ignores newlines
                * ( https://developer.mozilla.org/en-US/docs/Web/CSS/white-space#syntax )
-               */
               ignoreNewline:
                 !whiteSpace || whiteSpace === WhiteSpaceValues.NORMAL,
               pageWidth,
             };
           }
 
-          const parser = new DefaultLineBreakParser(config);
-
-          parser.setCalculator(this.calculator);
+          // const parser = new DefaultLineBreakParser(config);
 
           /*
            * Note the absence of a 'setTransformers' invocation.
            * The transformers act funny without the entire text.
            */
 
+          /*
           const generator = parser.generateParserStates(
             textContent,
-            parserState,
-            null
           );
+          */
 
-          let result: IteratorResult<ParserState>;
+          const textTokens = textContent.matchAll(this.tokenExpression);
 
-          while (!(result = generator.next()).done) {
-            yield (parserState = this.handlePageEnd(initial, result.value));
+          for (const textToken of textTokens) {
+            const [ word ] = textToken;
+      
+            const newPageContent = pageContent + word;
+      
+            textElement.innerHTML = newPageContent;
+            console.log({
+              pageContent,
+              clientHeight: textElement.clientHeight,
+            })
+            if (textElement.clientHeight >= pageHeight) {
+              yield this.handlePageEnd(pageContent);
+      
+              const openingTag = this.getOpeningTag();
+
+              pageContent = `${openingTag}${word}`;
+            } else {
+              pageContent = newPageContent;
+            }
           }
         } else if (token.type === TokenType.HTML) {
           if (!HTMLParser.allowedTags.includes(token.tag.name)) {
@@ -183,21 +206,12 @@ export default function HTMLParser(Tokenizer: {
 
             this.contexts.push(context);
 
-            parserState = this.updateCalculator(parserState);
-
-            // If the change in font size causes the current line to overflow, set a new page.
-            parserState =
-              this.parsePageOverflowFromLineHeightChange(parserState);
-
             // Create an opening tag.
-            yield (parserState = this.openTag(parserState));
+            pageContent += this.getOpeningTag();
           } else {
             switch (token.tag.name) {
               case 'br':
-                yield (parserState = this.parseBRTag(
-                  parserState,
-                  token.tag.opening
-                ));
+                pageContent += '<br/>';
                 break;
               default:
                 console.error(
@@ -210,51 +224,33 @@ export default function HTMLParser(Tokenizer: {
             continue;
           }
 
-          yield (parserState = this.endHTMLElement(parserState));
+          // yield (parserState = this.endHTMLElement(parserState));
+
+          pageContent += this.getClosingTag();
 
           this.contexts.pop();
 
-          parserState = this.updateCalculator(parserState);
+          // parserState = this.updateCalculator(parserState);
         }
 
-        initial = parserState;
+        // initial = parserState;
       }
 
-      parserState = end?.(parserState) ?? parserState;
+      // parserState = end?.(parserState) ?? parserState;
 
-      yield parserState;
+      yield pageContent;
     }
 
     *generatePages(text: string): Generator<string> {
       const parserStates = this.generateParserStates(text);
-
+  
       let parserState: ParserState;
-
+  
       for (const newParserState of parserStates) {
-        if (
-          parserState &&
-          newParserState.pages.length > parserState.pages.length
-        ) {
-          yield newParserState.pages.at(-1);
-        }
-
-        parserState = newParserState;
+        yield newParserState;
       }
     }
 
-    private initializeParserState(): ParserState {
-      return {
-        pages: [],
-        textIndex: 0,
-
-        lines: [],
-        pageHeight: Big(0),
-
-        lineWidth: Big(0),
-        lineHeight: this.bookLineHeight,
-        lineText: '',
-      };
-    }
 
     /**
      * Create the context for a new HTMLParser, using the given tag opening and name.
@@ -289,40 +285,16 @@ export default function HTMLParser(Tokenizer: {
           blockStyles,
           fontStyles,
           // Choose the greater line height. Code breaks if the line height is smaller.
+          /*
           lineHeight: BigUtils.max(
             this.bookLineHeight,
             Big(this.calculator.getCalculatedLineHeight())
           ),
+          */
         };
       } else {
         return this.context;
       }
-    }
-
-    /**
-     * Update the WordWidthCalculator when a context is pushed or popped.
-     * The deepest context with a change in font styles is used.
-     * If no context is found, then the calculator resets to its default configuration.
-     */
-    private updateCalculator(parserState: ParserState): ParserState {
-      const context = this.contexts
-        .slice()
-        .reverse()
-        .find((c) => Boolean(c.fontStyles));
-
-      if (context) {
-        this.calculator.apply(context.fontStyles);
-      } else {
-        this.calculator.reset();
-      }
-
-      return {
-        ...parserState,
-        lineHeight: BigUtils.max(
-          this.bookLineHeight,
-          Big(this.calculator.getCalculatedLineHeight())
-        ),
-      };
     }
 
     /**
@@ -367,80 +339,19 @@ export default function HTMLParser(Tokenizer: {
      * @param newParserState
      */
     private handlePageEnd(
-      initialState: ParserState,
-      newParserState: ParserState
-    ): ParserState {
+      pageText: string
+    ): string {
+      /*
       const initialLength = initialState.pages.length;
       const diff = newParserState.pages.length - initialLength;
-
+*/
       const closingTag = this.getClosingTag(false);
-      const openingTag = this.getOpeningTag(false);
+      // const openingTag = this.getOpeningTag(false);
 
-      if (diff > 0) {
-        const pages = [...newParserState.pages];
-
-        for (let i = 0; i < diff; i++) {
-          pages[initialLength + i] += closingTag;
-        }
-
-        // This modification is for the current page.
-        const lines = [...newParserState.lines];
-        let lineText = newParserState.lineText;
-
-        if (newParserState.lines[0]) {
-          lines[0] = openingTag + newParserState.lines[0];
-        } else {
-          lineText = openingTag + lineText;
-        }
-
-        // These modifications are for pages between the current page and the initial page.
-        for (let i = 0; i < diff; i++) {
-          pages[initialLength + i] = openingTag + pages[initialLength + i];
-        }
-
-        return {
-          ...newParserState,
-          pages,
-          lines,
-          lineText,
-        };
-      } else {
-        return newParserState;
-      }
+      return pageText + closingTag;
     }
 
-    /**
-     * End a parsed HTMLElement, by adding the closing tag.
-     */
-    private endHTMLElement(parserState: ParserState): ParserState {
-      const newParserState: ParserState = {
-        ...parserState,
-        // Add the closing tag if there is no remaining text content left.
-        lineText: (parserState.lineText += this.getClosingTag()),
-      };
-
-      if (this.context.blockStyles && newParserState.lineWidth.gt(0)) {
-        // End the parsing of a block-level element by setting the parser on a newline.
-        return createNewlineParser(newParserState, {
-          text: '',
-          width: Big(0),
-        });
-      } else {
-        return newParserState;
-      }
+    protected convert({ top = 0, right = 0, bottom = 0, left = 0 }: { top?: number; right?: number; bottom?: number; left?: number } = {}): string {
+      return `${top}px ${right}px ${bottom}px ${left}px`;
     }
-
-    /**
-     * <br> should be handled as a newline. QUESTION: Does it act as a newline in an inline element?
-     */
-    private parseBRTag(
-      parserState: ParserState,
-      tagOpening: string
-    ): ParserState {
-      return createNewlineParser(parserState, {
-        text: tagOpening,
-        width: Big(0),
-      });
-    }
-  };
-}
+  }
