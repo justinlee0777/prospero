@@ -1,22 +1,11 @@
-import Big from 'big.js';
-
 import { dash, newline, whitespace } from '../../glyphs.const';
 import Transformer from '../../transformers/models/transformer.interface';
-import IWordWidthCalculator from '../../word-width-calculator.interface';
-import CalculateWordWidth from '../builders/calculate-word-width.interface';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
-import ParseWord from '../models/parse-word.interface';
 import ParserState from '../models/parser-state.interface';
 import Parser from '../models/parser.interface';
 import Word from '../models/word.interface';
-import parseEnd from '../word-parsers/end.parser';
-import createNewlineParser from '../word-parsers/newline/newline.parser';
-import pageOverflowParser from '../word-parsers/page-overflow.parser';
-import createWhitespaceAtTextOverflowParser from '../word-parsers/whitespace/whitespace-at-text-overflow.parser';
-import parseWhitespaceInline from '../word-parsers/whitespace/whitespace-inline.parser';
-import createWordAtTextOverflowParser from '../word-parsers/word/word-at-text-overflow.parser';
-import parseWord from '../word-parsers/word/word.parser';
 import CreateLineBreakParserConfig from './create-line-break-parser-config.interface';
+import div from '../../elements/div.function';
 
 /**
  * Describes the effect a word has on a page.
@@ -37,31 +26,10 @@ export default class DefaultLineBreakParser implements Parser {
 
   protected tokenExpression: RegExp;
 
-  protected parseNewline = createNewlineParser;
-
-  protected parseWhitespaceAtTextOverflow =
-    createWhitespaceAtTextOverflowParser;
-  protected parseWhitespaceInline = parseWhitespaceInline;
-
-  protected parseWordAtTextOverflow = createWordAtTextOverflowParser;
-  protected parseWord = parseWord;
-
-  protected parsePageOverflow: (parserState: ParserState) => ParserState;
-
-  protected calculator: IWordWidthCalculator;
   protected transformers: Array<Transformer> = [];
-
-  protected pageWidth: number;
-
-  /**
-   * Line height for the whole book, given the font size configured.
-   */
-  protected bookLineHeight: Big;
 
   constructor(protected config: CreateLineBreakParserConfig) {
     this.debug = config;
-
-    this.pageWidth = config.pageWidth;
 
     /**
      * <token> = <punctuatedWord> | <whitespace> | <newline>
@@ -88,14 +56,6 @@ export default class DefaultLineBreakParser implements Parser {
     }
 
     this.tokenExpression = new RegExp(expressions.join('|'), 'g');
-
-    this.parsePageOverflow = pageOverflowParser(this.config);
-  }
-
-  setCalculator(calculator: IWordWidthCalculator): void {
-    this.calculator = calculator;
-
-    this.bookLineHeight = Big(this.calculator.getCalculatedLineHeight());
   }
 
   setTransformers(transformers: Array<Transformer>): void {
@@ -103,44 +63,79 @@ export default class DefaultLineBreakParser implements Parser {
   }
 
   *generateParserStates(
-    text: string,
-    parserState?: ParserState,
-    end = parseEnd
-  ): Generator<ParserState> {
+    text: string
+  ): Generator<string> {
     text = this.transformText(text);
 
-    const tokens = text.matchAll(this.tokenExpression);
-    const calculateWordWidth = (word) => this.calculator.calculate(word);
+    const { pageStyles } = this.config;
 
+    const textElement = div();
+
+    const styles: Partial<CSSStyleDeclaration> = {
+      boxSizing: 'border-box',
+      fontFamily: pageStyles.computedFontFamily,
+      fontSize: pageStyles.computedFontSize,
+      lineHeight: `${pageStyles.lineHeight}px`,
+      padding: this.convert(pageStyles.padding),
+      border: this.convert(pageStyles.border),
+      margin: this.convert(pageStyles.margin),
+      height: `${pageStyles.height}px`,
+      width: `${pageStyles.width}px`,
+    position: 'absolute',
+    left: '-99in',
+      whiteSpace: 'pre-wrap',
+    }
+
+    const page = div({
+      styles,
+      children: [textElement],
+    });
+
+    document.body.appendChild(page);
+
+    const tokens = text.matchAll(this.tokenExpression);
+
+    /*
     if (!parserState) {
       parserState = this.initializeParserState();
 
       yield parserState;
     }
+    */
+
+    const computedStyles = getComputedStyle(page);
+    const pageHeight = page.clientHeight - parseFloat(computedStyles.paddingTop) - parseFloat(computedStyles.paddingBottom);
+    console.log({
+      styles,
+      pageHeight,
+      computedStyles,
+    })
+    let pageText = '';
 
     for (const token of tokens) {
-      const { 0: word, groups } = token;
+      const [ word ] = token;
 
-      const wordDescription = this.getWordDescription(
-        parserState,
-        Boolean(groups['newline']),
-        Boolean(groups['whitespace']),
-        word,
-        calculateWordWidth
-      );
+      const newPageText = pageText + word;
 
-      const parseText = this.chooseWordParser(wordDescription);
+      textElement.textContent = newPageText;
+      console.log({
+        pageText,
+        clientHeight: textElement.clientHeight,
+      })
+      if (textElement.clientHeight >= pageHeight) {
+        yield pageText;
 
-      parserState = parseText(parserState, wordDescription.word);
-
-      parserState = this.parsePageOverflow(parserState);
-
-      yield parserState;
+        pageText = word;
+      } else {
+        pageText = newPageText;
+      }
     }
 
-    parserState = end?.(parserState) ?? parserState;
+    // parserState = end?.(parserState) ?? parserState;
 
-    yield parserState;
+    document.body.removeChild(page);
+
+    yield pageText;
   }
 
   *generatePages(text: string): Generator<string> {
@@ -149,15 +144,12 @@ export default class DefaultLineBreakParser implements Parser {
     let parserState: ParserState;
 
     for (const newParserState of parserStates) {
-      if (
-        parserState &&
-        newParserState.pages.length > parserState.pages.length
-      ) {
-        yield newParserState.pages.at(-1);
-      }
-
-      parserState = newParserState;
+      yield newParserState;
     }
+  }
+
+  protected convert({ top = 0, right = 0, bottom = 0, left = 0 }: { top?: number; right?: number; bottom?: number; left?: number } = {}): string {
+    return `${top}px ${right}px ${bottom}px ${left}px`;
   }
 
   protected transformText(text: string): string {
@@ -165,69 +157,5 @@ export default class DefaultLineBreakParser implements Parser {
       transformer.forHTML = false;
       return transformer.transform(newText);
     }, text);
-  }
-
-  protected initializeParserState(): ParserState {
-    return {
-      pages: [],
-      textIndex: 0,
-
-      lines: [],
-      pageHeight: Big(0),
-
-      lineWidth: Big(0),
-      lineHeight: this.bookLineHeight,
-      lineText: '',
-    };
-  }
-
-  protected getWordDescription(
-    parserState: ParserState,
-    isNewline: boolean,
-    isWhitespace: boolean,
-    text: string,
-    calculateWordWidth: CalculateWordWidth
-  ): WordDescription {
-    const wordWidth = Big(calculateWordWidth(text)).round(2, 3);
-
-    return {
-      isNewline,
-      isWhitespace,
-      isBeginningOfPage:
-        parserState.pageHeight.eq(0) && parserState.lineWidth.eq(0),
-      causesWordOverflow: parserState.lineWidth
-        .plus(wordWidth)
-        .gte(this.pageWidth),
-      word: {
-        text,
-        width: wordWidth,
-      },
-    };
-  }
-
-  protected chooseWordParser({
-    isNewline,
-    isWhitespace,
-    causesWordOverflow,
-  }: WordDescription): ParseWord {
-    let parseWord: ParseWord;
-
-    if (isNewline) {
-      parseWord = this.parseNewline;
-    } else if (isWhitespace) {
-      if (causesWordOverflow) {
-        parseWord = this.parseWhitespaceAtTextOverflow;
-      } else {
-        parseWord = this.parseWhitespaceInline;
-      }
-    } else {
-      if (causesWordOverflow) {
-        parseWord = this.parseWordAtTextOverflow;
-      } else {
-        parseWord = this.parseWord;
-      }
-    }
-
-    return parseWord.bind(this);
   }
 }

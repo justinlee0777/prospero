@@ -1,5 +1,4 @@
 import Transformer from '../../transformers/models/transformer.interface';
-import IWordWidthCalculator from '../../word-width-calculator.interface';
 import Parse from './parse.interface';
 import ParserState from './parser-state.interface';
 
@@ -10,8 +9,6 @@ export default interface Parser {
   debug: {
     pageWidth: number;
   };
-
-  setCalculator(calculator: IWordWidthCalculator): void;
 
   setTransformers(transformers: Array<Transformer>): void;
 
@@ -25,7 +22,7 @@ export default interface Parser {
     text: string,
     parserState?: ParserState,
     end?: Parse
-  ): Generator<ParserState>;
+  ): Generator<string>;
 
   generatePages(text: string): Generator<string>;
 }

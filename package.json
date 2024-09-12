@@ -21,7 +21,7 @@
     "./web/react": "./web/react.js"
   },
   "scripts": {
-    "start": "rm -rf dist && rollup -c ./rollup.config.dev.js && ./scripts/build-dev.sh && http-server -c-1 ./dist",
+    "start": "rm -rf dist && rollup -c ./rollup.config.dev.js && http-server -c-1 ./dist",
     "upload-ulysses": "rm -rf dist && rollup -c ./rollup.config.dev.js && ./scripts/build-dev.sh && node --harmony ./dist/upload-ulysses.js",
     "build:lib": "rm -rf dist && rollup -c",
     "release": "npm run build:lib && npm publish ./dist",
@@ -62,14 +62,10 @@
     "typescript-plugin-css-modules": "^5.0.0",
     "unified": "^10.1.2"
   },
-  "dependencies": {
-    "big.js": "^6.2.1",
-    "cheerio": "^1.0.0-rc.12",
-    "style-inject": "^0.3.0"
-  },
   "peerDependencies": {
-    "canvas": "^2.11.2",
-    "jsdom": "^22.0.0",
     "react": "^18.2.0"
+  },
+  "dependencies": {
+    "style-inject": "^0.3.0"
   }
 }

@@ -10,7 +10,7 @@ const sourcemap = true;
 const dir = 'dist';
 
 const pageEntries = readdirSync('./pages')
-  .filter((filename) => filename.includes('-page.ts'))
+  .filter((filename) => filename.includes('web-book-demo-page.ts'))
   .map((filename) => {
     const tokens = filename.split('.');
 
@@ -28,6 +28,7 @@ cpSync('pages/Bookerly', dir, { recursive: true });
 
 export default [
   // Scripts
+  /*
   {
     input: {
       buildPages: 'pages/build-pages.ts',
@@ -47,6 +48,7 @@ export default [
     ],
     external: ['canvas', 'jsdom'],
   },
+  */
   // HTML
   ...pageEntries.map(({ extensionlessName, extension }) => ({
     input: `pages/${extensionlessName}.${extension}`,

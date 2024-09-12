@@ -1,30 +1,15 @@
-import FontLocations from '../../models/font-locations.interface';
-import PageStyles from '../../models/page-styles.interface';
-import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
+import { PageStyles } from "../../models";
+import FontLocations from "../../models/font-locations.interface";
+import HTMLTransformerOptions from "../../transformers/html/html-transformer-options.interface";
+import Optional from "../../utils/optional.type";
+import toPixelUnits from "../../utils/to-pixel-units.function";
+import DefaultLineBreakParser from "../default-line-break/default-line-break.parser";
+import CreateTextParserConfig from "../models/create-text-parser-config.interface";
+import Parser from "../models/parser.interface";
 import Transformer from '../../transformers/models/transformer.interface';
-import Constructor from '../../utils/constructor.type';
-import Optional from '../../utils/optional.type';
-import toPixelUnits from '../../utils/to-pixel-units.function';
-import IWordWidthCalculator from '../../word-width-calculator.interface';
-import CreateTextParserConfig from '../models/create-text-parser-config.interface';
-import Parser from '../models/parser.interface';
-import IParserFactory from '../parser-factory.interface';
-import IParserBuilder from './parser.builder.interface';
 
-export default function ParserBuilder(
-  WordWidthCalculator: {
-    new (
-      computedFontSize: string,
-      computedFontFamily: string,
-      lineHeight: number,
-      fontLocation?: FontLocations
-    ): IWordWidthCalculator;
-  },
-  ParserFactory: IParserFactory
-): Constructor<IParserBuilder, []> {
-  return class ParserBuilder {
-    private ParserConstructor: (config: CreateTextParserConfig) => Parser =
-      ParserFactory.create;
+export default class ParserBuilder {
+    private ParserConstructor: (config: CreateTextParserConfig) => Parser = (config) => new DefaultLineBreakParser(config);
 
     private containerStyle: PageStyles;
 
@@ -79,10 +64,7 @@ export default function ParserBuilder(
     }
 
     forHTML(options?: HTMLTransformerOptions): ParserBuilder {
-      this.ParserConstructor = (config) =>
-        ParserFactory.createForHTML(config, options);
-
-      return this;
+      throw new Error('forHTML not implemented')
     }
 
     /**
@@ -119,24 +101,16 @@ export default function ParserBuilder(
         border.top -
         border.bottom;
 
-      const calculator = new WordWidthCalculator(
-        computedFontSize,
-        computedFontFamily,
-        lineHeight,
-        this.fontLocation
-      );
 
       const parser = this.ParserConstructor({
         fontSize: toPixelUnits(computedFontSize),
         pageHeight: containerHeight,
         pageWidth: containerWidth,
+        pageStyles: this.containerStyle,
       });
-
-      parser.setCalculator(calculator);
 
       parser.setTransformers(this.transformers);
 
       return parser;
     }
   };
-}

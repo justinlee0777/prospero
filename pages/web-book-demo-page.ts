@@ -59,9 +59,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         new IndentTransformer(5),
         new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
       ],
-      forHTML: {
-        hrString: '-',
-      },
     },
     {
       styles: {
