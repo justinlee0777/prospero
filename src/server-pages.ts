@@ -112,7 +112,7 @@ export default class ServerPages {
   async getData(): Promise<PagesOutput> {
     const pages = await this.getAll();
 
-    return { html: this.forHTML, pages, pageStyles: this.cachedPageStyles };
+    return { pages, pageStyles: this.cachedPageStyles };
   }
 
   async getDataAsIndices(): Promise<PagesAsIndicesOutput> {
@@ -133,7 +133,6 @@ export default class ServerPages {
     });
 
     return {
-      html: this.forHTML,
       text,
       pages,
       pageStyles: await this.getPageStyles(),

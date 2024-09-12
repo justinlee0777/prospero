@@ -3,14 +3,14 @@ import FontLocations from "../../models/font-locations.interface";
 import HTMLTransformerOptions from "../../transformers/html/html-transformer-options.interface";
 import Optional from "../../utils/optional.type";
 import toPixelUnits from "../../utils/to-pixel-units.function";
-import DefaultLineBreakParser from "../default-line-break/default-line-break.parser";
 import CreateTextParserConfig from "../models/create-text-parser-config.interface";
 import Parser from "../models/parser.interface";
 import Transformer from '../../transformers/models/transformer.interface';
 import HTMLParser from "../html/html.parser";
 
 export default class ParserBuilder {
-    private ParserConstructor: (config: CreateTextParserConfig) => Parser = (config) => new DefaultLineBreakParser(config);
+    private ParserConstructor: (config: CreateTextParserConfig, options?: HTMLTransformerOptions) => Parser = (config, options) =>
+      new HTMLParser(config, options);
 
     private containerStyle: PageStyles;
 
@@ -61,13 +61,6 @@ export default class ParserBuilder {
 
     setFontLocation(urlOrLocations: FontLocations): ParserBuilder {
       this.fontLocation = urlOrLocations;
-
-      return this;
-    }
-
-    forHTML(options?: HTMLTransformerOptions): ParserBuilder {
-      this.ParserConstructor = (config) =>
-        new HTMLParser(config, options);
 
       return this;
     }

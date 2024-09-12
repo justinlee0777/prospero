@@ -1,6 +1,4 @@
 import Transformer from '../../transformers/models/transformer.interface';
-import Parse from './parse.interface';
-import ParserState from './parser-state.interface';
 
 export default interface Parser {
   /**
@@ -20,8 +18,6 @@ export default interface Parser {
    */
   generateParserStates(
     text: string,
-    parserState?: ParserState,
-    end?: Parse
   ): Generator<string>;
 
   generatePages(text: string): Generator<string>;

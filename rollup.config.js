@@ -45,7 +45,7 @@ export default [
   // Base build
   {
     input: {
-      'server/pages': 'src/server/pages.ts',
+      // 'server/pages': 'src/server/pages.ts',
       'server/server-pages': 'src/server-pages.ts',
       'server/transformers': 'src/transformers/public-api.ts',
       server: 'src/server.ts',

@@ -1,7 +1,7 @@
 import GetPage from '../../models/get-page.interface';
 import PagesOutput from '../../models/pages-output.interface';
 
-type PageInfo = Pick<PagesOutput, 'pageStyles' | 'html'>;
+type PageInfo = Pick<PagesOutput, 'pageStyles'>;
 
 interface BookArgsWithGetPage extends PageInfo {
   getPage: GetPage;

@@ -2,18 +2,15 @@ import HTMLTransformerOptions from '../../transformers/html/html-transformer-opt
 import HTMLTransformer from '../../transformers/html/html.transformer';
 import Transformer from '../../transformers/models/transformer.interface';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
-import ParserState from '../models/parser-state.interface';
 import Parser from '../models/parser.interface';
 import AllowedTags from './allowed-tags.const';
 import extractStyles from './extract-styles.function';
 import getMargin from './get-margin.function';
-import {
-  ParserContext,
-} from './html-parser-constructor.interface';
 import HTMLTokenizer, { TokenType } from './html.tokenizer';
 import div from '../../elements/div.function';
 import { dash, newline, whitespace } from '../../glyphs.const';
 import pageStylesToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
+import ParserContext from './parser-context.interface';
 
 export default class HTMLParser implements Parser {
     /**
@@ -224,27 +221,17 @@ export default class HTMLParser implements Parser {
             continue;
           }
 
-          // yield (parserState = this.endHTMLElement(parserState));
-
           pageContent += this.getClosingTag();
 
           this.contexts.pop();
-
-          // parserState = this.updateCalculator(parserState);
         }
-
-        // initial = parserState;
       }
-
-      // parserState = end?.(parserState) ?? parserState;
 
       yield pageContent;
     }
 
     *generatePages(text: string): Generator<string> {
       const parserStates = this.generateParserStates(text);
-  
-      let parserState: ParserState;
   
       for (const newParserState of parserStates) {
         yield newParserState;
@@ -308,13 +295,6 @@ export default class HTMLParser implements Parser {
         (tag, context) => (tag += context.tag?.opening ?? ''),
         ''
       );
-    }
-
-    private openTag(state: ParserState): ParserState {
-      return {
-        ...state,
-        lineText: state.lineText + this.getOpeningTag(),
-      };
     }
 
     /**
