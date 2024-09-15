@@ -8,15 +8,13 @@ const text = await getTextSample();
 const desktop = new Pages(
   { ...containerStyles, computedFontSize: '16px' },
   text,
-  transformers,
-  { html: true }
+  transformers
 );
 
 const mobile = new Pages(
   { ...containerStyles, computedFontSize: '12px' },
   text,
-  transformers,
-  { html: true }
+  transformers
 );
 
 const url = 'http://0.0.0.0:9292';

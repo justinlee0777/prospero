@@ -1,9 +1,5 @@
 import './book-demo.css';
 
-import {
-  IndentTransformer,
-  NewlineTransformer,
-} from '../src/transformers/public-api';
 import { listenToClickEvents, listenToKeyboardEvents } from '../src/web';
 import FlexibleBookComponent from '../src/web/flexible-book/flexible-book.component';
 

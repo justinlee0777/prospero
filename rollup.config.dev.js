@@ -1,5 +1,6 @@
 import commonjs from '@rollup/plugin-commonjs';
 import html from '@rollup/plugin-html';
+import json from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import { copyFileSync, cpSync, readdirSync } from 'fs';
@@ -10,7 +11,7 @@ const sourcemap = true;
 const dir = 'dist';
 
 const pageEntries = readdirSync('./pages')
-  .filter((filename) => filename.includes('web-book-demo-page.ts'))
+  .filter((filename) => filename.includes('-page.ts'))
   .map((filename) => {
     const tokens = filename.split('.');
 
@@ -28,7 +29,6 @@ cpSync('pages/Bookerly', dir, { recursive: true });
 
 export default [
   // Scripts
-  /*
   {
     input: {
       buildPages: 'pages/build-pages.ts',
@@ -40,6 +40,7 @@ export default [
       dir,
     },
     plugins: [
+      json(),
       nodeResolve({
         moduleDirectories: ['node_modules'],
       }),
@@ -48,7 +49,6 @@ export default [
     ],
     external: ['canvas', 'jsdom'],
   },
-  */
   // HTML
   ...pageEntries.map(({ extensionlessName, extension }) => ({
     input: `pages/${extensionlessName}.${extension}`,

@@ -1,3 +1,4 @@
+/*
 import './debug-book.css';
 
 import { cloneDeep } from 'lodash-es';
@@ -53,3 +54,4 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 });
+*/

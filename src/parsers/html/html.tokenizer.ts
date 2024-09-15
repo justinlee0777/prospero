@@ -92,9 +92,7 @@ export default class HTMLTokenizer {
           yield {
             tag: {
               name: tagName,
-              opening: this.getOuterHTML(element)
-                .match(openingPattern)
-                .at(0),
+              opening: this.getOuterHTML(element).match(openingPattern).at(0),
               closing,
             },
             type: TokenType.HTML,

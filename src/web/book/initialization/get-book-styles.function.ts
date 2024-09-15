@@ -34,7 +34,7 @@ export default function getBookStyles(
 
     console.log({
       bookStyles,
-    })
+    });
 
     calculatedPageStyles = {
       ...userDefinedPageStyles,

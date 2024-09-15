@@ -91,7 +91,7 @@ const BookComponent: CreateBookElement = (
 
   console.log({
     calculatedPageStyles,
-  })
+  });
 
   let goToPage = updateHandler(book, {
     get: getPage,

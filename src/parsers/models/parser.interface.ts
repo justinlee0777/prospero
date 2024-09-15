@@ -16,9 +16,7 @@ export default interface Parser {
    * @param end handler for the parser. For example, the end of a parser may be to finish the entire book or section.
    *   If undefined, nothing should be done, implying that another parser will pick up subsequent work.
    */
-  generateParserStates(
-    text: string,
-  ): Generator<string>;
+  generateParserStates(text: string): Generator<string>;
 
   generatePages(text: string): Generator<string>;
 }

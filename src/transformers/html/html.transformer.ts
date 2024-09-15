@@ -76,8 +76,7 @@ export default class HTMLTransformer implements Transformer {
 
     text = text.replaceAll(
       createHTMLRegex('hr'),
-      () =>
-        `<div style="text-align: center; width: 100%">${hrString}</div>`
+      () => `<div style="text-align: center; width: 100%">${hrString}</div>`
     );
 
     text = text.replaceAll(createHTMLRegex('p'), (...args) => {

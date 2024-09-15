@@ -88,14 +88,12 @@ responses.forEach((response) => {
 });
 
 const mobilePages: PagesAsIndicesOutput = {
-  html: false,
   pages: mobile,
   pageStyles: mobileStyles,
   text: compiledText,
 };
 
 const desktopPages: PagesAsIndicesOutput = {
-  html: false,
   pages: desktop,
   pageStyles: desktopStyles,
   text: compiledText,

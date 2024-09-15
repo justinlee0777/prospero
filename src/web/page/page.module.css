@@ -6,10 +6,6 @@
   width: 100%;
 }
 
-.page.textOnlyPage {
-  white-space: pre-wrap;
-}
-
 .pageNumber {
   bottom: 1em;
   position: absolute;

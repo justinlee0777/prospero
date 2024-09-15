@@ -6,7 +6,7 @@ import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 
 export default async function getTextSample(): Promise<string> {
-  const url = './text-samples/ulysses/proteus.txt';
+  const url = './text-samples/color-example.txt';
 
   let text = await new Promise<string>((resolve, reject) =>
     readFile(url, 'utf8', (err, file) => (err ? reject(err) : resolve(file)))

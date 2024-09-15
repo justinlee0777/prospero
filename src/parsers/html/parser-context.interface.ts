@@ -18,4 +18,3 @@ export default interface ParserContext {
     name: string;
   };
 }
-

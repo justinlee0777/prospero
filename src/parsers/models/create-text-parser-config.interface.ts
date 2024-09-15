@@ -1,4 +1,4 @@
-import { PageStyles } from "../../models";
+import { PageStyles } from '../../models';
 
 export default interface CreateTextParserConfig {
   /** In pixels. */

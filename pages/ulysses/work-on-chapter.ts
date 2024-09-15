@@ -29,11 +29,11 @@ export default async function workOnChapter({
 
   const fontLocation = join(cwd(), 'pages/Bookerly-Regular.ttf');
 
-  const desktop = new Pages(desktopStyles, text, processors(), {
+  const desktop = await new Pages(desktopStyles, text, processors(), {
     fontLocation,
   }).getDataAsIndices();
 
-  const mobile = new Pages(mobileStyles, text, processors(), {
+  const mobile = await new Pages(mobileStyles, text, processors(), {
     fontLocation,
   }).getDataAsIndices();
 

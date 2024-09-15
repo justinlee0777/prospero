@@ -21,7 +21,7 @@
     "./web/react": "./web/react.js"
   },
   "scripts": {
-    "start": "rm -rf dist && rollup -c ./rollup.config.dev.js && http-server -c-1 ./dist",
+    "start": "rm -rf dist && rollup -c ./rollup.config.dev.js && ./scripts/build-dev.sh && http-server -c-1 ./dist",
     "upload-ulysses": "rm -rf dist && rollup -c ./rollup.config.dev.js && ./scripts/build-dev.sh && node --harmony ./dist/upload-ulysses.js",
     "build:lib": "rm -rf dist && rollup -c",
     "release": "npm run build:lib && npm publish ./dist",
@@ -31,7 +31,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.2",
     "@rollup/plugin-html": "^1.0.2",
-    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-typescript": "^11.1.1",
     "@types/big.js": "^6.1.6",
@@ -66,6 +66,7 @@
     "react": "^18.2.0"
   },
   "dependencies": {
+    "playwright": "^1.47.1",
     "style-inject": "^0.3.0"
   }
 }
