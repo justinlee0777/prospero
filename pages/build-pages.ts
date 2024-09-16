@@ -25,7 +25,7 @@ const desktopData = await desktop.getData();
 const mobileData = await mobile.getData();
 
 writeFileSync(
-  `./dist/${pagesJsonLocation}`,
+  `./dev/${pagesJsonLocation}`,
   JSON.stringify({
     desktop: desktopData,
     mobile: mobileData,
