@@ -4,12 +4,6 @@
  */
 export default interface Transformer {
   /**
-   * Flag used to let the transformer know it is meant for HTML. This is set by a client of the
-   * transformer.
-   */
-  forHTML: boolean;
-
-  /**
    * @param text, original
    * @returns the transformed text
    */

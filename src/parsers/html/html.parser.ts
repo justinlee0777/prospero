@@ -99,20 +99,19 @@ export default class HTMLParser implements Parser {
 
     // transform text. Tell the transformers they are working with HTML.
     text = this.transformers.reduce((newText, transformer) => {
-      transformer.forHTML = true;
       return transformer.transform(newText);
     }, text);
 
     const { pageStyles } = this.config;
 
-    const styles = {
+    const styles: Partial<CSSStyleDeclaration> = {
       ...pageStylesToStyleDeclaration(pageStyles),
       boxSizing: 'border-box',
       position: 'absolute',
       left: '-99in',
+      whiteSpace: 'pre-wrap',
     };
 
-    // below is the code that explicitly needs to run on the browser
     const textElement = div({
       styles: {
         overflowY: 'hidden',
@@ -197,8 +196,6 @@ export default class HTMLParser implements Parser {
         this.contexts.pop();
       }
     }
-
-    // end of the code that needs to be explicitly done on the browser
 
     yield pageContent;
   }

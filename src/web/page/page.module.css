@@ -3,6 +3,7 @@
   height: 100%;
   position: absolute;
   top: 0;
+  white-space: pre-wrap;
   width: 100%;
 }
 

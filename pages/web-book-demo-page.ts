@@ -1,6 +1,11 @@
 import './book-demo.css';
 
-import { listenToClickEvents, listenToKeyboardEvents } from '../src/web';
+import {
+  IndentTransformer,
+  listenToClickEvents,
+  listenToKeyboardEvents,
+  NewlineTransformer,
+} from '../src/web';
 import FlexibleBookComponent from '../src/web/flexible-book/flexible-book.component';
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -52,12 +57,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     },
     {
       transformers: [
-        // new IndentTransformer(5),
-        // new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
+        new IndentTransformer(5),
+        new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
       ],
-      forHTML: {
-        hrString: '-',
-      },
     },
     {
       styles: {

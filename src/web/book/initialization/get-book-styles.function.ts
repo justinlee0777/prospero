@@ -32,10 +32,6 @@ export default function getBookStyles(
       borderLeftWidth: styles.borderLeftWidth,
     };
 
-    console.log({
-      bookStyles,
-    });
-
     calculatedPageStyles = {
       ...userDefinedPageStyles,
       width: pageWidth,
