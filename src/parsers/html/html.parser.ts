@@ -1,12 +1,9 @@
 import div from '../../elements/div.function';
 import { dash, newline, whitespace } from '../../glyphs.const';
-import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
-import HTMLTransformer from '../../transformers/html/html.transformer';
 import Transformer from '../../transformers/models/transformer.interface';
 import pageStylesToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import Parser from '../models/parser.interface';
-import AllowedTags from './allowed-tags.const';
 import extractStyles from './extract-styles.function';
 import getMargin from './get-margin.function';
 import HTMLTokenizer, { TokenType } from './html.tokenizer';
@@ -17,11 +14,6 @@ export default class HTMLParser implements Parser {
    * This is used to debug the parser. Beware if you use this directly.
    */
   public debug: CreateTextParserConfig;
-
-  /**
-   * Tags that HTMLParser recognizes.
-   */
-  private static readonly allowedTags = AllowedTags;
 
   /**
    * Current HTML context to parse text with.
@@ -42,7 +34,6 @@ export default class HTMLParser implements Parser {
 
   constructor(
     private config: CreateTextParserConfig,
-    private transformerOptions?: HTMLTransformerOptions
   ) {
     this.debug = config;
 
@@ -89,14 +80,6 @@ export default class HTMLParser implements Parser {
     // parserState?: ParserState,
     // end = parseEnd
   ): Generator<string> {
-    // transform incompatible HTML tags into compatible ones using styling to match original behavior.
-    text = new HTMLTransformer(
-      {
-        fontSize: this.config.fontSize,
-      },
-      this.transformerOptions
-    ).transform(text);
-
     // transform text. Tell the transformers they are working with HTML.
     text = this.transformers.reduce((newText, transformer) => {
       return transformer.transform(newText);
@@ -161,10 +144,6 @@ export default class HTMLParser implements Parser {
           }
         }
       } else if (token.type === TokenType.HTML) {
-        if (!HTMLParser.allowedTags.includes(token.tag.name)) {
-          continue;
-        }
-
         if (token.tag.closing) {
           const opening = token.tag.opening;
           const tagName = token.tag.name;
@@ -187,10 +166,6 @@ export default class HTMLParser implements Parser {
           }
         }
       } else if (token.type === TokenType.END_HTML) {
-        if (!HTMLParser.allowedTags.includes(token.tagName)) {
-          continue;
-        }
-
         pageContent += this.getClosingTag();
 
         this.contexts.pop();
@@ -218,7 +193,6 @@ export default class HTMLParser implements Parser {
     tagOpening: string,
     tagName: string
   ): ParserContext {
-    if (HTMLParser.allowedTags.includes(tagName)) {
       const { font: fontStyles, block: blockStyles } =
         extractStyles(tagOpening);
 
@@ -241,9 +215,6 @@ export default class HTMLParser implements Parser {
         blockStyles,
         fontStyles,
       };
-    } else {
-      return this.context;
-    }
   }
 
   /**

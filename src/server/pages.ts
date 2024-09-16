@@ -38,7 +38,9 @@ export default class Pages
 
         const webPages: WebPages = new WebPagesClass(...constructorParameters);
 
-        return webPages.getData();
+        const data = webPages.getData();
+
+        return data;
       },
       {
         sourceUrl: this.webPagesSourceUrl,

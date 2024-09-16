@@ -1,24 +1,22 @@
 import { PageStyles } from '../../models';
 import FontLocations from '../../models/font-locations.interface';
-import HTMLTransformerOptions from '../../transformers/html/html-transformer-options.interface';
 import Transformer from '../../transformers/models/transformer.interface';
 import Optional from '../../utils/optional.type';
 import toPixelUnits from '../../utils/to-pixel-units.function';
+import registerFont from '../../web/utils/register-font.function';
 import HTMLParser from '../html/html.parser';
 import CreateTextParserConfig from '../models/create-text-parser-config.interface';
 import Parser from '../models/parser.interface';
 
 export default class ParserBuilder {
   private ParserConstructor: (
-    config: CreateTextParserConfig,
-    options?: HTMLTransformerOptions
-  ) => Parser = (config, options) => new HTMLParser(config, options);
+    config: CreateTextParserConfig
+  ) => Parser = (config) => new HTMLParser(config);
 
   private containerStyle: PageStyles;
 
   private transformers: Array<Transformer> = [];
 
-  // TODO need to implement
   private fontLocation: FontLocations;
 
   /**
@@ -71,8 +69,8 @@ export default class ParserBuilder {
    * Get the built parser.
    * @throws if there is no internal parser yet.
    */
-  build(): Parser {
-    const { width, height, computedFontSize, padding, margin, border } =
+  async build(): Promise<Parser> {
+    const { width, height, computedFontFamily, computedFontSize, padding, margin, border } =
       this.containerStyle;
 
     const containerWidth =
@@ -92,6 +90,10 @@ export default class ParserBuilder {
       margin.bottom -
       border.top -
       border.bottom;
+
+      if (this.fontLocation) {
+    await registerFont(computedFontFamily, this.fontLocation)
+      }
 
     const parser = this.ParserConstructor({
       fontSize: toPixelUnits(computedFontSize),

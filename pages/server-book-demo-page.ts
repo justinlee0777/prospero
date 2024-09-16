@@ -12,14 +12,14 @@ import DoublePageBookAnimation from '../src/web/book/animations/double-page-book
 import BooksComponent from '../src/web/books/books.component';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const fontUrl = 'http://127.0.0.1:8080/Bookerly-Regular.ttf';
+  const fontUrl = 'http://127.0.0.1:3000/Bookerly-Regular.ttf';
   const fontFace = new FontFace('Bookerly', `url(${fontUrl})`);
 
   document.fonts.add(fontFace);
 
-  const endpointBase = 'http://127.0.0.1:9292/prospero/texts';
+  const endpointBase = 'http://127.0.0.1:9292/api/prospero/texts';
 
-  const desktopPages = new ServerPages(`${endpointBase}/ulysses/desktop`);
+  const desktopPages = new ServerPages(`${endpointBase}/ulysses/desktop/`);
   const desktopStyles = await desktopPages.getPageStyles();
 
   const desktopBook = BookComponent(
@@ -52,7 +52,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   );
 
-  const mobilePages = new ServerPages(`${endpointBase}/ulysses/mobile`);
+  const mobilePages = new ServerPages(`${endpointBase}/ulysses/mobile/`);
   const mobileStyles = await mobilePages.getPageStyles();
 
   const mobileBook = BookComponent(

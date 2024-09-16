@@ -10,7 +10,7 @@ import ParserBuilder from '../parsers/builders/parser.builder';
 import Transformer from '../transformers/models/transformer.interface';
 
 export default class Pages implements IPages {
-  private pageGenerator: Generator<string>;
+  private pageGeneratorPromise: Promise<Generator<string>>;
 
   private cachedPages: Array<string> = [];
   private lastGeneratorResult: IteratorResult<string> | undefined;
@@ -31,12 +31,10 @@ export default class Pages implements IPages {
       parserBuilder = parserBuilder.setFontLocation(fontLocation);
     }
 
-    const parser = parserBuilder.build();
-
-    this.pageGenerator = parser.generatePages(text);
+    this.pageGeneratorPromise = parserBuilder.build().then(parser => parser.generatePages(text));
   }
 
-  get: GetPage = (pageNumber) => {
+  get: GetPage = async (pageNumber) => {
     const difference = pageNumber - (this.cachedPages.length - 1);
 
     if (difference < 0) {
@@ -48,7 +46,8 @@ export default class Pages implements IPages {
       let i = 0;
 
       while (i < difference) {
-        this.lastGeneratorResult = this.pageGenerator.next();
+        const pageGenerator = await this.pageGeneratorPromise;
+        this.lastGeneratorResult = pageGenerator.next();
 
         if (this.lastGeneratorResult.done) {
           break;
@@ -64,27 +63,28 @@ export default class Pages implements IPages {
     }
   };
 
-  getPageStyles(): PageStyles {
+  async getPageStyles(): Promise<PageStyles> {
     return this.pageStyles;
   }
 
-  getAll(): Array<string> {
-    return [...this.pageGenerator];
+  async getAll(): Promise<Array<string>> {
+    const pageGenerator = await this.pageGeneratorPromise;
+    return [ ...pageGenerator ];
   }
 
   /**
    * @returns a JS object that is compatable with the structured clone algorithm. This behavior will be unit tested.
    * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
    */
-  getData(): PagesOutput {
+  async getData(): Promise<PagesOutput> {
     return {
-      pages: this.getAll(),
+      pages: await this.getAll(),
       pageStyles: this.pageStyles,
     };
   }
 
-  getDataAsIndices(): PagesAsIndicesOutput {
-    const stringPages = this.getAll();
+  async getDataAsIndices(): Promise<PagesAsIndicesOutput> {
+    const stringPages = await this.getAll();
 
     let text = '';
     let pages: PagesAsIndicesOutput['pages'] = [];

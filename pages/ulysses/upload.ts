@@ -1,12 +1,7 @@
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
-
 import PageStyles from '../../src/models/page-styles.interface';
 import PagesAsIndicesOutput from '../../src/models/pages-as-indices-output.interface';
 import containerStyles from '../container-style.const';
 import workOnChapter from './work-on-chapter';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const chapters = [
   'telemachus',
@@ -46,7 +41,7 @@ const responses = await Promise.all(
     workOnChapter({
       mobileStyles,
       desktopStyles,
-      filename: resolve(__dirname, `./ulysses/${chapter}.txt`),
+      filename: `./text-samples/ulysses/${chapter}.txt`,
     })
   )
 );
@@ -99,7 +94,7 @@ const desktopPages: PagesAsIndicesOutput = {
   text: compiledText,
 };
 
-const url = 'https://api.iamjustinlee.com';
+const url = 'https://iamjustinlee.com/api';
 
 try {
   let response = await fetch(`${url}/prospero/texts/ulysses/mobile`, {
@@ -115,6 +110,10 @@ try {
   });
 
   console.log(response.status);
+
+  process.exit(0);
 } catch (error) {
   console.log(error);
+
+  process.exit(1);
 }

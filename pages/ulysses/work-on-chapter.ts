@@ -1,6 +1,4 @@
 import { readFile } from 'node:fs';
-import { join } from 'node:path';
-import { cwd } from 'node:process';
 
 import Pages from '../../src/server/pages';
 import {
@@ -8,6 +6,7 @@ import {
   NewlineTransformer,
 } from '../../src/transformers/public-api';
 import ChapterWorkerData from './chapter-worker-data.interface';
+import TextToHTMLTransformer from '../../src/transformers/text-to-html/html.transformer';
 
 export default async function workOnChapter({
   mobileStyles,
@@ -22,12 +21,15 @@ export default async function workOnChapter({
 
   const processors = function () {
     return [
+      new TextToHTMLTransformer(),
       new IndentTransformer(5),
       new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
     ];
   };
 
-  const fontLocation = join(cwd(), 'pages/Bookerly-Regular.ttf');
+  const fontLocation = '/Bookerly-Regular.ttf';
+
+  console.log(`working on ${filename}...`)
 
   const desktop = await new Pages(desktopStyles, text, processors(), {
     fontLocation,
@@ -36,6 +38,8 @@ export default async function workOnChapter({
   const mobile = await new Pages(mobileStyles, text, processors(), {
     fontLocation,
   }).getDataAsIndices();
+
+  console.log(`done with ${filename}`)
 
   return {
     mobile,
