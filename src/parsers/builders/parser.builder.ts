@@ -9,9 +9,9 @@ import CreateTextParserConfig from '../models/create-text-parser-config.interfac
 import Parser from '../models/parser.interface';
 
 export default class ParserBuilder {
-  private ParserConstructor: (
-    config: CreateTextParserConfig
-  ) => Parser = (config) => new HTMLParser(config);
+  private ParserConstructor: (config: CreateTextParserConfig) => Parser = (
+    config
+  ) => new HTMLParser(config);
 
   private containerStyle: PageStyles;
 
@@ -70,8 +70,15 @@ export default class ParserBuilder {
    * @throws if there is no internal parser yet.
    */
   async build(): Promise<Parser> {
-    const { width, height, computedFontFamily, computedFontSize, padding, margin, border } =
-      this.containerStyle;
+    const {
+      width,
+      height,
+      computedFontFamily,
+      computedFontSize,
+      padding,
+      margin,
+      border,
+    } = this.containerStyle;
 
     const containerWidth =
       width -
@@ -91,9 +98,9 @@ export default class ParserBuilder {
       border.top -
       border.bottom;
 
-      if (this.fontLocation) {
-    await registerFont(computedFontFamily, this.fontLocation)
-      }
+    if (this.fontLocation) {
+      await registerFont(computedFontFamily, this.fontLocation);
+    }
 
     const parser = this.ParserConstructor({
       fontSize: toPixelUnits(computedFontSize),

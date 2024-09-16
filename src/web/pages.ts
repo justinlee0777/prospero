@@ -31,7 +31,9 @@ export default class Pages implements IPages {
       parserBuilder = parserBuilder.setFontLocation(fontLocation);
     }
 
-    this.pageGeneratorPromise = parserBuilder.build().then(parser => parser.generatePages(text));
+    this.pageGeneratorPromise = parserBuilder
+      .build()
+      .then((parser) => parser.generatePages(text));
   }
 
   get: GetPage = async (pageNumber) => {
@@ -69,7 +71,7 @@ export default class Pages implements IPages {
 
   async getAll(): Promise<Array<string>> {
     const pageGenerator = await this.pageGeneratorPromise;
-    return [ ...pageGenerator ];
+    return [...pageGenerator];
   }
 
   /**

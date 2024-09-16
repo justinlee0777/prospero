@@ -7,8 +7,8 @@ import Transformer from '../models/transformer.interface';
 export default class TextToHTMLTransformer implements Transformer {
   transform(text: string): string {
     /**
-       * Match all non-newline character groups.
-       */
+     * Match all non-newline character groups.
+     */
     const pattern = /([^\n]+)/g;
 
     const newText = text.replace(pattern, `<p>$1</p>`).replaceAll('\n', '');

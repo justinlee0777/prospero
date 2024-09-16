@@ -4,27 +4,86 @@ import PagesAsIndicesOutput from '../models/pages-as-indices-output.interface';
 import Transformer from '../transformers/models/transformer.interface';
 import WebPages from '../web/pages';
 
-// Host source code on iamjustinlee.com and blah
-export default class Pages
-  implements Pick<IPages, 'getData' | 'getDataAsIndices'>
-{
-  private webPagesSourceDomain = 'http://localhost:8080';
-
-  private webPagesSourceUrl = `${this.webPagesSourceDomain}/web/pages.js`;
+export default class Pages implements IPages {
+  private webPagesSourceUrl: string;
 
   private webPagesConstructorParameters: ConstructorParameters<typeof WebPages>;
 
   constructor(
+    private webPagesSourceDomain: string,
     pageStyles: PageStyles,
     text: string,
     transformers?: Array<Transformer>,
     pageConfig: PagesConfig = {}
   ) {
+    this.webPagesSourceUrl = `${this.webPagesSourceDomain}/web/pages.js`;
+
     text = transformers?.reduce(
       (acc, transformer) => transformer.transform(acc),
       text
     );
     this.webPagesConstructorParameters = [pageStyles, text, null, pageConfig];
+  }
+
+  async get(pageNumber: number): Promise<string> {
+    const browserPage = await this.openBrowser();
+
+    return browserPage.evaluate(
+      async ({ sourceUrl, constructorParameters, pageNumber }) => {
+        const module = await import(sourceUrl);
+
+        const WebPagesClass = module.default;
+
+        const webPages: WebPages = new WebPagesClass(...constructorParameters);
+
+        return webPages.get(pageNumber);
+      },
+      {
+        sourceUrl: this.webPagesSourceUrl,
+        constructorParameters: this.webPagesConstructorParameters,
+        pageNumber,
+      }
+    );
+  }
+
+  async getPageStyles(): Promise<PageStyles> {
+    const browserPage = await this.openBrowser();
+
+    return browserPage.evaluate(
+      async ({ sourceUrl, constructorParameters }) => {
+        const module = await import(sourceUrl);
+
+        const WebPagesClass = module.default;
+
+        const webPages: WebPages = new WebPagesClass(...constructorParameters);
+
+        return webPages.getPageStyles();
+      },
+      {
+        sourceUrl: this.webPagesSourceUrl,
+        constructorParameters: this.webPagesConstructorParameters,
+      }
+    );
+  }
+
+  async getAll(): Promise<Array<string>> {
+    const browserPage = await this.openBrowser();
+
+    return browserPage.evaluate(
+      async ({ sourceUrl, constructorParameters }) => {
+        const module = await import(sourceUrl);
+
+        const WebPagesClass = module.default;
+
+        const webPages: WebPages = new WebPagesClass(...constructorParameters);
+
+        return webPages.getAll();
+      },
+      {
+        sourceUrl: this.webPagesSourceUrl,
+        constructorParameters: this.webPagesConstructorParameters,
+      }
+    );
   }
 
   async getData(): Promise<PagesOutput> {

@@ -32,9 +32,7 @@ export default class HTMLParser implements Parser {
 
   private tokenExpression: RegExp;
 
-  constructor(
-    private config: CreateTextParserConfig,
-  ) {
+  constructor(private config: CreateTextParserConfig) {
     this.debug = config;
 
     this.contexts = [
@@ -193,28 +191,27 @@ export default class HTMLParser implements Parser {
     tagOpening: string,
     tagName: string
   ): ParserContext {
-      const { font: fontStyles, block: blockStyles } =
-        extractStyles(tagOpening);
+    const { font: fontStyles, block: blockStyles } = extractStyles(tagOpening);
 
-      let { pageWidth } = this.context;
+    let { pageWidth } = this.context;
 
-      if (blockStyles) {
-        const marginStyle = blockStyles.margin;
-        if (marginStyle) {
-          const margin = getMargin(marginStyle);
-          pageWidth -= margin.left + margin.right;
-        }
+    if (blockStyles) {
+      const marginStyle = blockStyles.margin;
+      if (marginStyle) {
+        const margin = getMargin(marginStyle);
+        pageWidth -= margin.left + margin.right;
       }
+    }
 
-      return {
-        tag: {
-          opening: tagOpening,
-          name: tagName,
-        },
-        pageWidth,
-        blockStyles,
-        fontStyles,
-      };
+    return {
+      tag: {
+        opening: tagOpening,
+        name: tagName,
+      },
+      pageWidth,
+      blockStyles,
+      fontStyles,
+    };
   }
 
   /**
