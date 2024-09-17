@@ -155,9 +155,11 @@ export default class HTMLParser implements Parser {
           pageContent += token.tag.opening;
         }
       } else if (token.type === TokenType.END_HTML) {
-        pageContent += this.getClosingTag();
+        if (this.context.tag?.name === token.tagName) {
+          pageContent += this.getClosingTag();
 
-        this.contexts.pop();
+          this.contexts.pop();
+        }
       }
     }
 
