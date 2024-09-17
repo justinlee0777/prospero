@@ -46,7 +46,8 @@ const responses = await Promise.all(
   )
 );
 
-let compiledText = '';
+let desktopCompiledText = '';
+let mobileCompiledText = '';
 
 let mobile: PagesAsIndicesOutput['pages'] = [];
 let mobileIndex = 0;
@@ -55,8 +56,8 @@ let desktop: PagesAsIndicesOutput['pages'] = [];
 let desktopIndex = 0;
 
 responses.forEach((response) => {
-  // Using 'desktop' is arbitrary as they should both be equal
-  compiledText += response.desktop.text;
+  desktopCompiledText += response.desktop.text;
+  mobileCompiledText += response.mobile.text;
 
   response.mobile.pages.forEach((mobilePage) => {
     mobile.push({
@@ -85,13 +86,13 @@ responses.forEach((response) => {
 const mobilePages: PagesAsIndicesOutput = {
   pages: mobile,
   pageStyles: mobileStyles,
-  text: compiledText,
+  text: mobileCompiledText,
 };
 
 const desktopPages: PagesAsIndicesOutput = {
   pages: desktop,
   pageStyles: desktopStyles,
-  text: compiledText,
+  text: desktopCompiledText,
 };
 
 const url = 'https://iamjustinlee.com/api';
