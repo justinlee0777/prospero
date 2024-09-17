@@ -9,14 +9,14 @@ import transformers from './transformers.const';
 const text = await getTextSample();
 
 const desktop = new Pages(
-  'http://localhost:8080',
+  'http://localhost:9292/prospero',
   { ...containerStyles, computedFontSize: '16px' },
   text,
   transformers
 );
 
 const mobile = new Pages(
-  'http://localhost:8080',
+  'http://localhost:9292/prospero',
   { ...containerStyles, computedFontSize: '12px' },
   text,
   transformers

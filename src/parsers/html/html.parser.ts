@@ -38,7 +38,6 @@ export default class HTMLParser implements Parser {
     this.contexts = [
       {
         pageWidth: this.config.pageWidth,
-        // lineHeight: Big(0),
         blockStyles: {
           margin: '0px',
         },

@@ -95,7 +95,7 @@ const desktopPages: PagesAsIndicesOutput = {
   text: desktopCompiledText,
 };
 
-const url = 'https://iamjustinlee.com/api';
+const url = 'http://localhost:9292/api';
 
 try {
   let response = await fetch(`${url}/prospero/texts/ulysses/mobile`, {
