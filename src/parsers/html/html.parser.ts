@@ -152,15 +152,7 @@ export default class HTMLParser implements Parser {
           // Create an opening tag.
           pageContent += this.getOpeningTag();
         } else {
-          switch (token.tag.name) {
-            case 'br':
-              pageContent += '<br/>';
-              break;
-            default:
-              console.error(
-                `Void-content tag '${token.tag.name}' is not supported by HTMLParser. Please contact the code owner.`
-              );
-          }
+          pageContent += token.tag.opening;
         }
       } else if (token.type === TokenType.END_HTML) {
         pageContent += this.getClosingTag();
