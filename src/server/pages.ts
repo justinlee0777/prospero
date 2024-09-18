@@ -4,18 +4,36 @@ import PagesAsIndicesOutput from '../models/pages-as-indices-output.interface';
 import Transformer from '../transformers/models/transformer.interface';
 import WebPages from '../web/pages';
 
+interface ServerPagesConfig extends PagesConfig {
+  /**
+   * Where the source code for Pages is hosted. The code is uploaded by Playwright and used to calculate
+   * the pages in a way consistent with the web offering for Prospero.
+   * You shouldn't have to define this as I'll host the source code somewhere.
+   */
+  webPagesSourceDomain: string;
+}
+
+const sourceCodeHost = 'https://iamjustinlee.com/source/prospero';
+
 export default class Pages implements IPages {
+  private webPagesSourceDomain: string;
+
   private webPagesSourceUrl: string;
 
   private webPagesConstructorParameters: ConstructorParameters<typeof WebPages>;
 
   constructor(
-    private webPagesSourceDomain: string,
     pageStyles: PageStyles,
     text: string,
     transformers?: Array<Transformer>,
-    pageConfig: PagesConfig = {}
+    {
+      webPagesSourceDomain = sourceCodeHost,
+      ...pageConfig
+    }: ServerPagesConfig = {
+      webPagesSourceDomain: sourceCodeHost,
+    }
   ) {
+    this.webPagesSourceDomain = webPagesSourceDomain;
     this.webPagesSourceUrl = `${this.webPagesSourceDomain}/web/pages.js`;
 
     text = transformers?.reduce(
