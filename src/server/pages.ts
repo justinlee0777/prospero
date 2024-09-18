@@ -13,7 +13,7 @@ interface ServerPagesConfig extends PagesConfig {
   webPagesSourceDomain: string;
 }
 
-const sourceCodeHost = 'https://iamjustinlee.com/source/prospero';
+const sourceCodeHost = 'https://www.iamjustinlee.com/source/prospero';
 
 export default class Pages implements IPages {
   private webPagesSourceDomain: string;
