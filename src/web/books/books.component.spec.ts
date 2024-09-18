@@ -18,7 +18,6 @@ import BooksComponent from './books.component';
 
 describe('BooksComponent', () => {
   const pagesOutput: PagesOutput = {
-    html: false,
     pages: ['Foo', 'Bar', 'Baz'],
     pageStyles: {
       width: 375,

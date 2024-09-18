@@ -31,25 +31,13 @@ export default async function workOnChapter({
 
   console.log(`working on ${filename}...`);
 
-  const desktop = await new Pages(
-    'http://localhost:8080',
-    desktopStyles,
-    text,
-    processors(),
-    {
-      fontLocation,
-    }
-  ).getDataAsIndices();
+  const desktop = await new Pages(desktopStyles, text, processors(), {
+    fontLocation,
+  }).getDataAsIndices();
 
-  const mobile = await new Pages(
-    'http://localhost:8080',
-    mobileStyles,
-    text,
-    processors(),
-    {
-      fontLocation,
-    }
-  ).getDataAsIndices();
+  const mobile = await new Pages(mobileStyles, text, processors(), {
+    fontLocation,
+  }).getDataAsIndices();
 
   console.log(`done with ${filename}`);
 

@@ -1,5 +1,5 @@
-import createHTMLRegex from '../../regexp/html.regexp';
-import Transformer from '../models/transformer.interface';
+import sourceCodeUrl from '../../consts/source-code-url';
+import { EjectingTransformer } from '../models/transformer.interface';
 
 interface IndentTransformerOptions {
   htmlCompatible?: boolean;
@@ -8,37 +8,54 @@ interface IndentTransformerOptions {
 /**
  * Add indentation to new paragraphs.
  */
-export default class IndentTransformer implements Transformer {
+export default class IndentTransformer implements EjectingTransformer {
+  source = `${sourceCodeUrl}/transformers/indent/indent.transformer.js`;
+
   private text: string;
 
   constructor(
     private spaces: number,
-    { htmlCompatible = true }: IndentTransformerOptions = {
+    private options: IndentTransformerOptions = {
       htmlCompatible: true,
     }
   ) {
-    const spaceCharacter = htmlCompatible ? '&nbsp;' : '';
+    const { htmlCompatible = true } = options;
+
+    const spaceCharacter = htmlCompatible ? '&nbsp;' : ' ';
     this.text = Array(this.spaces).fill(spaceCharacter).join('');
   }
 
   transform(text: string): string {
-    const htmlPattern = createHTMLRegex();
-    /*
-     * The additional capture group, which is optional, is to check for newlines succeeding the void tag.
-     * Any whitespace here gets ignored, so the newline is placed after.
-     */
-    const pattern = new RegExp(
-      `(<[A-Za-z0-9]+.*?\/?>)?(\n*)([^\n]+)`,
-      htmlPattern.flags
-    );
+    const parser = new DOMParser();
 
-    return text.replace(
-      pattern,
-      (match, opening = '', newline = '', textContent) => {
-        // Place newline after the tag opening.
-        const newText = `${opening}${newline}${this.text}${textContent}`;
-        return newText;
+    const document = parser.parseFromString(text, 'text/html');
+
+    const childNodes = document.body.childNodes;
+
+    let newText = '';
+
+    for (const node of childNodes) {
+      switch (node.nodeType) {
+        case 1:
+          const element = node as HTMLElement;
+
+          element.textContent = `${this.text}${element.textContent}`;
+
+          newText += element.outerHTML;
+          break;
+        case 3:
+          newText += node.textContent
+            .split('\n')
+            .map((textContent) => `${this.text}${textContent}`)
+            .join('\n');
+          break;
       }
-    );
+    }
+
+    return newText;
+  }
+
+  eject(): ConstructorParameters<typeof IndentTransformer> {
+    return [this.spaces, this.options];
   }
 }

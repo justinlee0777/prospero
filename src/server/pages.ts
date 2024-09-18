@@ -1,7 +1,11 @@
 import { chromium, Page } from 'playwright';
+import sourceCodeUrl from '../consts/source-code-url';
 import { IPages, PagesConfig, PagesOutput, PageStyles } from '../models';
 import PagesAsIndicesOutput from '../models/pages-as-indices-output.interface';
 import Transformer from '../transformers/models/transformer.interface';
+import TransformerSerializer, {
+  SerializedTransformer,
+} from '../transformers/transformer.serializer';
 import WebPages from '../web/pages';
 
 interface ServerPagesConfig extends PagesConfig {
@@ -10,36 +14,39 @@ interface ServerPagesConfig extends PagesConfig {
    * the pages in a way consistent with the web offering for Prospero.
    * You shouldn't have to define this as I'll host the source code somewhere.
    */
-  webPagesSourceDomain: string;
+  webPagesSourceDomain?: string;
 }
-
-const sourceCodeHost = 'https://www.iamjustinlee.com/source/prospero';
 
 export default class Pages implements IPages {
   private webPagesSourceDomain: string;
 
   private webPagesSourceUrl: string;
 
+  private transformerSerializerSourceUrl: string;
+
   private webPagesConstructorParameters: ConstructorParameters<typeof WebPages>;
+
+  private serializedTransformers: Array<SerializedTransformer>;
 
   constructor(
     pageStyles: PageStyles,
     text: string,
     transformers?: Array<Transformer>,
     {
-      webPagesSourceDomain = sourceCodeHost,
+      webPagesSourceDomain = sourceCodeUrl,
       ...pageConfig
     }: ServerPagesConfig = {
-      webPagesSourceDomain: sourceCodeHost,
+      webPagesSourceDomain: sourceCodeUrl,
     }
   ) {
     this.webPagesSourceDomain = webPagesSourceDomain;
     this.webPagesSourceUrl = `${this.webPagesSourceDomain}/web/pages.js`;
+    this.transformerSerializerSourceUrl = `${this.webPagesSourceDomain}/transformers/transformer.serializer.js`;
 
-    text = transformers?.reduce(
-      (acc, transformer) => transformer.transform(acc),
-      text
+    this.serializedTransformers = (transformers ?? []).map(
+      TransformerSerializer.serialize
     );
+
     this.webPagesConstructorParameters = [pageStyles, text, null, pageConfig];
   }
 
@@ -47,10 +54,27 @@ export default class Pages implements IPages {
     const browserPage = await this.openBrowser();
 
     return browserPage.evaluate(
-      async ({ sourceUrl, constructorParameters, pageNumber }) => {
-        const module = await import(sourceUrl);
+      async ({
+        sourceUrl,
+        constructorParameters,
+        pageNumber,
+        serializedTransformers,
+        serializerSourceUrl,
+      }) => {
+        const webPagesModule = await import(sourceUrl);
 
-        const WebPagesClass = module.default;
+        const WebPagesClass = webPagesModule.default;
+
+        const serializerModule = await import(serializerSourceUrl);
+
+        const Serializer: typeof TransformerSerializer =
+          serializerModule.default;
+
+        const transformers = await Promise.all(
+          serializedTransformers.map(Serializer.deserialize)
+        );
+
+        constructorParameters[2] = transformers;
 
         const webPages: WebPages = new WebPagesClass(...constructorParameters);
 
@@ -60,6 +84,8 @@ export default class Pages implements IPages {
         sourceUrl: this.webPagesSourceUrl,
         constructorParameters: this.webPagesConstructorParameters,
         pageNumber,
+        serializedTransformers: this.serializedTransformers,
+        serializerSourceUrl: this.transformerSerializerSourceUrl,
       }
     );
   }
@@ -68,10 +94,26 @@ export default class Pages implements IPages {
     const browserPage = await this.openBrowser();
 
     return browserPage.evaluate(
-      async ({ sourceUrl, constructorParameters }) => {
-        const module = await import(sourceUrl);
+      async ({
+        sourceUrl,
+        constructorParameters,
+        serializedTransformers,
+        serializerSourceUrl,
+      }) => {
+        const webPagesModule = await import(sourceUrl);
 
-        const WebPagesClass = module.default;
+        const WebPagesClass = webPagesModule.default;
+
+        const serializerModule = await import(serializerSourceUrl);
+
+        const Serializer: typeof TransformerSerializer =
+          serializerModule.default;
+
+        const transformers = await Promise.all(
+          serializedTransformers.map(Serializer.deserialize)
+        );
+
+        constructorParameters[2] = transformers;
 
         const webPages: WebPages = new WebPagesClass(...constructorParameters);
 
@@ -80,6 +122,8 @@ export default class Pages implements IPages {
       {
         sourceUrl: this.webPagesSourceUrl,
         constructorParameters: this.webPagesConstructorParameters,
+        serializedTransformers: this.serializedTransformers,
+        serializerSourceUrl: this.transformerSerializerSourceUrl,
       }
     );
   }
@@ -88,10 +132,26 @@ export default class Pages implements IPages {
     const browserPage = await this.openBrowser();
 
     return browserPage.evaluate(
-      async ({ sourceUrl, constructorParameters }) => {
-        const module = await import(sourceUrl);
+      async ({
+        sourceUrl,
+        constructorParameters,
+        serializedTransformers,
+        serializerSourceUrl,
+      }) => {
+        const webPagesModule = await import(sourceUrl);
 
-        const WebPagesClass = module.default;
+        const WebPagesClass = webPagesModule.default;
+
+        const serializerModule = await import(serializerSourceUrl);
+
+        const Serializer: typeof TransformerSerializer =
+          serializerModule.default;
+
+        const transformers = await Promise.all(
+          serializedTransformers.map(Serializer.deserialize)
+        );
+
+        constructorParameters[2] = transformers;
 
         const webPages: WebPages = new WebPagesClass(...constructorParameters);
 
@@ -100,6 +160,8 @@ export default class Pages implements IPages {
       {
         sourceUrl: this.webPagesSourceUrl,
         constructorParameters: this.webPagesConstructorParameters,
+        serializedTransformers: this.serializedTransformers,
+        serializerSourceUrl: this.transformerSerializerSourceUrl,
       }
     );
   }
@@ -108,10 +170,26 @@ export default class Pages implements IPages {
     const browserPage = await this.openBrowser();
 
     return browserPage.evaluate(
-      async ({ sourceUrl, constructorParameters }) => {
-        const module = await import(sourceUrl);
+      async ({
+        sourceUrl,
+        constructorParameters,
+        serializedTransformers,
+        serializerSourceUrl,
+      }) => {
+        const webPagesModule = await import(sourceUrl);
 
-        const WebPagesClass = module.default;
+        const WebPagesClass = webPagesModule.default;
+
+        const serializerModule = await import(serializerSourceUrl);
+
+        const Serializer: typeof TransformerSerializer =
+          serializerModule.default;
+
+        const transformers = await Promise.all(
+          serializedTransformers.map(Serializer.deserialize)
+        );
+
+        constructorParameters[2] = transformers;
 
         const webPages: WebPages = new WebPagesClass(...constructorParameters);
 
@@ -122,6 +200,8 @@ export default class Pages implements IPages {
       {
         sourceUrl: this.webPagesSourceUrl,
         constructorParameters: this.webPagesConstructorParameters,
+        serializedTransformers: this.serializedTransformers,
+        serializerSourceUrl: this.transformerSerializerSourceUrl,
       }
     );
   }
@@ -130,10 +210,26 @@ export default class Pages implements IPages {
     const browserPage = await this.openBrowser();
 
     return browserPage.evaluate(
-      async ({ sourceUrl, constructorParameters }) => {
-        const module = await import(sourceUrl);
+      async ({
+        sourceUrl,
+        constructorParameters,
+        serializedTransformers,
+        serializerSourceUrl,
+      }) => {
+        const webPagesModule = await import(sourceUrl);
 
-        const WebPagesClass = module.default;
+        const WebPagesClass = webPagesModule.default;
+
+        const serializerModule = await import(serializerSourceUrl);
+
+        const Serializer: typeof TransformerSerializer =
+          serializerModule.default;
+
+        const transformers = await Promise.all(
+          serializedTransformers.map(Serializer.deserialize)
+        );
+
+        constructorParameters[2] = transformers;
 
         const webPages: WebPages = new WebPagesClass(...constructorParameters);
 
@@ -142,6 +238,8 @@ export default class Pages implements IPages {
       {
         sourceUrl: this.webPagesSourceUrl,
         constructorParameters: this.webPagesConstructorParameters,
+        serializedTransformers: this.serializedTransformers,
+        serializerSourceUrl: this.transformerSerializerSourceUrl,
       }
     );
   }

@@ -9,7 +9,6 @@ describe('BookComponent updateHandler()', () => {
   const pages = ['foo', 'bar', 'baz'];
 
   const pagesOutput: PagesOutput = {
-    html: false,
     pages,
     pageStyles: {
       width: 400,
@@ -180,6 +179,6 @@ describe('BookComponent updateHandler()', () => {
 
     const pageNumberElement = page.querySelector('.pageNumber');
     expect(pageNumberElement).toBeTruthy();
-    expect(pageNumberElement.textContent).toBe('1');
+    expect(pageNumberElement!.textContent).toBe('1');
   });
 });
