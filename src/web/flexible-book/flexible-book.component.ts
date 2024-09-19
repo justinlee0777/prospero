@@ -21,7 +21,7 @@ import FlexibleBookMediaQuery from './flexible-book-media-query.interface';
  */
 const FlexibleBookComponent: CreateFlexibleBookElement = (
   requiredArgs,
-  { fontLocation, transformers, bookClassNames, forHTML } = {},
+  { fontLocation, transformers, bookClassNames } = {},
   elementConfig = {}
 ) => {
   const { pageStyles, text } = requiredArgs;
@@ -81,7 +81,6 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
 
     const pages = new Pages(pageStyles, text, transformers, {
       fontLocation,
-      html: forHTML,
     });
 
     bookElement = BookComponent(
@@ -89,7 +88,6 @@ const FlexibleBookComponent: CreateFlexibleBookElement = (
         pageStyles,
         getPage: (pageNumber) =>
           pageNumber >= 0 ? pages.get(pageNumber) : null,
-        html: Boolean(forHTML),
       },
       bookConfig,
       {

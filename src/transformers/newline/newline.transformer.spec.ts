@@ -41,10 +41,11 @@ describe('NewlineTransformer', () => {
       beginningSections: 2,
       betweenParagraphs: 1,
     });
-    transformer.forHTML = true;
 
     // The transformer only recognizes HTML.
-    expect(transformer.transform('Foo\nBar\nBaz')).toEqual('Foo\nBar\nBaz');
+    expect(transformer.transform('Foo\nBar\nBaz')).toEqual(
+      '\n\nFoo\n\nBar\n\nBaz'
+    );
 
     expect(
       transformer.transform('<div>Foo</div><div>Bar</div><div>Baz</div>')

@@ -7,7 +7,7 @@ import postcss from 'rollup-plugin-postcss';
 
 const sourcemap = true;
 
-const dir = 'dist';
+const dir = 'dev';
 
 const pageEntries = readdirSync('./pages')
   .filter((filename) => filename.includes('-page.ts'))
@@ -27,26 +27,6 @@ copyFileSync('pages/Bookerly-Regular.ttf', `${dir}/Bookerly-Regular.ttf`);
 cpSync('pages/Bookerly', dir, { recursive: true });
 
 export default [
-  // Scripts
-  {
-    input: {
-      buildPages: 'pages/build-pages.ts',
-      uploadPages: 'pages/upload-pages.ts',
-      'upload-ulysses': 'pages/ulysses/upload.ts',
-    },
-    output: {
-      sourcemap,
-      dir,
-    },
-    plugins: [
-      nodeResolve({
-        moduleDirectories: ['node_modules'],
-      }),
-      commonjs(),
-      typescript(),
-    ],
-    external: ['canvas', 'jsdom'],
-  },
   // HTML
   ...pageEntries.map(({ extensionlessName, extension }) => ({
     input: `pages/${extensionlessName}.${extension}`,

@@ -1,12 +1,7 @@
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
-
 import PageStyles from '../../src/models/page-styles.interface';
 import PagesAsIndicesOutput from '../../src/models/pages-as-indices-output.interface';
 import containerStyles from '../container-style.const';
 import workOnChapter from './work-on-chapter';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const chapters = [
   'telemachus',
@@ -46,12 +41,13 @@ const responses = await Promise.all(
     workOnChapter({
       mobileStyles,
       desktopStyles,
-      filename: resolve(__dirname, `./ulysses/${chapter}.txt`),
+      filename: `./text-samples/ulysses/${chapter}.txt`,
     })
   )
 );
 
-let compiledText = '';
+let desktopCompiledText = '';
+let mobileCompiledText = '';
 
 let mobile: PagesAsIndicesOutput['pages'] = [];
 let mobileIndex = 0;
@@ -60,8 +56,8 @@ let desktop: PagesAsIndicesOutput['pages'] = [];
 let desktopIndex = 0;
 
 responses.forEach((response) => {
-  // Using 'desktop' is arbitrary as they should both be equal
-  compiledText += response.desktop.text;
+  desktopCompiledText += response.desktop.text;
+  mobileCompiledText += response.mobile.text;
 
   response.mobile.pages.forEach((mobilePage) => {
     mobile.push({
@@ -88,20 +84,18 @@ responses.forEach((response) => {
 });
 
 const mobilePages: PagesAsIndicesOutput = {
-  html: false,
   pages: mobile,
   pageStyles: mobileStyles,
-  text: compiledText,
+  text: mobileCompiledText,
 };
 
 const desktopPages: PagesAsIndicesOutput = {
-  html: false,
   pages: desktop,
   pageStyles: desktopStyles,
-  text: compiledText,
+  text: desktopCompiledText,
 };
 
-const url = 'https://api.iamjustinlee.com';
+const url = 'https://iamjustinlee.com/api';
 
 try {
   let response = await fetch(`${url}/prospero/texts/ulysses/mobile`, {
@@ -117,6 +111,10 @@ try {
   });
 
   console.log(response.status);
+
+  process.exit(0);
 } catch (error) {
   console.log(error);
+
+  process.exit(1);
 }

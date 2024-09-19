@@ -1,3 +1,4 @@
+import { IPages } from './models';
 import GetPage from './models/get-page.interface';
 import PageStyles from './models/page-styles.interface';
 import PagesAsIndicesOutput from './models/pages-as-indices-output.interface';
@@ -20,7 +21,7 @@ import PaginatedResponse from './models/paginated-response.interface';
  *
  * TODO: Queue up requests reasonably (ex. load up to 50 pages before and after the current page).
  */
-export default class ServerPages {
+export default class ServerPages implements IPages {
   private readonly pageSize = 10;
 
   /**
@@ -30,8 +31,6 @@ export default class ServerPages {
    */
   private readonly requests: Map<string, Promise<PaginatedResponse>> =
     new Map();
-
-  private forHTML: boolean | undefined;
 
   private pages: Array<string> | undefined;
 
@@ -112,7 +111,7 @@ export default class ServerPages {
   async getData(): Promise<PagesOutput> {
     const pages = await this.getAll();
 
-    return { html: this.forHTML, pages, pageStyles: this.cachedPageStyles };
+    return { pages, pageStyles: this.cachedPageStyles };
   }
 
   async getDataAsIndices(): Promise<PagesAsIndicesOutput> {
@@ -133,7 +132,6 @@ export default class ServerPages {
     });
 
     return {
-      html: this.forHTML,
       text,
       pages,
       pageStyles: await this.getPageStyles(),
@@ -165,7 +163,6 @@ export default class ServerPages {
   private async initialize(): Promise<void> {
     const { value, page } = await this.fetch(1, 1);
 
-    this.forHTML = value.html;
     this.pages = Array(page.totalSize);
     this.cachedPageStyles = value.pageStyles;
   }

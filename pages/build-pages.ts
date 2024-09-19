@@ -11,21 +11,25 @@ const text = await getTextSample();
 const desktop = new Pages(
   { ...containerStyles, computedFontSize: '16px' },
   text,
-  transformers,
-  { html: true }
+  transformers
 );
 
 const mobile = new Pages(
   { ...containerStyles, computedFontSize: '12px' },
   text,
-  transformers,
-  { html: true }
+  transformers
 );
 
+const desktopData = await desktop.getData();
+
+const mobileData = await mobile.getData();
+
 writeFileSync(
-  `./dist/${pagesJsonLocation}`,
+  `./dev/${pagesJsonLocation}`,
   JSON.stringify({
-    desktop: desktop.getData(),
-    mobile: mobile.getData(),
+    desktop: desktopData,
+    mobile: mobileData,
   })
 );
+
+process.exit(0);

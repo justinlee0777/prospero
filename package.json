@@ -1,6 +1,6 @@
 {
   "name": "prospero",
-  "version": "0.1.12",
+  "version": "0.2.5",
   "sideEffects": false,
   "type": "module",
   "exports": {
@@ -21,8 +21,9 @@
     "./web/react": "./web/react.js"
   },
   "scripts": {
-    "start": "rm -rf dist && rollup -c ./rollup.config.dev.js && ./scripts/build-dev.sh && http-server -c-1 ./dist",
-    "upload-ulysses": "rm -rf dist && rollup -c ./rollup.config.dev.js && ./scripts/build-dev.sh && node --harmony ./dist/upload-ulysses.js",
+    "start": "rm -rf dist && (rollup -c & rollup -c ./rollup.config.dev.js) && (http-server -c-1 ./dist & http-server -c-1 ./dev -p 3000)",
+    "upload-ulysses": "tsx ./pages/ulysses/upload.ts",
+    "build-pages": "tsx ./pages/build-pages.ts",
     "build:lib": "rm -rf dist && rollup -c",
     "release": "npm run build:lib && npm publish ./dist",
     "format": "prettier --write .",
@@ -31,7 +32,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.2",
     "@rollup/plugin-html": "^1.0.2",
-    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-typescript": "^11.1.1",
     "@types/big.js": "^6.1.6",
@@ -58,18 +59,16 @@
     "rollup": "^3.25.1",
     "rollup-plugin-postcss": "^4.0.2",
     "ts-jest": "^29.1.0",
+    "tsx": "^4.19.1",
     "typescript": "^5.0.3",
     "typescript-plugin-css-modules": "^5.0.0",
     "unified": "^10.1.2"
   },
-  "dependencies": {
-    "big.js": "^6.2.1",
-    "cheerio": "^1.0.0-rc.12",
-    "style-inject": "^0.3.0"
-  },
   "peerDependencies": {
-    "canvas": "^2.11.2",
-    "jsdom": "^22.0.0",
     "react": "^18.2.0"
+  },
+  "dependencies": {
+    "playwright": "^1.47.1",
+    "style-inject": "^0.3.0"
   }
 }

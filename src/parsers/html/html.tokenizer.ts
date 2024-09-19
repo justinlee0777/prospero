@@ -43,38 +43,44 @@ export interface ElementConstruct {
 /**
  * Creates tokens out of an HTML string that the HTMLParser consumes.
  */
-export default abstract class HTMLTokenizer<
-  Loader = any,
-  Element extends ElementConstruct = any
-> {
+export default class HTMLTokenizer {
   private static allowedVoidTags = allowedVoidTags;
   private static voidTags = voidTags;
-
-  private loader: Loader;
 
   constructor() {}
 
   *getTokens(text: string): Generator<Token> {
-    const loader = (this.loader = this.loadHTML(text));
+    const loader = this.loadHTML(text);
 
     yield* this.parseHTMLElement(this.getRoot(loader));
   }
 
-  abstract loadHTML(text: string): Loader;
+  loadHTML(text: string): Document {
+    const parser = new DOMParser();
+    return parser.parseFromString(text, 'text/html');
+  }
 
-  abstract getRoot(loader: Loader): Element;
+  getRoot(document: Document): HTMLElement {
+    return document.body;
+  }
 
-  abstract getInnerHTML(element: Element, loader: Loader): string;
+  getInnerHTML(element: HTMLElement): string {
+    return element.innerHTML;
+  }
 
-  abstract getOuterHTML(element: Element, loader: Loader): string;
+  getOuterHTML(element: HTMLElement): string {
+    return element.outerHTML;
+  }
 
-  abstract getText(element: Element, loader: Loader): string;
+  getText(element: HTMLElement): string {
+    return element.textContent;
+  }
 
   private *parseHTMLElement(element: Element): Generator<Token> {
     for (const node of element.childNodes) {
       switch (node.nodeType) {
         case 1:
-          const element = node as unknown as Element;
+          const element = node as unknown as HTMLElement;
           const tagName = element.tagName.toLowerCase();
 
           const closing = !HTMLTokenizer.voidTags.includes(tagName)
@@ -86,9 +92,7 @@ export default abstract class HTMLTokenizer<
           yield {
             tag: {
               name: tagName,
-              opening: this.getOuterHTML(element, this.loader)
-                .match(openingPattern)
-                .at(0),
+              opening: this.getOuterHTML(element).match(openingPattern).at(0),
               closing,
             },
             type: TokenType.HTML,
@@ -99,7 +103,7 @@ export default abstract class HTMLTokenizer<
           break;
         case 3:
           yield {
-            content: this.getText(node, this.loader),
+            content: this.getText(node as HTMLElement),
             type: TokenType.TEXT,
           };
           break;

@@ -3,11 +3,8 @@
   height: 100%;
   position: absolute;
   top: 0;
-  width: 100%;
-}
-
-.page.textOnlyPage {
   white-space: pre-wrap;
+  width: 100%;
 }
 
 .pageNumber {

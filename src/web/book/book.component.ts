@@ -102,7 +102,6 @@ const BookComponent: CreateBookElement = (
         classnames: [theme?.pageClassName],
       }
     ),
-    html: args.html,
     animation,
     showPageNumbers,
   });

@@ -1,12 +1,11 @@
 import { readFile } from 'node:fs';
-import { join } from 'node:path';
-import { cwd } from 'node:process';
 
 import Pages from '../../src/server/pages';
 import {
   IndentTransformer,
   NewlineTransformer,
 } from '../../src/transformers/public-api';
+import TextToHTMLTransformer from '../../src/transformers/text-to-html/html.transformer';
 import ChapterWorkerData from './chapter-worker-data.interface';
 
 export default async function workOnChapter({
@@ -22,20 +21,25 @@ export default async function workOnChapter({
 
   const processors = function () {
     return [
+      new TextToHTMLTransformer(),
       new IndentTransformer(5),
       new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
     ];
   };
 
-  const fontLocation = join(cwd(), 'pages/Bookerly-Regular.ttf');
+  const fontLocation = '/Bookerly/Bookerly-Regular.ttf';
 
-  const desktop = new Pages(desktopStyles, text, processors(), {
+  console.log(`working on ${filename}...`);
+
+  const desktop = await new Pages(desktopStyles, text, processors(), {
     fontLocation,
   }).getDataAsIndices();
 
-  const mobile = new Pages(mobileStyles, text, processors(), {
+  const mobile = await new Pages(mobileStyles, text, processors(), {
     fontLocation,
   }).getDataAsIndices();
+
+  console.log(`done with ${filename}`);
 
   return {
     mobile,

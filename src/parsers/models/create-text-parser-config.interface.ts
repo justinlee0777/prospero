@@ -1,3 +1,5 @@
+import { PageStyles } from '../../models';
+
 export default interface CreateTextParserConfig {
   /** In pixels. */
   fontSize: number;
@@ -5,4 +7,5 @@ export default interface CreateTextParserConfig {
   pageHeight: number;
   /** The width of the page, in pixels. */
   pageWidth: number;
+  pageStyles: PageStyles;
 }

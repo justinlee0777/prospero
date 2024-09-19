@@ -1,63 +1,69 @@
-import createHTMLRegex from '../../regexp/html.regexp';
-import Transformer from '../models/transformer.interface';
+import sourceCodeUrl from '../../consts/source-code-url';
+import { EjectingTransformer } from '../models/transformer.interface';
 import NewlineTransformerOptions from './newline-transformer-options.interface';
 
 /**
  * Add newlines between paragraphs if there are none.
  */
-export default class NewlineTransformer implements Transformer {
-  forHTML: boolean;
-
-  private readonly tags = new Set(['div']);
-
-  private sectionBegan = false;
+export default class NewlineTransformer implements EjectingTransformer {
+  source = `${sourceCodeUrl}/transformers/newline/newline.transformer.js`;
 
   constructor(private options: NewlineTransformerOptions = {}) {}
 
   transform(text: string): string {
-    const sectionBeginning = this.sectionBegan
-      ? ''
-      : this.createNewlines(this.options?.beginningSections ?? 0);
+    const sectionBeginning = this.createNewlines(
+      this.options?.beginningSections ?? 0
+    );
     const betweenParagraphs = this.createNewlines(
       this.options?.betweenParagraphs ?? 1
     );
 
-    if (this.forHTML) {
-      const pattern = createHTMLRegex();
+    // Skip the first HTML tag encountered. We will use the "beginningSections" config instead.
+    let sectionBegan = false;
 
-      // Skip the first HTML tag encountered. We will use the "beginningSections" config instead.
-      let skipFirst = !this.sectionBegan;
+    const parser = new DOMParser();
 
-      return text.replace(
-        pattern,
-        (match, opening, tagName, tagContent = '', ending = '') => {
-          if (skipFirst) {
-            this.sectionBegan = true;
-            skipFirst = false;
+    const document = parser.parseFromString(text, 'text/html');
 
-            return `${opening}${sectionBeginning}${tagContent}${ending}`;
-          } else if (this.tags.has(tagName)) {
-            return `${opening}${betweenParagraphs}${tagContent}${ending}`;
-          } else {
-            return match;
+    const childNodes = document.body.childNodes;
+
+    let newText = '';
+
+    for (const node of childNodes) {
+      const spaces = sectionBegan ? betweenParagraphs : sectionBeginning;
+
+      switch (node.nodeType) {
+        case 1:
+          const element = node as HTMLElement;
+
+          element.textContent = `${spaces}${element.textContent}`;
+
+          newText += element.outerHTML;
+          break;
+        case 3:
+          const paragraphs: Array<string> = [];
+
+          for (const paragraph of node.textContent.split('\n')) {
+            if (!sectionBegan) {
+              paragraphs.push(`${sectionBeginning}${paragraph}`);
+              sectionBegan = true;
+            } else {
+              paragraphs.push(`${betweenParagraphs}${paragraph}`);
+            }
           }
-        }
-      );
-    } else {
-      /**
-       * Match lines that end with a newline but also have at least one non-newline character succeeding them, so as not to
-       * double-up on line breaks.
-       * The first capture group is a newline.
-       * The second capture group is a contentful character.
-       */
-      const pattern = /(\n)([^\n])/g;
 
-      this.sectionBegan = true;
+          newText += paragraphs.join('\n');
+          break;
+      }
 
-      return (
-        sectionBeginning + text.replace(pattern, `$1${betweenParagraphs}$2`)
-      );
+      sectionBegan = true;
     }
+
+    return newText;
+  }
+
+  eject(): ConstructorParameters<typeof NewlineTransformer> {
+    return [this.options];
   }
 
   private createNewlines(number: number): string {

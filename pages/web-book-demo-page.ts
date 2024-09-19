@@ -2,13 +2,14 @@ import './book-demo.css';
 
 import {
   IndentTransformer,
+  listenToClickEvents,
+  listenToKeyboardEvents,
   NewlineTransformer,
-} from '../src/transformers/public-api';
-import { listenToClickEvents, listenToKeyboardEvents } from '../src/web';
+} from '../src/web';
 import FlexibleBookComponent from '../src/web/flexible-book/flexible-book.component';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('./ulysses/proteus.txt');
+  const response = await fetch('./color-example.txt');
   const text = await response.text();
 
   const container = document.body;
@@ -59,9 +60,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         new IndentTransformer(5),
         new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
       ],
-      forHTML: {
-        hrString: '-',
-      },
     },
     {
       styles: {
