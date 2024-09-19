@@ -27,7 +27,7 @@ export default async function workOnChapter({
     ];
   };
 
-  const fontLocation = '/Bookerly-Regular.ttf';
+  const fontLocation = '/Bookerly/Bookerly-Regular.ttf';
 
   console.log(`working on ${filename}...`);
 
