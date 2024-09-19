@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   document.fonts.add(fontFace);
 
-  const endpointBase = 'http://127.0.0.1:9292/api/prospero/texts';
+  const endpointBase = 'https://iamjustinlee.com/api/prospero/texts';
 
   const desktopPages = new ServerPages(`${endpointBase}/ulysses/desktop/`);
   const desktopStyles = await desktopPages.getPageStyles();
