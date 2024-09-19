@@ -1,4 +1,4 @@
-import { chromium, Page } from 'playwright';
+import { Page } from 'playwright';
 import sourceCodeUrl from '../consts/source-code-url';
 import { IPages, PagesConfig, PagesOutput, PageStyles } from '../models';
 import PagesAsIndicesOutput from '../models/pages-as-indices-output.interface';
@@ -8,6 +8,8 @@ import TransformerSerializer, {
 } from '../transformers/transformer.serializer';
 import WebPages from '../web/pages';
 
+type Browser = 'chromium' | 'webkit' | 'firefox';
+
 interface ServerPagesConfig extends PagesConfig {
   /**
    * Where the source code for Pages is hosted. The code is uploaded by Playwright and used to calculate
@@ -15,12 +17,21 @@ interface ServerPagesConfig extends PagesConfig {
    * You shouldn't have to define this as I'll host the source code somewhere.
    */
   webPagesSourceDomain?: string;
+
+  /**
+   * TODO: Figure out a way to collect all the permutations of page sizes and browser types for user convenience.
+   */
+  browser?: Browser;
 }
+
+const defaultBrowser: Browser = 'chromium';
 
 export default class Pages implements IPages {
   private webPagesSourceDomain: string;
 
   private webPagesSourceUrl: string;
+
+  private browser: Browser;
 
   private transformerSerializerSourceUrl: string;
 
@@ -34,11 +45,14 @@ export default class Pages implements IPages {
     transformers?: Array<Transformer>,
     {
       webPagesSourceDomain = sourceCodeUrl,
+      browser = defaultBrowser,
       ...pageConfig
     }: ServerPagesConfig = {
       webPagesSourceDomain: sourceCodeUrl,
+      browser: defaultBrowser,
     }
   ) {
+    this.browser = browser;
     this.webPagesSourceDomain = webPagesSourceDomain;
     this.webPagesSourceUrl = `${this.webPagesSourceDomain}/web/pages.js`;
     this.transformerSerializerSourceUrl = `${this.webPagesSourceDomain}/transformers/transformer.serializer.js`;
@@ -245,8 +259,9 @@ export default class Pages implements IPages {
   }
 
   private async openBrowser(): Promise<Page> {
-    // TODO: Needs to be customizable instead of hardcoded to chromium
-    const browser = await chromium.launch();
+    const module = await import('playwright');
+
+    const browser = await module[this.browser].launch();
 
     const context = await browser.newContext();
 

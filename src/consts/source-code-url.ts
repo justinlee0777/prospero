@@ -1,3 +1,3 @@
-const sourceCodeUrl = 'https://iamjustinlee.com/source/prospero';
+const sourceCodeUrl = 'https://www.iamjustinlee.com/source/prospero';
 
 export default sourceCodeUrl;
