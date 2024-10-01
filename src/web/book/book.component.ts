@@ -101,7 +101,6 @@ class BookComponent {
       },
       classnames: [theme?.pageClassName],
     });
-    console.log('elementConfig', elementConfig);
 
     const decrement = () => this.updatePage(this.currentPage - pagesShown);
     const increment = () => this.updatePage(this.currentPage + pagesShown);

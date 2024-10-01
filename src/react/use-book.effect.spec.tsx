@@ -1,5 +1,7 @@
 jest.mock('../utils/merge.function', () => (arg) => arg);
 
+jest.mock('picture-in-picture-js', () => ({}));
+
 import renderer from 'react-test-renderer';
 
 import { useRef } from 'react';
