@@ -256,10 +256,9 @@ When running `prospero` on the server, Playwright is used to open an instance of
 
 ### Roadmap
 
-- Overlay videos
-  - fix double asset bug
-- loading on startup
 - Asset sizing controls w/ images and videos
 - Video/audio syllabus
 - Chapters
 - Library
+- loading on startup
+- how to handle verses?
