@@ -23,10 +23,6 @@ const PageComponent: CreatePageElement = (pageConfig, config = {}) => {
 
   let classnames = [pageClassName];
 
-  if (!pageConfig.html) {
-    classnames = [...classnames, styles.textOnlyPage];
-  }
-
   const page = div(
     merge(
       {
