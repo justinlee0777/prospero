@@ -141,6 +141,8 @@ export default class HTMLParser implements Parser {
           }
         }
       } else if (token.type === TokenType.HTML) {
+        let newToken: string;
+
         if (token.tag.closing) {
           const opening = token.tag.opening;
           const tagName = token.tag.name;
@@ -150,9 +152,23 @@ export default class HTMLParser implements Parser {
           this.contexts.push(context);
 
           // Create an opening tag.
-          pageContent += this.getOpeningTag();
+          newToken = this.getOpeningTag();
         } else {
-          pageContent += token.tag.opening;
+          newToken = token.tag.opening;
+        }
+
+        const newPageContent = pageContent + newToken;
+
+        textElement.innerHTML = newPageContent;
+
+        if (textElement.clientHeight >= pageHeight) {
+          yield this.handlePageEnd(pageContent);
+
+          const openingTag = this.getOpeningTag();
+
+          pageContent = `${openingTag}${newToken}`;
+        } else {
+          pageContent = newPageContent;
         }
       } else if (token.type === TokenType.END_HTML) {
         if (this.context.tag?.name === token.tagName) {
