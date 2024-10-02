@@ -1,4 +1,3 @@
-import 'picture-in-picture-js/index.css';
 import './book-demo.css';
 
 import {

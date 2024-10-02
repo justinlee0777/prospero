@@ -1,3 +1,4 @@
+import 'picture-in-picture-js/index.css';
 import styles from './book.module.css';
 
 import type { HTMLPIPElement } from 'picture-in-picture-js';
