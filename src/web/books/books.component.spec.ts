@@ -1,6 +1,8 @@
 let mediaQueryBookList;
 let mockDestroyMediaQueryListener;
 
+jest.mock('picture-in-picture-js', () => ({}));
+
 jest.mock('../media-query/media-query-listener.factory', () => ({
   create(...args) {
     mediaQueryBookList = args;

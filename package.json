@@ -21,7 +21,7 @@
     "./web/react": "./web/react.js"
   },
   "scripts": {
-    "start": "rm -rf dist && (rollup -c & rollup -c ./rollup.config.dev.js) && (http-server -c-1 ./dist & http-server -c-1 ./dev -p 3000)",
+    "start": "rm -rf dist dev && (rollup -c & rollup -c ./rollup.config.dev.js) && (http-server -c-1 ./dist & http-server -c-1 ./dev -p 3000)",
     "upload-ulysses": "tsx ./pages/ulysses/upload.ts",
     "build-pages": "tsx ./pages/build-pages.ts",
     "build:lib": "rm -rf dist && rollup -c",
@@ -68,6 +68,7 @@
     "react": "^18.2.0"
   },
   "dependencies": {
+    "picture-in-picture-js": "^0.1.3",
     "playwright": "^1.47.1",
     "style-inject": "^0.3.0"
   }

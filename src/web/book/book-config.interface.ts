@@ -22,4 +22,10 @@ export default interface BookConfig extends BookAttributes {
   showBookmark?: {
     storage: BookmarkStorage;
   };
+  pictureInPicture?: {
+    /** The CSS selector that finds the elements that should be put into an overlay. */
+    affectedElements: string;
+    /** Whether the overlay should lock into the quarters of the view or into the side. */
+    autoLock?: boolean;
+  };
 }

@@ -1,3 +1,4 @@
+import 'picture-in-picture-js/index.css';
 import './book-demo.css';
 
 import {
@@ -9,7 +10,7 @@ import {
 import FlexibleBookComponent from '../src/web/flexible-book/flexible-book.component';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const response = await fetch('./color-example.txt');
+  const response = await fetch('./iframe-example.txt');
   const text = await response.text();
 
   const container = document.body;
@@ -32,6 +33,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         {
           pagesShown: 1,
           listeners: [listenToClickEvents],
+          pictureInPicture: {
+            affectedElements: 'iframe',
+            autoLock: true,
+          },
         },
         {
           pattern: {
@@ -51,12 +56,21 @@ window.addEventListener('DOMContentLoaded', async () => {
                   ),
               },
             },
+            pictureInPicture: {
+              affectedElements: 'iframe',
+              autoLock: true,
+            },
           },
         },
       ],
     },
     {
       transformers: [
+        {
+          transform(text) {
+            return text.replaceAll('\n', '');
+          },
+        },
         new IndentTransformer(5),
         new NewlineTransformer({ beginningSections: 4, betweenParagraphs: 0 }),
       ],
