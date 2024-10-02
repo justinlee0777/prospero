@@ -265,10 +265,10 @@ class BookComponent {
           pictureInPicture.affectedElements
         );
 
-        affectedElements.forEach((affectedElement, i) => {
-          const key = `pip-page-${pageNumber}-index-${i}`;
+        affectedElements.forEach((affectedElement, elIndex) => {
+          const key = `pip-page-${i}-index-${elIndex}`;
 
-          createTriggerElement(affectedElement, {
+          const triggerElement = createTriggerElement(affectedElement, {
             replaceWith: true,
             autoLock: pictureInPicture.autoLock,
             onpipcreated: (pip) => {
@@ -280,6 +280,8 @@ class BookComponent {
             },
             existingPIP: this.overlay?.id === key && this.overlay,
           });
+
+          triggerElement.onclick = (event) => event.stopPropagation();
         });
       }
 
