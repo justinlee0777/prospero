@@ -133,7 +133,7 @@ export default class HTMLParser implements Parser {
           if (textElement.clientHeight >= pageHeight) {
             yield this.handlePageEnd(pageContent);
 
-            const openingTag = this.getOpeningTag();
+            const openingTag = this.getOpeningTag(false);
 
             pageContent = `${openingTag}${word}`;
           } else {
@@ -164,7 +164,7 @@ export default class HTMLParser implements Parser {
         if (textElement.clientHeight >= pageHeight) {
           yield this.handlePageEnd(pageContent);
 
-          const openingTag = this.getOpeningTag();
+          const openingTag = this.getOpeningTag(false);
 
           pageContent = `${openingTag}${newToken}`;
         } else {
