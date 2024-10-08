@@ -1,5 +1,6 @@
 import commonjs from '@rollup/plugin-commonjs';
 import html from '@rollup/plugin-html';
+import image from '@rollup/plugin-image';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import { copyFileSync, cpSync, readdirSync } from 'fs';
@@ -39,6 +40,7 @@ export default [
         moduleDirectories: ['node_modules'],
       }),
       commonjs(),
+      image(),
       typescript(),
       postcss({
         extract: true,

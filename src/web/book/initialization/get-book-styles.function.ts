@@ -11,8 +11,9 @@ export default function getBookStyles(
   userDefinedPageStyles: Partial<CSSStyleDeclaration>,
   pagesShown: number
 ): [Partial<CSSStyleDeclaration>, Partial<CSSStyleDeclaration>] {
-  let bookStyles: Partial<CSSStyleDeclaration>;
-  let calculatedPageStyles: Partial<CSSStyleDeclaration>;
+  let bookStyles: Partial<CSSStyleDeclaration> = {};
+  let calculatedPageStyles: Partial<CSSStyleDeclaration> =
+    userDefinedPageStyles;
 
   if (pageStyles) {
     const styles = pageStylesToStyleDeclaration(pageStyles);

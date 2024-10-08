@@ -333,13 +333,15 @@ class BookComponent {
    * @returns destruction of loading icon.
    */
   private addLoadingIcon(parent: HTMLElement): NullaryFn {
-    const loadingIcon = LoadingIconComponent({
-      classnames: [styles.bookLoadingIcon],
-    });
+    const loadingIcon =
+      this.bookConfig.loading() ??
+      LoadingIconComponent({
+        classnames: [styles.bookLoadingIcon],
+      });
 
     parent.appendChild(loadingIcon);
 
-    return () => loadingIcon.prospero.destroy();
+    return () => loadingIcon.prospero?.destroy();
   }
 }
 

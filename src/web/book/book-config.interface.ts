@@ -1,5 +1,7 @@
+import Optional from '../../utils/optional.type';
 import BookmarkStorage from '../bookmark/bookmark-storage.interface';
 import AddListeners from '../model/add-listeners.interface';
+import Component from '../model/component.interface';
 import BookAttributes from './book-attributes.interface';
 import Theme from './theming/theme.interface';
 
@@ -28,4 +30,6 @@ export default interface BookConfig extends BookAttributes {
     /** Whether the overlay should lock into the quarters of the view or into the side. */
     autoLock?: boolean;
   };
+  /** Used to customize what shows on the screen when the book is getting a page.*/
+  loading?: () => HTMLElement & Optional<Component, 'prospero'>;
 }
