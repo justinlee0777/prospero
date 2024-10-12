@@ -1,6 +1,7 @@
 export {
   IndentTransformer,
   NewlineTransformer,
+  TextToHTMLTransformer,
 } from './transformers/public-api';
 export {
   BookComponent,
