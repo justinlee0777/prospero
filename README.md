@@ -222,6 +222,55 @@ BookComponent(
 );
 ```
 
+### Picture-in-Picture for assets
+
+To allow users to watch videos as they peruse the book, configure the book with:
+
+```
+BookComponent(
+    ...,
+    {
+        ...,
+        pictureInPicture: {
+            affectedElements: 'video,img,iframe',
+            autoLock: <true | false>,
+        },
+    }
+);
+```
+
+`affectedElements` is a CSS selector. This is used to wrap the elements that serve as assets in containers that can trigger a picture-in-picture overlay.
+
+`autoLock` is an optional configuration. This is used to lock the overlay into the four quadrants of the screen or to be hidden in the side of the page. The default, `false`, means the user can drag the overlay anywhere on the screen.
+
+### Loading Screen
+
+`prospero` exports a component that can be used as a loading screen when pages are being loaded by the page. This takes the same arguments as the book itself. For example,
+
+```
+import { DefaultBookTheme, LoadingScreenComponent } from 'prospero/web';
+
+const pageStyles: PageStyles = {
+    // ...
+}
+
+const theme: Theme = DefaultBookTheme;
+
+const loadingScreen = LoadingScreenComponent(
+    { pageStyles },
+    { theme: DefaultBookTheme, pagesShown: 2 }
+)
+
+document.body.appendChild(loadingScreen);
+
+const desktopPages = new ServerPages(...);
+
+const desktopStyles = await desktopPages.getPageStyles();
+
+document.body.removeChild(loadingScreen);
+
+```
+
 ### Transformers
 
 `prospero` via both entrypoints exports basic `Transformer`s (`prospero/server/transformers` or `prospero/web/transformers`), which transform the text so that the text can be stored separately in its original form. Currently there are two transformers: `IndentTransformer` and `NewlineTransformer`. Both are exported through the `web` and `server` entry-points.
@@ -229,8 +278,6 @@ BookComponent(
 `IndentTransformer` adds indentation to the beginning of paragraphs. (I personally use this for fiction.)
 
 `NewlineTransformer` adds a certain number of newlines between paragraphs. (I personally use this for essays - think Medium.)
-
-Both are stateful, so do not reuse them across books; please create new instances.
 
 ### Concept and architecture
 
@@ -256,7 +303,6 @@ When running `prospero` on the server, Playwright is used to open an instance of
 
 ### Roadmap
 
-- Asset sizing controls w/ images and videos
 - Video/audio syllabus
 - Chapters
 - Library

@@ -9,6 +9,7 @@ export {
   DefaultBookTheme,
   DoublePageBookAnimation,
   FlexibleBookComponent,
+  LoadingScreenComponent,
   SinglePageBookAnimation,
   listenToClickEvents,
   listenToKeyboardEvents,
