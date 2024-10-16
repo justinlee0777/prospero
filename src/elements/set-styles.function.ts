@@ -3,6 +3,6 @@ export default function setStyles(
   styles: Partial<CSSStyleDeclaration>
 ): void {
   Object.entries(styles).forEach(([key, value]) => {
-    element.style[key] = value;
+    (element.style as any)[key] = value;
   });
 }

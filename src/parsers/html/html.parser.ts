@@ -25,7 +25,7 @@ export default class HTMLParser implements Parser {
    * The last context pushed, which is the current tag worked with.
    */
   private get context(): ParserContext {
-    return this.contexts.at(-1);
+    return this.contexts.at(-1)!;
   }
 
   private transformers: Array<Transformer> = [];
@@ -218,8 +218,8 @@ export default class HTMLParser implements Parser {
         name: tagName,
       },
       pageWidth,
-      blockStyles,
-      fontStyles,
+      blockStyles: blockStyles ?? undefined,
+      fontStyles: fontStyles ?? undefined,
     };
   }
 

@@ -13,11 +13,11 @@ export default class ParserBuilder {
     config
   ) => new HTMLParser(config);
 
-  private containerStyle: PageStyles;
+  private containerStyle: PageStyles | undefined;
 
   private transformers: Array<Transformer> = [];
 
-  private fontLocation: FontLocations;
+  private fontLocation: FontLocations | undefined;
 
   /**
    * Use ContainerStyle to initialize much of what you need for a parser.
@@ -70,6 +70,10 @@ export default class ParserBuilder {
    * @throws if there is no internal parser yet.
    */
   async build(): Promise<Parser> {
+    if (!this.containerStyle) {
+      throw new Error("'fromPageStyles' has not been invoked.");
+    }
+
     const {
       width,
       height,
@@ -82,21 +86,21 @@ export default class ParserBuilder {
 
     const containerWidth =
       width -
-      padding.left -
-      padding.right -
-      margin.left -
-      margin.right -
-      border.left -
-      border.right;
+      (padding?.left ?? 0) -
+      (padding?.right ?? 0) -
+      (margin?.left ?? 0) -
+      (margin?.right ?? 0) -
+      (border?.left ?? 0) -
+      (border?.right ?? 0);
 
     const containerHeight =
       height -
-      padding.top -
-      padding.bottom -
-      margin.top -
-      margin.bottom -
-      border.top -
-      border.bottom;
+      (padding?.top ?? 0) -
+      (padding?.bottom ?? 0) -
+      (margin?.top ?? 0) -
+      (margin?.bottom ?? 0) -
+      (border?.top ?? 0) -
+      (border?.bottom ?? 0);
 
     if (this.fontLocation) {
       await registerFont(computedFontFamily, this.fontLocation);

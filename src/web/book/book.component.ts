@@ -17,6 +17,7 @@ import PagePickerComponent from '../page-picker/page-picker.component';
 import PageNumberingAlignment from '../page/page-numbering-alignment.enum';
 import pageSelector from '../page/page-selector.const';
 import PageComponent from '../page/page.component';
+import DefaultPageFlipAnimation from './animations/default-page-flip.animation';
 import BookConfig from './book-config.interface';
 import BookElement from './book-element.interface';
 import CreateBookElement from './create-book-element.interface';
@@ -49,10 +50,10 @@ class BookComponent {
 
     const {
       pageStyles: userDefinedPageStyles,
-      pagesShown,
+      pagesShown = 1,
       media,
       animation,
-      listeners,
+      listeners = [],
       showBookmark,
       theme,
     } = bookConfig;
@@ -64,11 +65,11 @@ class BookComponent {
 
     const [bookStyles, calculatedPageStyles] = getBookStyles(
       pageStyles,
-      userDefinedPageStyles,
+      userDefinedPageStyles ?? {},
       pagesShown
     );
 
-    const destroyCallbacks = [];
+    const destroyCallbacks: Array<() => void> = [];
 
     this.lamina = LaminaComponent();
 
@@ -85,7 +86,7 @@ class BookComponent {
       },
       merge(
         {
-          classnames: [styles.book, theme?.className],
+          classnames: [styles.book, theme?.className ?? ''],
           styles: {
             ...(this.elementConfig.styles ?? {}),
             ...bookStyles,
@@ -100,7 +101,7 @@ class BookComponent {
       styles: {
         ...calculatedPageStyles,
       },
-      classnames: [theme?.pageClassName],
+      classnames: [theme?.pageClassName ?? ''],
     });
 
     const decrement = () => this.updatePage(this.currentPage - pagesShown);
@@ -204,7 +205,7 @@ class BookComponent {
   }
 
   private async goToPage(pageNumber: number): Promise<boolean> {
-    const { pagesShown } = this.bookConfig;
+    const { pagesShown = 1 } = this.bookConfig;
 
     const leftmostPage = pageNumber - (pageNumber % pagesShown);
     const pageNumbers = Array(pagesShown)
@@ -249,7 +250,7 @@ class BookComponent {
         },
         merge<CreateElementConfig>(
           {
-            innerHTML: content,
+            innerHTML: content ?? '',
             styles: {
               left: `${offset * i}%`,
             },
@@ -278,7 +279,7 @@ class BookComponent {
             onpipdestroyed: () => {
               this.overlay = undefined;
             },
-            existingPIP: this.overlay?.id === key && this.overlay,
+            existingPIP: this.overlay?.id === key ? this.overlay : undefined,
           });
 
           triggerElement.onclick = (event) => event.stopPropagation();
@@ -292,12 +293,9 @@ class BookComponent {
      * The animation handles the actual page changing as it may need to control
      * how and when the pages are deleted.
      */
-    const animationFinished = this.bookConfig.animation.changePage(
-      this.bookElement,
-      pageNumber,
-      oldPages,
-      pages
-    );
+    const animationFinished = (
+      this.bookConfig.animation ?? new DefaultPageFlipAnimation()
+    ).changePage(this.bookElement, pageNumber, oldPages, pages);
 
     const pageChangeEvent: PageChangeEvent = {
       pageNumber,
@@ -334,7 +332,7 @@ class BookComponent {
    */
   private addLoadingIcon(parent: HTMLElement): NullaryFn {
     const loadingIcon =
-      this.bookConfig.loading() ??
+      this.bookConfig.loading?.() ??
       LoadingIconComponent({
         classnames: [styles.bookLoadingIcon],
       });

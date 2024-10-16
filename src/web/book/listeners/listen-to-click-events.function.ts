@@ -4,7 +4,7 @@ const listenToClickEvents: AddListeners = (book, [decrement, increment]) => {
   function flipPage(event: MouseEvent) {
     const eventTarget = event.target;
 
-    if (eventTarget['tagName'] === 'A') {
+    if ((eventTarget as HTMLElement)['tagName'] === 'A') {
       // Do nothing if an anchor tag is clicked on.
       return;
     }

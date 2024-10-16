@@ -43,7 +43,7 @@ export default class NewlineTransformer implements EjectingTransformer {
         case 3:
           const paragraphs: Array<string> = [];
 
-          for (const paragraph of node.textContent.split('\n')) {
+          for (const paragraph of (node.textContent ?? '').split('\n')) {
             if (!sectionBegan) {
               paragraphs.push(`${sectionBeginning}${paragraph}`);
               sectionBegan = true;

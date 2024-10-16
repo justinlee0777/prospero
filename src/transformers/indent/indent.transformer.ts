@@ -44,7 +44,7 @@ export default class IndentTransformer implements EjectingTransformer {
           newText += element.outerHTML;
           break;
         case 3:
-          newText += node.textContent
+          newText += (node.textContent ?? '')
             .split('\n')
             .map((textContent) => `${this.text}${textContent}`)
             .join('\n');

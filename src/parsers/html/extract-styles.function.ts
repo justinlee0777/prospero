@@ -45,20 +45,15 @@ export default function extractStyles(htmlString: string): Styles {
   for (const [, property, value] of styles) {
     if (ValidFontStyles.includes(property)) {
       // Only permit allowed font styles.
-      fontStyles[property] = value;
+      (fontStyles as any)[property] = value;
     }
     if (ValidBlockStyles.includes(property)) {
-      blockStyles[property] = value;
+      (blockStyles as any)[property] = value;
     }
   }
 
-  return [
-    ['font', fontStyles],
-    ['block', blockStyles],
-  ].reduce((acc, [key, styles]: [string, Object]) => {
-    return {
-      ...acc,
-      [key]: Object.keys(styles).length > 0 ? styles : null,
-    };
-  }, {}) as Styles;
+  return {
+    font: Object.keys(fontStyles).length > 0 ? fontStyles : null,
+    block: Object.keys(blockStyles).length ? blockStyles : null,
+  };
 }

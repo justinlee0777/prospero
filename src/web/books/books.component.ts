@@ -1,6 +1,7 @@
 import div from '../../elements/div.function';
 import NullaryFn from '../../utils/nullary-fn.type';
 import BookElement from '../book/book-element.interface';
+import MediaQueryListenerConfig from '../media-query/media-query-listener-config.interface';
 import MediaQueryListenerFactory from '../media-query/media-query-listener.factory';
 import BooksElement from './books-element.interface';
 import CreateBooksElement from './create-books-element.interface';
@@ -18,6 +19,7 @@ const BooksComponent: CreateBooksElement = (config) => {
     (child) =>
       'prospero' in child &&
       typeof child.prospero === 'object' &&
+      child.prospero !== null &&
       'type' in child.prospero &&
       child.prospero.type === 'book'
   ) as Array<BookElement>;
@@ -45,7 +47,7 @@ const BooksComponent: CreateBooksElement = (config) => {
 
   const destroyMediaQueryListener = MediaQueryListenerFactory.create(
     bookVisibilityState(fallback),
-    ...renderedBooks
+    ...(renderedBooks as Array<MediaQueryListenerConfig>)
   );
 
   const booksElement = div(config) as unknown as BooksElement;

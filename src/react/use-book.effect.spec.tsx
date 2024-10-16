@@ -1,4 +1,4 @@
-jest.mock('../utils/merge.function', () => (arg) => arg);
+jest.mock('../utils/merge.function', () => (arg: any) => arg);
 
 jest.mock('picture-in-picture-js', () => ({}));
 
@@ -11,12 +11,12 @@ import useBook from './use-book.effect';
 describe('useBook', () => {
   let appendChildSpy: jest.Mock;
 
-  function UseBookTest(props): JSX.Element {
+  function UseBookTest(props: any): JSX.Element {
     props ||= {};
 
     const { classname, noBook } = props;
 
-    const ref = useRef<HTMLDivElement>();
+    const ref = useRef<HTMLDivElement>(null);
 
     useBook(
       ref,

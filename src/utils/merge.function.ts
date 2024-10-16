@@ -11,7 +11,9 @@ export default function merge<T extends Object>(dest: T, source: T): T {
       dest[key] = (dest[key] as any).concat(source[key]);
     } else if (
       typeof destValue === 'object' &&
-      typeof sourceValue === 'object'
+      typeof sourceValue === 'object' &&
+      destValue !== null &&
+      sourceValue !== null
     ) {
       // If both values are objects, recursively merge them (dig into object tree until primitives are encountered).
       dest[key] = merge(destValue, sourceValue);

@@ -53,12 +53,13 @@ export default class ServerPages implements IPages {
 
     await this.initialization;
 
-    const { pages, pageSize } = this;
+    const pages = this.pages!;
+    const pageSize = this.pageSize;
 
     if (pageNumber >= pages.length) {
       return null;
     } else if (!pages[pageNumber]) {
-      const beginningIndex = Math.floor(pageNumber / this.pageSize);
+      const beginningIndex = Math.floor(pageNumber / pageSize);
       const batchPageNumber = beginningIndex + 1;
 
       const { value } = await this.fetch(batchPageNumber, pageSize);
@@ -75,7 +76,7 @@ export default class ServerPages implements IPages {
 
   async getPageStyles(): Promise<PageStyles> {
     await this.initialization;
-    return this.cachedPageStyles;
+    return this.cachedPageStyles!;
   }
 
   /**
@@ -86,16 +87,17 @@ export default class ServerPages implements IPages {
     await this.initialization;
 
     const { pageSize } = this;
+    const pages = this.pages!;
     const fetches: Array<Promise<void>> = [];
 
     let i = 0;
-    while (i < this.pages.length) {
+    while (i < pages.length) {
       const beginningIndex = i * pageSize;
 
-      if (!this.pages[beginningIndex]) {
+      if (!pages[beginningIndex]) {
         const fetch = this.fetch(i, pageSize).then(({ value }) => {
           value.content.forEach((page, j) => {
-            this.pages[beginningIndex + j] = page;
+            pages[beginningIndex + j] = page;
           });
         });
 
@@ -105,13 +107,13 @@ export default class ServerPages implements IPages {
 
     await Promise.all(fetches);
 
-    return this.pages;
+    return pages;
   }
 
   async getData(): Promise<PagesOutput> {
     const pages = await this.getAll();
 
-    return { pages, pageStyles: this.cachedPageStyles };
+    return { pages, pageStyles: this.cachedPageStyles! };
   }
 
   async getDataAsIndices(): Promise<PagesAsIndicesOutput> {
@@ -145,7 +147,7 @@ export default class ServerPages implements IPages {
     const requestId = `${pageNumber}-${pageNumber + pageSize}`;
 
     if (this.requests.has(requestId)) {
-      return await this.requests.get(requestId);
+      return this.requests.get(requestId)!;
     } else {
       const request = fetch(
         `${this.endpoint}?pageNumber=${pageNumber}&pageSize=${pageSize}`

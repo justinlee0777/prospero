@@ -26,8 +26,8 @@ const input: CreateInputElement = (
 
   element.type = type;
 
-  minlength ?? (element.minLength = minlength);
-  maxlength ?? (element.maxLength = maxlength);
+  minlength && (element.minLength = minlength);
+  maxlength && (element.maxLength = maxlength);
 
   setElement(element, ...args);
 

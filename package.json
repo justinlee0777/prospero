@@ -22,7 +22,6 @@
   },
   "scripts": {
     "start": "rm -rf dist dev && (rollup -c & rollup -c ./rollup.config.dev.js) && (http-server -c-1 ./dist & http-server -c-1 ./dev -p 3000)",
-    "upload-ulysses": "tsx ./pages/ulysses/upload.ts",
     "build-pages": "tsx ./pages/build-pages.ts",
     "build:lib": "rm -rf dist && rollup -c",
     "release": "npm run build:lib && npm publish ./dist",

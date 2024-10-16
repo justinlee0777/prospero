@@ -11,7 +11,7 @@ export default function lockElement(book: HTMLElement): NullaryFn {
       });
     }
 
-    let reset: NullaryFn;
+    let reset: NullaryFn | undefined;
 
     function stopScrolling(): void {
       const originalTouchAction = book.style.touchAction;
@@ -28,7 +28,7 @@ export default function lockElement(book: HTMLElement): NullaryFn {
 
         await listenTo('blur');
 
-        reset();
+        reset!();
       }
     } catch {
       reset?.();

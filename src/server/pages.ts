@@ -61,10 +61,15 @@ export default class Pages implements IPages {
       TransformerSerializer.serialize
     );
 
-    this.webPagesConstructorParameters = [pageStyles, text, null, pageConfig];
+    this.webPagesConstructorParameters = [
+      pageStyles,
+      text,
+      undefined,
+      pageConfig,
+    ];
   }
 
-  async get(pageNumber: number): Promise<string> {
+  async get(pageNumber: number): Promise<string | null> {
     const browserPage = await this.openBrowser();
 
     return browserPage.evaluate(

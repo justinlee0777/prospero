@@ -5,8 +5,8 @@ interface KeyCodesFunctionMap {
 export default function createKeydownListener(
   map: KeyCodesFunctionMap
 ): EventListenerOrEventListenerObject {
-  return (event: KeyboardEvent) => {
-    const keyCode = event.code;
+  return (event: Event) => {
+    const keyCode = (event as KeyboardEvent).code;
 
     Object.entries(map).forEach(([matchingCode, callback]) => {
       if (keyCode === matchingCode) {

@@ -18,7 +18,7 @@ export default function getBookStyles(
   if (pageStyles) {
     const styles = pageStylesToStyleDeclaration(pageStyles);
 
-    const bookWidth = `${toPixelUnits(styles.width) * pagesShown}px`;
+    const bookWidth = `${toPixelUnits(styles.width ?? '0px') * pagesShown}px`;
     const pageWidth = styles.width;
 
     bookStyles = {

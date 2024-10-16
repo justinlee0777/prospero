@@ -13,13 +13,13 @@ export default function normalizePageStyles(
   pageStyles = { ...pageStyles };
 
   ['padding', 'margin', 'border'].forEach((key) => {
-    if (typeof pageStyles[key] === 'object') {
-      pageStyles[key] = {
+    if (typeof (pageStyles as any)[key] === 'object') {
+      (pageStyles as any)[key] = {
         ...defaultDimensionalValue,
-        ...pageStyles[key],
+        ...(pageStyles as any)[key],
       };
     } else {
-      pageStyles[key] = defaultDimensionalValue;
+      (pageStyles as any)[key] = defaultDimensionalValue;
     }
   });
 

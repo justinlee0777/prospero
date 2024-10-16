@@ -1,26 +1,13 @@
-import styles from './loading-screen.module.css';
+import cssStyles from './loading-screen.module.css';
 
 import div from '../../elements/div.function';
-import PageStyles from '../../models/page-styles.interface';
 import pageStylesToStyleDeclaration from '../../utils/container-style-to-style-declaration.function';
 import merge from '../../utils/merge.function';
 import BookIcon from '../assets/book-open-svgrepo-com.svg';
 import CreateBookElement from '../book/create-book-element.interface';
 import getBookStyles from '../book/initialization/get-book-styles.function';
 import { DefaultBookTheme } from '../book/theming';
-import Theme from '../book/theming/theme.interface';
 import LoadingScreenElement from './loading-screen-element.interface';
-
-interface Config {
-  /**
-   * Used to initialize dimensions for this component. Should be closest to final book.
-   */
-  pageStyles?: PageStyles;
-  /**
-   * Used to style component. Should be closest to final book.
-   */
-  theme?: Theme;
-}
 
 type CreateLoadingScreenElement = (
   requiredArgs?: Partial<Omit<Parameters<CreateBookElement>[0], 'pages'>>,
@@ -36,7 +23,7 @@ type CreateLoadingScreenElement = (
  */
 const LoadingScreenComponent: CreateLoadingScreenElement = (
   { pageStyles } = {},
-  { theme = DefaultBookTheme, pagesShown } = {},
+  { theme = DefaultBookTheme, pagesShown = 1 } = {},
   elementConfig = {}
 ) => {
   let userDefinedPageStyles: Partial<CSSStyleDeclaration> = {
@@ -44,25 +31,37 @@ const LoadingScreenComponent: CreateLoadingScreenElement = (
     width: '100%',
   };
 
+  let styles: Partial<CSSStyleDeclaration> | undefined;
+
   if (pageStyles) {
     userDefinedPageStyles = pageStylesToStyleDeclaration(pageStyles);
+
+    const [bookStyles, calculatedPageStyles] = getBookStyles(
+      pageStyles,
+      userDefinedPageStyles,
+      pagesShown
+    );
+
+    styles = merge(bookStyles, calculatedPageStyles);
   }
 
-  const [bookStyles, calculatedPageStyles] = getBookStyles(
-    pageStyles,
-    userDefinedPageStyles,
-    pagesShown
-  );
+  const classnames = [cssStyles.loadingScreen];
+
+  if (theme) {
+    if (theme.className) {
+      classnames.push(theme.className);
+    }
+
+    if (theme.pageClassName) {
+      classnames.push(theme.pageClassName);
+    }
+  }
 
   const screen = div(
     merge(
       {
-        classnames: [
-          styles.loadingScreen,
-          theme?.className,
-          theme?.pageClassName,
-        ],
-        styles: merge(bookStyles, calculatedPageStyles),
+        classnames,
+        styles,
       },
       elementConfig
     )
@@ -71,7 +70,7 @@ const LoadingScreenComponent: CreateLoadingScreenElement = (
   const svg = document.createElement('object');
   svg.type = 'image/svg+xml';
   svg.data = BookIcon;
-  svg.className = styles.loadingScreenIcon;
+  svg.className = cssStyles.loadingScreenIcon;
 
   screen.appendChild(svg);
 

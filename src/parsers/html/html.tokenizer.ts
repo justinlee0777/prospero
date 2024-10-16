@@ -73,7 +73,7 @@ export default class HTMLTokenizer {
   }
 
   getText(element: HTMLElement): string {
-    return element.textContent;
+    return element.textContent ?? '';
   }
 
   private *parseHTMLElement(element: Element): Generator<Token> {
@@ -92,7 +92,8 @@ export default class HTMLTokenizer {
           yield {
             tag: {
               name: tagName,
-              opening: this.getOuterHTML(element).match(openingPattern).at(0),
+              opening:
+                this.getOuterHTML(element).match(openingPattern)?.at(0) ?? '',
               closing,
             },
             type: TokenType.HTML,
