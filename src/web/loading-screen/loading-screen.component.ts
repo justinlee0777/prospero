@@ -26,15 +26,13 @@ const LoadingScreenComponent: CreateLoadingScreenElement = (
   { theme = DefaultBookTheme, pagesShown = 1 } = {},
   elementConfig = {}
 ) => {
-  let userDefinedPageStyles: Partial<CSSStyleDeclaration> = {
+  let styles: Partial<CSSStyleDeclaration> = {
     height: '100%',
     width: '100%',
   };
 
-  let styles: Partial<CSSStyleDeclaration> | undefined;
-
   if (pageStyles) {
-    userDefinedPageStyles = pageStylesToStyleDeclaration(pageStyles);
+    const userDefinedPageStyles = pageStylesToStyleDeclaration(pageStyles);
 
     const [bookStyles, calculatedPageStyles] = getBookStyles(
       pageStyles,
