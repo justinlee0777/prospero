@@ -1,4 +1,4 @@
-jest.mock('./merge.function', () => (arg) => arg);
+jest.mock('./merge.function', () => (arg: any) => arg);
 
 import normalizePageStyles from './normalize-page-styles.function';
 

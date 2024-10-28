@@ -1,17 +1,17 @@
-let mediaQueryBookList;
-let mockDestroyMediaQueryListener;
+let mediaQueryBookList: any;
+let mockDestroyMediaQueryListener: any;
 
 jest.mock('picture-in-picture-js', () => ({}));
 
 jest.mock('../media-query/media-query-listener.factory', () => ({
-  create(...args) {
+  create(...args: any) {
     mediaQueryBookList = args;
     mockDestroyMediaQueryListener = jest.fn();
     return mockDestroyMediaQueryListener;
   },
 }));
 
-jest.mock('../../utils/merge.function', () => (arg) => arg);
+jest.mock('../../utils/merge.function', () => (arg: any) => arg);
 
 import PagesOutput from '../../models/pages-output.interface';
 import BookElement from '../book/book-element.interface';
@@ -107,7 +107,7 @@ describe('BooksComponent', () => {
 
     let bookElements = [...books.children];
 
-    mediaQueryBookList.forEach((book) => book.hide());
+    mediaQueryBookList.forEach((book: any) => book.hide());
 
     expect(bookElements[0].ariaHidden).toBe('true');
     expect(bookElements[1].ariaHidden).toBe('true');

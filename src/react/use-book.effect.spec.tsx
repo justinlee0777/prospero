@@ -2,6 +2,8 @@ jest.mock('../utils/merge.function', () => (arg: any) => arg);
 
 jest.mock('picture-in-picture-js', () => ({}));
 
+jest.mock('../web/assets/book-open-svgrepo-com.svg', () => '');
+
 import renderer from 'react-test-renderer';
 
 import { useRef } from 'react';

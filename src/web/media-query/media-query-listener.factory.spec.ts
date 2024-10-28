@@ -105,10 +105,10 @@ describe('MediaQueryListenerFactory', () => {
     const mockUnobserve = jest.fn();
     const mockDisconnect = jest.fn();
 
-    let trigger;
+    let trigger: any;
 
     window.ResizeObserver = class MockResizeObserver {
-      constructor(public size) {
+      constructor(public size: any) {
         trigger = () => size();
       }
 

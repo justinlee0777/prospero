@@ -1,4 +1,4 @@
-jest.mock('../../utils/merge.function', () => (arg) => arg);
+jest.mock('../../utils/merge.function', () => (arg: any) => arg);
 
 import BookmarkData from './bookmark-data.interface';
 import BookmarkStorage from './bookmark-storage.interface';
@@ -44,7 +44,7 @@ describe('BookmarkComponent', () => {
   });
 
   test('fetches any saved bookmark data asynchronously and tells the client', async () => {
-    let resolve;
+    let resolve: any;
 
     mockStorageGet.mockReturnValue(
       new Promise((resolveFn) => (resolve = resolveFn))
@@ -55,7 +55,7 @@ describe('BookmarkComponent', () => {
     const onbookmarkretrieval = jest.fn();
     component.onbookmarkretrieval = onbookmarkretrieval;
 
-    resolve({
+    resolve!({
       pageNumber: 10,
     });
 

@@ -5,7 +5,7 @@ jest.mock('../../web/utils/register-font.function', () => mockRegisterFont);
 import ParserBuilder from './parser.builder';
 
 describe(ParserBuilder, () => {
-  let containerStyle;
+  let containerStyle: any;
 
   beforeEach(() => {
     containerStyle = {

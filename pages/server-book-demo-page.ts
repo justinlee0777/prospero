@@ -23,19 +23,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const desktopPages = new ServerPages(`${endpointBase}/ulysses/desktop/`);
 
-  let loadingScreen = LoadingScreenComponent(
-    {
-      pageStyles: containerStyleConst,
-    },
-    {
-      pagesShown: 2,
-    },
-    {
-      styles: {
-        margin: 'auto',
-      },
-    }
-  );
+  let loadingScreen = LoadingScreenComponent();
 
   document.body.appendChild(loadingScreen);
 
@@ -60,7 +48,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       showBookmark: {
         storage: {
           get: () =>
-            JSON.parse(localStorage.getItem('desktop-ulysses-bookmark')),
+            JSON.parse(localStorage.getItem('desktop-ulysses-bookmark')!),
           save: (bookmark) =>
             localStorage.setItem(
               'desktop-ulysses-bookmark',

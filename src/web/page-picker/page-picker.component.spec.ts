@@ -1,4 +1,4 @@
-jest.mock('../../utils/merge.function', () => (arg) => arg);
+jest.mock('../../utils/merge.function', () => (arg: any) => arg);
 
 import div from '../../elements/div.function';
 import PagePickerComponent from './page-picker.component';
