@@ -18,6 +18,10 @@ To install `prospero` in your project, run:
 npm install prospero
 ```
 
+### Demo
+
+You can see the project working on [my personal site](https://www.iamjustinlee.com/prospero/). The demo code is hosted [here](https://github.com/justinlee0777/my-portfolio/tree/main/src/prospero).
+
 ### Usage
 
 `prospero` has two barrel entry-points: `prospero/server` and `prospero/web`. For tree-shaking, there are individual entry-points divided by utility as exposed in `exports` of the `package.json`.
