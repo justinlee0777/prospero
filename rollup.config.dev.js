@@ -34,6 +34,7 @@ export default [
     output: {
       sourcemap,
       file: `${dir}/${extensionlessName}.js`,
+      inlineDynamicImports: true,
     },
     plugins: [
       nodeResolve({

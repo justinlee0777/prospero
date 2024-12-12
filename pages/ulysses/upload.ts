@@ -75,12 +75,12 @@ responses.forEach((response) => {
 
   // Add an empty page.
   desktop.push({
-    beginIndex: desktop.at(-1).endIndex,
-    endIndex: desktop.at(-1).endIndex,
+    beginIndex: desktop.at(-1)!.endIndex,
+    endIndex: desktop.at(-1)!.endIndex,
   });
 
-  mobileIndex += response.mobile.pages.at(-1).endIndex;
-  desktopIndex += response.desktop.pages.at(-1).endIndex;
+  mobileIndex += response.mobile.pages.at(-1)!.endIndex;
+  desktopIndex += response.desktop.pages.at(-1)!.endIndex;
 });
 
 const mobilePages: PagesAsIndicesOutput = {

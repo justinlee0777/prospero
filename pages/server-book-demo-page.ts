@@ -56,6 +56,18 @@ window.addEventListener('DOMContentLoaded', async () => {
             ),
         },
       },
+      tableOfContents: {
+        sections: [
+          {
+            title: 'foo',
+            pageNumber: 1,
+          },
+          {
+            title: 'bar',
+            pageNumber: 4,
+          },
+        ],
+      },
     },
     {
       styles: { margin: 'auto' },

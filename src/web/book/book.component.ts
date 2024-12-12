@@ -56,6 +56,7 @@ class BookComponent {
       listeners = [],
       showBookmark,
       theme,
+      tableOfContents,
     } = bookConfig;
 
     this.currentPage = bookConfig.currentPage ?? 0;
@@ -172,6 +173,68 @@ class BookComponent {
       destroyCallbacks.push(() => bookmark.prospero.destroy());
     } else {
       this.goToPage(this.currentPage);
+    }
+
+    if (tableOfContents) {
+      const loadTableOfContents = async () => {
+        const { default: TableOfContentsButtonComponent } = await import(
+          '../table-of-contents-button/table-of-contents-button.component'
+        );
+
+        const tableOfContentsButton = TableOfContentsButtonComponent({
+          classnames: [styles.bookTableOfContentsButton],
+        });
+
+        tableOfContentsButton.addEventListener('click', async (event) => {
+          event.stopPropagation();
+
+          const { default: TableOfContentsComponent } = await import(
+            '../table-of-contents/table-of-contents.component'
+          );
+
+          const tableOfContentsListing = TableOfContentsComponent(
+            tableOfContents,
+            {
+              classnames: [styles.bookTableOfContents],
+              styles: {
+                opacity: '0',
+                transform: 'translateX(-100%)',
+              },
+            }
+          );
+
+          tableOfContentsListing.tabIndex = 0;
+
+          tableOfContentsListing
+            .animate([{ opacity: 1, transform: 'none' }], 300)
+            .finished.then(() => {
+              tableOfContentsListing.style.opacity = '1';
+              tableOfContentsListing.style.transform = 'none';
+
+              const closeTableOfContents = () =>
+                tableOfContentsListing
+                  .animate(
+                    [{ transform: 'translateX(-100%)', opacity: 0 }],
+                    300
+                  )
+                  .finished.then(() => tableOfContentsListing.remove());
+
+              tableOfContentsListing.onblur =
+                tableOfContentsListing.onpaneclose = closeTableOfContents;
+              tableOfContentsListing.onpageselected = (pageNumber) => {
+                this.goToPage(pageNumber);
+                closeTableOfContents();
+              };
+            });
+          this.lamina.appendChild(tableOfContentsListing);
+        });
+
+        this.lamina.appendChild(tableOfContentsButton);
+
+        destroyCallbacks.push(() => tableOfContentsButton.prospero.destroy());
+      };
+
+      loadTableOfContents();
     }
 
     this.bookElement = book;

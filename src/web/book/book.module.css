@@ -27,3 +27,18 @@
   right: 8px;
   top: 8px;
 }
+
+.bookTableOfContentsButton {
+  left: 8px;
+  position: absolute;
+  top: 8px;
+}
+
+.bookTableOfContents {
+  height: 100%;
+  left: 0;
+  list-style: none;
+  max-width: 50%;
+  position: absolute;
+  top: 0;
+}
