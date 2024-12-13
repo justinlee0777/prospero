@@ -4,12 +4,12 @@ import button from '../../elements/button.function';
 import CreateElementConfig from '../../elements/create-element.config';
 import li from '../../elements/li.function';
 import ul from '../../elements/ul.function';
+import { TableOfContentsConfig } from '../../models/table-of-contents.interface';
 import merge from '../../utils/merge.function';
-import { BookConfig } from '../types';
 import TableOfContentsElement from './table-of-contents-element.interface';
 
 export default function TableOfContentsComponent(
-  config: Exclude<BookConfig['tableOfContents'], undefined>,
+  config: TableOfContentsConfig,
   elementConfig: CreateElementConfig = {}
 ): TableOfContentsElement {
   const tableOfContents = ul(

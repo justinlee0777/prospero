@@ -1,4 +1,4 @@
-import { TableOfContentsSection } from '../../models/table-of-contents.interface';
+import { TableOfContentsConfig } from '../../models/table-of-contents.interface';
 import Optional from '../../utils/optional.type';
 import BookmarkStorage from '../bookmark/bookmark-storage.interface';
 import AddListeners from '../model/add-listeners.interface';
@@ -33,7 +33,5 @@ export default interface BookConfig extends BookAttributes {
   };
   /** Used to customize what shows on the screen when the book is getting a page.*/
   loading?: () => HTMLElement & Optional<Component, 'prospero'>;
-  tableOfContents?: {
-    sections: Array<TableOfContentsSection>;
-  };
+  tableOfContents?: TableOfContentsConfig | Promise<TableOfContentsConfig>;
 }

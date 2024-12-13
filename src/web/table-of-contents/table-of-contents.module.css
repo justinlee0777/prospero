@@ -20,6 +20,8 @@
   height: 2rem;
   margin-bottom: 1em;
   margin-left: auto;
+  position: sticky;
+  top: 0;
   width: 2rem;
 }
 
