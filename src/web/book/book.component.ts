@@ -223,7 +223,7 @@ class BookComponent {
                 tableOfContentsListing.onblur =
                   tableOfContentsListing.onpaneclose = closeTableOfContents;
                 tableOfContentsListing.onpageselected = (pageNumber) => {
-                  this.goToPage(pageNumber);
+                  this.goToPage((this.currentPage = pageNumber));
                   closeTableOfContents();
                 };
               });

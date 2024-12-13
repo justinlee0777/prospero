@@ -33,5 +33,9 @@ export default interface BookConfig extends BookAttributes {
   };
   /** Used to customize what shows on the screen when the book is getting a page.*/
   loading?: () => HTMLElement & Optional<Component, 'prospero'>;
+  /**
+   * If provided, uses the data to create a table of contents that users can move from section / chapter to section.
+   * Takes in a promise in case chapters / sections metadata is stored with page indices and may need to be loaded asynchronously from a DB.
+   */
   tableOfContents?: TableOfContentsConfig | Promise<TableOfContentsConfig>;
 }

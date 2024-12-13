@@ -272,8 +272,33 @@ const desktopPages = new ServerPages(...);
 const desktopStyles = await desktopPages.getPageStyles();
 
 document.body.removeChild(loadingScreen);
+```
+
+### Table of Contents
+
+A table of contents can be configured for a book.
 
 ```
+BookComponent(
+    ...,
+    {
+        ...,
+        tableOfContents: {
+            sections: [
+                {
+                    title: 'Chapter 1',
+                    pageNumber: 0,
+                },
+                // ...
+            ]
+        },
+    }
+);
+```
+
+`tableOfContents` also takes in a `Promise` of `TableOfContentsConfig`.
+
+A possible feature in the future is to calculate the table of contents for you, which would be useful for a flexible book. Not in the roadmap at the moment however as I am not sure what performance would look like, and it would be tied to a potential "load ahead" feature that loads pages ahead of time for the user (but in such a way that will not make the client's network too busy) which would be far more valuable. (Sorry for rambling in the documentation.)
 
 ### Transformers
 
