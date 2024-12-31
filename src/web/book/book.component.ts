@@ -332,7 +332,7 @@ class BookComponent {
         );
 
         affectedElements.forEach((affectedElement, elIndex) => {
-          const key = `pip-page-${i}-index-${elIndex}`;
+          const key = `pip-page-${pageNumber + i}-index-${elIndex}`;
 
           const triggerElement = createTriggerElement(affectedElement, {
             replaceWith: true,
