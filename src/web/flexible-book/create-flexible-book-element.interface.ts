@@ -1,4 +1,5 @@
 import CreateElementConfig from '../../elements/create-element.config';
+import { PagesConfig } from '../../models';
 import Transformer from '../../transformers/models/transformer.interface';
 import BookConfig from '../book/book-config.interface';
 import FlexibleBookPageStyles from './flexible-book-container-style.interface';
@@ -27,9 +28,7 @@ type RequiredArgs =
   | RequiredArgsWithSingleConfig
   | RequiredArgsWithMediaQueryConfigs;
 
-interface OptionalArgs {
-  fontLocation?: string;
-
+interface OptionalArgs extends PagesConfig {
   transformers?: Array<Transformer>;
 
   bookClassNames?: Array<string>;

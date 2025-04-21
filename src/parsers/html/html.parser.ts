@@ -82,7 +82,7 @@ export default class HTMLParser implements Parser {
       return transformer.transform(newText);
     }, text);
 
-    const { pageStyles } = this.config;
+    const { pageStyles, sectionBreak } = this.config;
 
     const styles: Partial<CSSStyleDeclaration> = {
       ...pageStylesToStyleDeclaration(pageStyles),
@@ -126,19 +126,28 @@ export default class HTMLParser implements Parser {
         for (const textToken of textTokens) {
           const [word] = textToken;
 
-          const newPageContent = pageContent + word;
+          let newPageContent = pageContent + word;
 
           textElement.innerHTML = newPageContent;
 
           if (textElement.clientHeight >= pageHeight) {
-            yield this.handlePageEnd(pageContent);
+            textElement.innerHTML = pageContent;
 
-            const openingTag = this.getOpeningTag(false);
+            const nextPageContent =
+              this.getNextPageContentIfSectionBreak(textElement);
 
-            pageContent = `${openingTag}${word}`;
-          } else {
-            pageContent = newPageContent;
+            if (nextPageContent) {
+              newPageContent = nextPageContent + word;
+            } else {
+              const openingTag = this.getOpeningTag(false);
+
+              newPageContent = `${openingTag}${word}`;
+            }
+
+            yield this.handlePageEnd(textElement.innerHTML);
           }
+
+          pageContent = newPageContent;
         }
       } else if (token.type === TokenType.HTML) {
         let newToken: string;
@@ -156,20 +165,28 @@ export default class HTMLParser implements Parser {
         } else {
           newToken = token.tag.opening;
         }
-
-        const newPageContent = pageContent + newToken;
+        let newPageContent = pageContent + newToken;
 
         textElement.innerHTML = newPageContent;
 
         if (textElement.clientHeight >= pageHeight) {
-          yield this.handlePageEnd(pageContent);
+          const nextPageContent =
+            this.getNextPageContentIfSectionBreak(textElement);
 
-          const openingTag = this.getOpeningTag(false);
+          if (nextPageContent) {
+            newPageContent = nextPageContent + newToken;
+          } else {
+            textElement.innerHTML = pageContent;
 
-          pageContent = `${openingTag}${newToken}`;
-        } else {
-          pageContent = newPageContent;
+            const openingTag = this.getOpeningTag(false);
+
+            newPageContent = `${openingTag}${newToken}`;
+          }
+
+          yield this.handlePageEnd(textElement.innerHTML);
         }
+
+        pageContent = newPageContent;
       } else if (token.type === TokenType.END_HTML) {
         if (this.context.tag?.name === token.tagName) {
           pageContent += this.getClosingTag();
@@ -234,6 +251,50 @@ export default class HTMLParser implements Parser {
       (tag, context) => (tag += context.tag?.opening ?? ''),
       ''
     );
+  }
+
+  private getNextPageContentIfSectionBreak(
+    textElement: HTMLElement
+  ): string | undefined {
+    const { sectionBreak } = this.config;
+
+    if (sectionBreak) {
+      const beginnings = textElement.querySelectorAll(
+        sectionBreak.beginningSelector
+      );
+
+      if (beginnings.length === 0) {
+        return;
+      }
+
+      const lastSectionBeginning = beginnings.item(beginnings.length - 1);
+
+      let immediateSuccessor = lastSectionBeginning.nextElementSibling;
+
+      const transferredElements: Array<Element> = [lastSectionBeginning];
+
+      while (immediateSuccessor && !immediateSuccessor.textContent?.trim()) {
+        transferredElements.push(immediateSuccessor);
+
+        immediateSuccessor = immediateSuccessor.nextElementSibling;
+      }
+
+      const emptyBeginning = !immediateSuccessor;
+
+      if (emptyBeginning) {
+        const str =
+          transferredElements
+            .slice(0, -1)
+            .map((element) => element.outerHTML)
+            .join('') +
+          this.getOpeningTag(true) +
+          transferredElements.at(-1)!.innerHTML;
+
+        transferredElements.forEach((element) => element.remove());
+
+        return str;
+      }
+    }
   }
 
   /**

@@ -19,7 +19,7 @@ export default class Pages implements IPages {
     private pageStyles: PageStyles,
     text: string,
     transformers?: Array<Transformer>,
-    { fontLocation }: PagesConfig = {}
+    { fontLocation, ...remainingPagesConfig }: PagesConfig = {}
   ) {
     let parserBuilder = new ParserBuilder().fromPageStyles(pageStyles);
 
@@ -32,7 +32,7 @@ export default class Pages implements IPages {
     }
 
     this.pageGeneratorPromise = parserBuilder
-      .build()
+      .build({ ...remainingPagesConfig })
       .then((parser) => parser.generatePages(text));
   }
 
