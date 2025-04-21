@@ -1,6 +1,7 @@
-import { PageStyles } from '../../models';
+import { PagesConfig, PageStyles } from '../../models';
 
-export default interface CreateTextParserConfig {
+export default interface CreateTextParserConfig
+  extends Pick<PagesConfig, 'sectionBreak'> {
   /** In pixels. */
   fontSize: number;
   /** The height of a page. */

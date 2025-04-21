@@ -35,11 +35,6 @@ export interface EndHTMLToken {
   type: TokenType.END_HTML;
 }
 
-export interface ElementConstruct {
-  childNodes: any;
-  tagName: string;
-}
-
 /**
  * Creates tokens out of an HTML string that the HTMLParser consumes.
  */

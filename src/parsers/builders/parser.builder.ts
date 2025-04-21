@@ -1,4 +1,4 @@
-import { PageStyles } from '../../models';
+import { PagesConfig, PageStyles } from '../../models';
 import FontLocations from '../../models/font-locations.interface';
 import Transformer from '../../transformers/models/transformer.interface';
 import Optional from '../../utils/optional.type';
@@ -69,7 +69,7 @@ export default class ParserBuilder {
    * Get the built parser.
    * @throws if there is no internal parser yet.
    */
-  async build(): Promise<Parser> {
+  async build(config: Pick<PagesConfig, 'sectionBreak'> = {}): Promise<Parser> {
     if (!this.containerStyle) {
       throw new Error("'fromPageStyles' has not been invoked.");
     }
@@ -111,6 +111,7 @@ export default class ParserBuilder {
       pageHeight: containerHeight,
       pageWidth: containerWidth,
       pageStyles: this.containerStyle,
+      ...config,
     });
 
     parser.setTransformers(this.transformers);
