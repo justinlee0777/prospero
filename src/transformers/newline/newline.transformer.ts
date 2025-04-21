@@ -36,7 +36,7 @@ export default class NewlineTransformer implements EjectingTransformer {
         case 1:
           const element = node as HTMLElement;
 
-          element.textContent = `${spaces}${element.textContent}`;
+          element.innerHTML = `${spaces}${element.innerHTML}`;
 
           newText += element.outerHTML;
           break;

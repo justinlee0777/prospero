@@ -39,7 +39,7 @@ export default class IndentTransformer implements EjectingTransformer {
         case 1:
           const element = node as HTMLElement;
 
-          element.textContent = `${this.text}${element.textContent}`;
+          element.innerHTML = `${this.text}${element.innerHTML}`;
 
           newText += element.outerHTML;
           break;

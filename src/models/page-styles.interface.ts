@@ -40,4 +40,6 @@ export default interface PageStyles {
     /** In pixels. */
     left?: number;
   };
+  /** Stylesheet contents. */
+  stylesheets?: string;
 }

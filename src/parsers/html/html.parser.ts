@@ -82,7 +82,7 @@ export default class HTMLParser implements Parser {
       return transformer.transform(newText);
     }, text);
 
-    const { pageStyles, sectionBreak } = this.config;
+    const { pageStyles } = this.config;
 
     const styles: Partial<CSSStyleDeclaration> = {
       ...pageStylesToStyleDeclaration(pageStyles),
@@ -98,9 +98,14 @@ export default class HTMLParser implements Parser {
       },
     });
 
+    let styleElement = document.createElement('style');
+    if (pageStyles.stylesheets) {
+      styleElement.textContent = pageStyles.stylesheets;
+    }
+
     const page = div({
       styles,
-      children: [textElement],
+      children: [styleElement, textElement],
     });
 
     document.body.appendChild(page);
