@@ -195,6 +195,8 @@ export default class HTMLParser implements Parser {
             this.currentPageFootnotes = [];
           } else {
             if (token.footnote) {
+              // If the overflow is caused by the new tag and footnote itself,
+              // we have to move both to the next page. Hence this little dance here.
               this.currentPageFootnotes = this.currentPageFootnotes.slice(
                 0,
                 -1
@@ -205,6 +207,7 @@ export default class HTMLParser implements Parser {
 
               this.currentPageFootnotes = [token.footnote];
             } else {
+              // Otherwise, just put everything together.
               textElement.innerHTML = pageContent + footnotesHTML;
               this.currentPageFootnotes = [];
             }
