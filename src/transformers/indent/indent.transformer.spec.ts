@@ -16,7 +16,7 @@ describe('IndentTransformer', () => {
     expect(transformer.transform('Foo')).toBe('&nbsp;&nbsp;&nbsp;&nbsp;Foo');
 
     expect(transformer.transform('<div>Foo</div>')).toBe(
-      '<div>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Foo</div>'
+      '<div>&nbsp;&nbsp;&nbsp;&nbsp;Foo</div>'
     );
   });
 });
