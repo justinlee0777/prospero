@@ -3,6 +3,8 @@ import { EjectingTransformer } from '../models/transformer.interface';
 
 interface IndentTransformerOptions {
   htmlCompatible?: boolean;
+  /** Element selector. */
+  exclude?: string;
 }
 
 /**
@@ -39,7 +41,11 @@ export default class IndentTransformer implements EjectingTransformer {
         case 1:
           const element = node as HTMLElement;
 
-          element.innerHTML = `${this.text}${element.innerHTML}`;
+          if (
+            !(this.options.exclude && element.matches(this.options.exclude))
+          ) {
+            element.innerHTML = `${this.text}${element.innerHTML}`;
+          }
 
           newText += element.outerHTML;
           break;

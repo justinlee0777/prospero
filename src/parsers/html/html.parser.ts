@@ -32,6 +32,8 @@ export default class HTMLParser implements Parser {
 
   private tokenExpression: RegExp;
 
+  private currentPageFootnotes: Array<Element> = [];
+
   constructor(private config: CreateTextParserConfig) {
     this.debug = config;
 
@@ -118,9 +120,11 @@ export default class HTMLParser implements Parser {
 
     let pageContent = '';
 
-    const tokenizer = new HTMLTokenizer();
+    const tokenizer = new HTMLTokenizer(text, {
+      footnotes: this.config.footnotes?.footnoteSelector,
+    });
 
-    const tokens = tokenizer.getTokens(text);
+    const tokens = tokenizer.getTokens();
 
     for (const token of tokens) {
       if (token.type === TokenType.TEXT) {
@@ -133,7 +137,8 @@ export default class HTMLParser implements Parser {
 
           let newPageContent = pageContent + word;
 
-          textElement.innerHTML = newPageContent;
+          const footnotesHTML = this.createFootnotes()?.outerHTML ?? '';
+          textElement.innerHTML = newPageContent + footnotesHTML;
 
           if (textElement.clientHeight >= pageHeight) {
             textElement.innerHTML = pageContent;
@@ -149,13 +154,19 @@ export default class HTMLParser implements Parser {
               newPageContent = `${openingTag}${word}`;
             }
 
-            yield this.handlePageEnd(textElement.innerHTML);
+            this.currentPageFootnotes = [];
+
+            yield this.handlePageEnd(textElement.innerHTML + footnotesHTML);
           }
 
           pageContent = newPageContent;
         }
       } else if (token.type === TokenType.HTML) {
         let newToken: string;
+
+        if (token.footnote) {
+          this.currentPageFootnotes.push(token.footnote);
+        }
 
         if (token.tag.closing) {
           const opening = token.tag.opening;
@@ -172,7 +183,8 @@ export default class HTMLParser implements Parser {
         }
         let newPageContent = pageContent + newToken;
 
-        textElement.innerHTML = newPageContent;
+        const footnotesHTML = this.createFootnotes()?.outerHTML ?? '';
+        textElement.innerHTML = newPageContent + footnotesHTML;
 
         if (textElement.clientHeight >= pageHeight) {
           const nextPageContent =
@@ -180,8 +192,22 @@ export default class HTMLParser implements Parser {
 
           if (nextPageContent) {
             newPageContent = nextPageContent + newToken;
+            this.currentPageFootnotes = [];
           } else {
-            textElement.innerHTML = pageContent;
+            if (token.footnote) {
+              this.currentPageFootnotes = this.currentPageFootnotes.slice(
+                0,
+                -1
+              );
+
+              textElement.innerHTML =
+                pageContent + (this.createFootnotes()?.outerHTML ?? '');
+
+              this.currentPageFootnotes = [token.footnote];
+            } else {
+              textElement.innerHTML = pageContent + footnotesHTML;
+              this.currentPageFootnotes = [];
+            }
 
             const openingTag = this.getOpeningTag(false);
 
@@ -272,6 +298,12 @@ export default class HTMLParser implements Parser {
         return;
       }
 
+      // If there are footnotes, remove them temporarily. They are not part of the calculation.
+      const footnotes = textElement.querySelector('.footnotes');
+
+      footnotes?.remove();
+      //
+
       const lastSectionBeginning = beginnings.item(beginnings.length - 1);
 
       let immediateSuccessor = lastSectionBeginning.nextElementSibling;
@@ -282,6 +314,11 @@ export default class HTMLParser implements Parser {
         transferredElements.push(immediateSuccessor);
 
         immediateSuccessor = immediateSuccessor.nextElementSibling;
+      }
+
+      // Return footnotes back. Only works because footnotes are guaranteed to be last.
+      if (footnotes) {
+        textElement.appendChild(footnotes);
       }
 
       const emptyBeginning = !immediateSuccessor;
@@ -327,6 +364,21 @@ export default class HTMLParser implements Parser {
     const closingTag = this.getClosingTag(false);
 
     return pageText + closingTag;
+  }
+
+  private createFootnotes(): HTMLElement | undefined {
+    if (this.currentPageFootnotes.length === 0) {
+      return;
+    }
+
+    const footnoteContainer = document.createElement('div');
+    footnoteContainer.className = 'footnotes';
+
+    this.currentPageFootnotes.forEach((footnote) => {
+      footnoteContainer.appendChild(footnote);
+    });
+
+    return footnoteContainer;
   }
 
   protected convert({

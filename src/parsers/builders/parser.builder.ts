@@ -69,7 +69,9 @@ export default class ParserBuilder {
    * Get the built parser.
    * @throws if there is no internal parser yet.
    */
-  async build(config: Pick<PagesConfig, 'sectionBreak'> = {}): Promise<Parser> {
+  async build(
+    config: Pick<PagesConfig, 'sectionBreak' | 'footnotes'> = {}
+  ): Promise<Parser> {
     if (!this.containerStyle) {
       throw new Error("'fromPageStyles' has not been invoked.");
     }

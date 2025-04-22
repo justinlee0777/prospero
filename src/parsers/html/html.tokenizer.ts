@@ -25,6 +25,7 @@ export interface HTMLToken {
     closing?: string;
   };
   type: TokenType.HTML;
+  footnote?: Element;
 }
 
 /**
@@ -35,6 +36,10 @@ export interface EndHTMLToken {
   type: TokenType.END_HTML;
 }
 
+interface Config {
+  footnotes?: string;
+}
+
 /**
  * Creates tokens out of an HTML string that the HTMLParser consumes.
  */
@@ -42,36 +47,51 @@ export default class HTMLTokenizer {
   private static allowedVoidTags = allowedVoidTags;
   private static voidTags = voidTags;
 
-  constructor() {}
+  private generator: Generator<Token>;
 
-  *getTokens(text: string): Generator<Token> {
+  private footnotes: Array<Element> = [];
+
+  constructor(text: string, config: Config) {
     const loader = this.loadHTML(text);
 
-    yield* this.parseHTMLElement(this.getRoot(loader));
+    const element = this.getRoot(loader);
+
+    if (config.footnotes) {
+      const footnotes = (this.footnotes = [
+        ...element.querySelectorAll(config.footnotes),
+      ]);
+
+      footnotes.forEach((element) => element.remove());
+    }
+
+    this.generator = this.parseHTMLElement(element, config);
   }
 
-  loadHTML(text: string): Document {
+  *getTokens(): Generator<Token> {
+    yield* this.generator;
+  }
+
+  private loadHTML(text: string): Document {
     const parser = new DOMParser();
     return parser.parseFromString(text, 'text/html');
   }
 
-  getRoot(document: Document): HTMLElement {
+  private getRoot(document: Document): HTMLElement {
     return document.body;
   }
 
-  getInnerHTML(element: HTMLElement): string {
-    return element.innerHTML;
-  }
-
-  getOuterHTML(element: HTMLElement): string {
+  private getOuterHTML(element: HTMLElement): string {
     return element.outerHTML;
   }
 
-  getText(element: HTMLElement): string {
+  private getText(element: HTMLElement): string {
     return element.textContent ?? '';
   }
 
-  private *parseHTMLElement(element: Element): Generator<Token> {
+  private *parseHTMLElement(
+    element: Element,
+    config: Config
+  ): Generator<Token> {
     for (const node of element.childNodes) {
       switch (node.nodeType) {
         case 1:
@@ -84,6 +104,20 @@ export default class HTMLTokenizer {
 
           const openingPattern = /<[A-Za-z0-9]+.*?\/?>/;
 
+          let footnote: Element | undefined;
+
+          if (this.footnotes.length > 0) {
+            const footnoteIdentifier = (element as HTMLAnchorElement).href
+              ?.split('#')
+              .at(-1);
+
+            if (footnoteIdentifier) {
+              footnote = this.footnotes.find((element) =>
+                element.matches(`#${footnoteIdentifier}`)
+              );
+            }
+          }
+
           yield {
             tag: {
               name: tagName,
@@ -92,9 +126,10 @@ export default class HTMLTokenizer {
               closing,
             },
             type: TokenType.HTML,
+            footnote,
           };
 
-          yield* this.parseHTMLElement(element);
+          yield* this.parseHTMLElement(element, config);
 
           break;
         case 3:
