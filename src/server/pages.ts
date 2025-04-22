@@ -174,7 +174,9 @@ export default class Pages implements IPages {
 
         const webPages: WebPages = new WebPagesClass(...constructorParameters);
 
-        return webPages.getAll();
+        const pages = webPages.getAll();
+
+        return pages;
       },
       {
         sourceUrl: this.webPagesSourceUrl,

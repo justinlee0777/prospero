@@ -10,4 +10,7 @@ export default interface PagesConfig {
   sectionBreak?: {
     beginningSelector: string;
   };
+  footnotes?: {
+    footnoteSelector: string;
+  };
 }
