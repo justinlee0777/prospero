@@ -13,12 +13,12 @@ import useBook from './use-book.effect';
 describe('useBook', () => {
   let appendChildSpy: jest.Mock;
 
-  function UseBookTest(props: any): JSX.Element {
+  function UseBookTest(props: any) {
     props ||= {};
 
     const { classname, noBook } = props;
 
-    const ref = useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLDivElement | null>(null);
 
     useBook(
       ref,

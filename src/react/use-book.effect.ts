@@ -18,7 +18,7 @@ import FlexibleBookElement from '../web/flexible-book/flexible-book-element.inte
  * @returns a function that destroys the book.
  */
 export default function useBook(
-  containerRef: RefObject<HTMLElement>,
+  containerRef: RefObject<HTMLElement | null>,
   createBook: () => BooksElement | FlexibleBookElement | null,
   deps: Array<unknown> = []
 ): void {
