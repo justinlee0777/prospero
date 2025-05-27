@@ -1,57 +1,57 @@
 {
   "name": "prospero",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "sideEffects": false,
   "type": "module",
   "exports": {
     "./server": {
-      "export": "./server.js",
+      "import": "./server.js",
       "types": "./server.d.ts"
     },
     "./web": {
-      "export": "./web.js",
+      "import": "./web.js",
       "types": "./web.js"
     },
     "./types": "./types.d.ts",
     "./models": "./models/index.d.ts",
     "./server/pages": "./server/pages.js",
     "./server/server-pages": {
-      "export": "./server/server-pages.js",
+      "import": "./server/server-pages.js",
       "types": "./server/server-pages.d.ts"
     },
     "./server/transformers": {
-      "export": "./server/transformers.js",
+      "import": "./server/transformers.js",
       "types": "./server/transformers/index.d.ts"
     },
     "./web/book": "./web/book.js",
     "./web/books": "./web/books.js",
     "./web/flexible-book": {
-      "export": "./web/flexible-book.js",
+      "import": "./web/flexible-book.js",
       "types": "./web/flexible-book/index.d.ts"
     },
     "./web/book/animations": {
-      "export": "./web/book/animations.js",
+      "import": "./web/book/animations.js",
       "types": "./web/book/animations/index.d.ts"
     },
     "./web/book/theming": {
-      "export": "./web/book/theming.js",
+      "import": "./web/book/theming.js",
       "types": "./web/book/theming/index.d.ts"
     },
     "./web/book/listeners": {
-      "export": "./web/book/listeners.js",
+      "import": "./web/book/listeners.js",
       "types": "./web/book/listeners/index.d.ts"
     },
     "./web/pages": {
-      "export": "./web/pages.js",
+      "import": "./web/pages.js",
       "types": "./web/pages.d.ts"
     },
     "./web/server-pages": "./web/server-pages.js",
     "./web/transformers": {
-      "export": "./web/transformers.js",
+      "import": "./web/transformers.js",
       "types": "./web/transformers/types.d.ts"
     },
     "./web/react": {
-      "export": "./web/react.js",
+      "import": "./web/react.js",
       "types": "./web/react/index.d.ts"
     }
   },
