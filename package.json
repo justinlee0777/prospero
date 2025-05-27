@@ -4,21 +4,56 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    "./server": "./server.js",
-    "./web": "./web.js",
+    "./server": {
+      "export": "./server.js",
+      "types": "./server.d.ts"
+    },
+    "./web": {
+      "export": "./web.js",
+      "types": "./web.js"
+    },
+    "./types": "./types.d.ts",
+    "./models": "./models/index.d.ts",
     "./server/pages": "./server/pages.js",
-    "./server/server-pages": "./server/server-pages.js",
-    "./server/transformers": "./server/transformers.js",
+    "./server/server-pages": {
+      "export": "./server/server-pages.js",
+      "types": "./server/server-pages.d.ts"
+    },
+    "./server/transformers": {
+      "export": "./server/transformers.js",
+      "types": "./server/transformers/index.d.ts"
+    },
     "./web/book": "./web/book.js",
     "./web/books": "./web/books.js",
-    "./web/flexible-book": "./web/flexible-book.js",
-    "./web/book/animations": "./web/book/animations.js",
-    "./web/book/theming": "./web/book/theming.js",
-    "./web/book/listeners": "./web/book/listeners.js",
-    "./web/pages": "./web/pages.js",
+    "./web/flexible-book": {
+      "export": "./web/flexible-book.js",
+      "types": "./web/flexible-book/index.d.ts"
+    },
+    "./web/book/animations": {
+      "export": "./web/book/animations.js",
+      "types": "./web/book/animations/index.d.ts"
+    },
+    "./web/book/theming": {
+      "export": "./web/book/theming.js",
+      "types": "./web/book/theming/index.d.ts"
+    },
+    "./web/book/listeners": {
+      "export": "./web/book/listeners.js",
+      "types": "./web/book/listeners/index.d.ts"
+    },
+    "./web/pages": {
+      "export": "./web/pages.js",
+      "types": "./web/pages.d.ts"
+    },
     "./web/server-pages": "./web/server-pages.js",
-    "./web/transformers": "./web/transformers.js",
-    "./web/react": "./web/react.js"
+    "./web/transformers": {
+      "export": "./web/transformers.js",
+      "types": "./web/transformers/types.d.ts"
+    },
+    "./web/react": {
+      "export": "./web/react.js",
+      "types": "./web/react/index.d.ts"
+    }
   },
   "scripts": {
     "start": "rm -rf dist dev && (rollup -c & rollup -c ./rollup.config.dev.js) && (http-server -c-1 ./dist & http-server -c-1 ./dev -p 3000)",
